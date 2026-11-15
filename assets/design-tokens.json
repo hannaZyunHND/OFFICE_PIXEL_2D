@@ -1,0 +1,86 @@
+{
+  "$schema": "https://tr.designtokens.org/format/",
+  "meta": {
+    "project": "Pixel Agent Office",
+    "version": "1.0.0",
+    "architecture": "three-layer (primitive -> semantic -> component)"
+  },
+  "primitive": {
+    "color": {
+      "slate-950": "#020617",
+      "slate-900": "#0F172A",
+      "slate-850": "#1B2336",
+      "slate-800": "#1E293B",
+      "slate-700": "#334155",
+      "slate-600": "#475569",
+      "slate-400": "#94A3B8",
+      "slate-50": "#F8FAFC",
+      "emerald-500": "#22C55E",
+      "emerald-600": "#16A34A",
+      "emerald-400": "#4ADE80",
+      "sky-400": "#38BDF8",
+      "amber-500": "#F59E0B",
+      "purple-500": "#A855F7",
+      "purple-400": "#C084FC",
+      "red-500": "#EF4444",
+      "zone-work-base": "#1E293B",
+      "zone-work-alt": "#243247",
+      "zone-approval-base": "#2E1F3E",
+      "zone-approval-alt": "#38264B",
+      "zone-idle-base": "#1F2E2B",
+      "zone-idle-alt": "#263935"
+    },
+    "font": {
+      "pixel": "'Silkscreen', 'JetBrains Mono', monospace",
+      "mono": "'JetBrains Mono', monospace",
+      "sans": "'IBM Plex Sans', system-ui, -apple-system, sans-serif"
+    },
+    "space": {
+      "2xs": "2px",
+      "xs": "4px",
+      "sm": "8px",
+      "md": "12px",
+      "lg": "16px",
+      "xl": "24px",
+      "2xl": "32px"
+    },
+    "tile": {
+      "base": "32px",
+      "scale-desktop": "2"
+    }
+  },
+  "semantic": {
+    "color": {
+      "canvas-void": "{primitive.color.slate-950}",
+      "background": "{primitive.color.slate-900}",
+      "card": "{primitive.color.slate-850}",
+      "muted": "{primitive.color.slate-800}",
+      "foreground": "{primitive.color.slate-50}",
+      "muted-foreground": "{primitive.color.slate-400}",
+      "border": "{primitive.color.slate-700}",
+      "accent": "{primitive.color.emerald-500}",
+      "accent-hover": "{primitive.color.emerald-600}",
+      "godview": "{primitive.color.sky-400}",
+      "handoff": "{primitive.color.amber-500}",
+      "editmode": "{primitive.color.purple-500}",
+      "destructive": "{primitive.color.red-500}"
+    }
+  },
+  "component": {
+    "hud-bar": {
+      "height": "48px",
+      "bg": "rgba(15, 23, 42, 0.90)",
+      "border": "{semantic.color.border}"
+    },
+    "inspector-drawer": {
+      "width": "380px",
+      "bg": "rgba(15, 23, 42, 0.95)",
+      "border": "{semantic.color.border}"
+    },
+    "run-demo-btn": {
+      "bg": "{semantic.color.accent}",
+      "fg": "{primitive.color.slate-950}",
+      "hover-bg": "{semantic.color.accent-hover}"
+    }
+  }
+}

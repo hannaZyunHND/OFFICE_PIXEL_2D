@@ -1,0 +1,70 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://pixel-agent-office.local/schemas/llm-topology.schema.json",
+  "title": "Stage1SemanticTopology",
+  "description": "Stage 1 LLM Structured Output Schema for extracting multi-agent topology from Markdown WITHOUT spatial (x, y) coordinates.",
+  "type": "object",
+  "required": ["project_name", "zones", "agents", "edges"],
+  "additionalProperties": false,
+  "properties": {
+    "project_name": {
+      "type": "string",
+      "description": "Concise title of the multi-agent system extracted from the Markdown document."
+    },
+    "zones": {
+      "type": "array",
+      "minItems": 1,
+      "description": "Functional rooms/departments. Do NOT include coordinates.",
+      "items": {
+        "type": "object",
+        "required": ["id", "name", "type", "props"],
+        "additionalProperties": false,
+        "properties": {
+          "id": { "type": "string" },
+          "name": { "type": "string" },
+          "type": { "type": "string", "enum": ["WORK", "APPROVAL", "IDLE"] },
+          "props": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": ["COFFEE_MACHINE", "SOFA", "PLANT", "AQUARIUM", "WHITEBOARD", "BOOKSHELF"]
+            }
+          }
+        }
+      }
+    },
+    "agents": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": ["id", "name", "role", "zone_id", "color", "avatar_sprite"],
+        "additionalProperties": false,
+        "properties": {
+          "id": { "type": "string" },
+          "name": { "type": "string" },
+          "role": { "type": "string" },
+          "zone_id": { "type": "string", "description": "ID of the WORK or APPROVAL zone where this agent's desk belongs." },
+          "color": { "type": "string", "pattern": "^#[0-9a-fA-F]{6}$" },
+          "avatar_sprite": {
+            "type": "string",
+            "enum": ["default_scientist", "default_coder", "default_writer", "default_manager", "default_reviewer"]
+          }
+        }
+      }
+    },
+    "edges": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["from", "to", "label"],
+        "additionalProperties": false,
+        "properties": {
+          "from": { "type": "string" },
+          "to": { "type": "string" },
+          "label": { "type": "string" }
+        }
+      }
+    }
+  }
+}

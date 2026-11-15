@@ -1,0 +1,453 @@
+{
+  "meta": {
+    "project_name": "MULTI-AGENT GAME FACTORY (CREWAI FLOWS)",
+    "grid_cols": 28,
+    "grid_rows": 23,
+    "tile_size": 32
+  },
+  "zones": [
+    {
+      "id": "zone_work",
+      "name": "Phase 1 & 2: Pre-Prod & 3 Game Streams",
+      "type": "WORK",
+      "rect": [
+        1,
+        1,
+        18,
+        21
+      ]
+    },
+    {
+      "id": "zone_approval",
+      "name": "QA Playwright, Vision Critic & Deploy",
+      "type": "APPROVAL",
+      "rect": [
+        20,
+        1,
+        7,
+        12
+      ]
+    },
+    {
+      "id": "zone_pantry",
+      "name": "Game Studio Pantry & Lounge",
+      "type": "IDLE",
+      "rect": [
+        20,
+        14,
+        7,
+        8
+      ]
+    }
+  ],
+  "furniture": [
+    {
+      "id": "furn_desk_agent_pedagogy",
+      "type": "DESK_PC",
+      "x": 3,
+      "y": 4,
+      "footprint": [
+        2,
+        1
+      ],
+      "interaction_point": [
+        3,
+        5
+      ],
+      "facing": "UP",
+      "agent_id": "agent_pedagogy"
+    },
+    {
+      "id": "furn_desk_agent_creative",
+      "type": "DESK_PC",
+      "x": 8,
+      "y": 4,
+      "footprint": [
+        2,
+        1
+      ],
+      "interaction_point": [
+        8,
+        5
+      ],
+      "facing": "UP",
+      "agent_id": "agent_creative"
+    },
+    {
+      "id": "furn_desk_agent_art_audio",
+      "type": "DESK_PC",
+      "x": 13,
+      "y": 4,
+      "footprint": [
+        2,
+        1
+      ],
+      "interaction_point": [
+        13,
+        5
+      ],
+      "facing": "UP",
+      "agent_id": "agent_art_audio"
+    },
+    {
+      "id": "furn_desk_agent_level_designer",
+      "type": "DESK_PC",
+      "x": 3,
+      "y": 8,
+      "footprint": [
+        2,
+        1
+      ],
+      "interaction_point": [
+        3,
+        9
+      ],
+      "facing": "UP",
+      "agent_id": "agent_level_designer"
+    },
+    {
+      "id": "furn_desk_agent_dev_arcade",
+      "type": "DESK_PC",
+      "x": 8,
+      "y": 8,
+      "footprint": [
+        2,
+        1
+      ],
+      "interaction_point": [
+        8,
+        9
+      ],
+      "facing": "UP",
+      "agent_id": "agent_dev_arcade"
+    },
+    {
+      "id": "furn_desk_agent_dev_sim",
+      "type": "DESK_PC",
+      "x": 13,
+      "y": 8,
+      "footprint": [
+        2,
+        1
+      ],
+      "interaction_point": [
+        13,
+        9
+      ],
+      "facing": "UP",
+      "agent_id": "agent_dev_sim"
+    },
+    {
+      "id": "furn_desk_agent_dev_puzzle",
+      "type": "DESK_PC",
+      "x": 3,
+      "y": 12,
+      "footprint": [
+        2,
+        1
+      ],
+      "interaction_point": [
+        3,
+        13
+      ],
+      "facing": "UP",
+      "agent_id": "agent_dev_puzzle"
+    },
+    {
+      "id": "furn_desk_agent_portal_packager",
+      "type": "DESK_PC",
+      "x": 8,
+      "y": 12,
+      "footprint": [
+        2,
+        1
+      ],
+      "interaction_point": [
+        8,
+        13
+      ],
+      "facing": "UP",
+      "agent_id": "agent_portal_packager"
+    },
+    {
+      "id": "furn_desk_agent_qa_hunter",
+      "type": "DESK_PC",
+      "x": 22,
+      "y": 3,
+      "footprint": [
+        2,
+        1
+      ],
+      "interaction_point": [
+        22,
+        4
+      ],
+      "facing": "UP",
+      "agent_id": "agent_qa_hunter"
+    },
+    {
+      "id": "furn_desk_agent_vision_critic",
+      "type": "DESK_PC",
+      "x": 22,
+      "y": 6,
+      "footprint": [
+        2,
+        1
+      ],
+      "interaction_point": [
+        22,
+        7
+      ],
+      "facing": "UP",
+      "agent_id": "agent_vision_critic"
+    },
+    {
+      "id": "furn_desk_agent_devops_deployer",
+      "type": "DESK_PC",
+      "x": 22,
+      "y": 9,
+      "footprint": [
+        2,
+        1
+      ],
+      "interaction_point": [
+        22,
+        10
+      ],
+      "facing": "UP",
+      "agent_id": "agent_devops_deployer"
+    },
+    {
+      "id": "furn_bookshelf_auto",
+      "type": "BOOKSHELF",
+      "x": 2,
+      "y": 2,
+      "footprint": [
+        2,
+        1
+      ],
+      "interaction_point": [
+        2,
+        3
+      ],
+      "facing": "UP"
+    },
+    {
+      "id": "furn_whiteboard_auto",
+      "type": "WHITEBOARD",
+      "x": 12,
+      "y": 2,
+      "footprint": [
+        2,
+        1
+      ],
+      "interaction_point": [
+        12,
+        3
+      ],
+      "facing": "UP"
+    },
+    {
+      "id": "furn_coffee_auto",
+      "type": "COFFEE_MACHINE",
+      "x": 21,
+      "y": 15,
+      "footprint": [
+        1,
+        1
+      ],
+      "interaction_point": [
+        21,
+        16
+      ],
+      "facing": "UP"
+    },
+    {
+      "id": "furn_aquarium_auto",
+      "type": "AQUARIUM",
+      "x": 24,
+      "y": 15,
+      "footprint": [
+        2,
+        1
+      ],
+      "interaction_point": [
+        24,
+        16
+      ],
+      "facing": "UP"
+    },
+    {
+      "id": "furn_sofa_auto",
+      "type": "SOFA",
+      "x": 22,
+      "y": 19,
+      "footprint": [
+        2,
+        1
+      ],
+      "interaction_point": [
+        22,
+        18
+      ],
+      "facing": "DOWN"
+    }
+  ],
+  "agents": [
+    {
+      "id": "agent_pedagogy",
+      "name": "Pedagogy Analyst",
+      "role": "Phase 1 (claude-3-7-sonnet): Phân tích sư phạm & Chuẩn kiến thức chủ đề",
+      "color": "#38bdf8",
+      "avatar_sprite": "default_scientist",
+      "desk_id": "furn_desk_agent_pedagogy"
+    },
+    {
+      "id": "agent_creative",
+      "name": "Creative Director",
+      "role": "Phase 1 (o3-mini): Thiết kế cơ chế Gameplay 3 dòng (Arcade / Sim / Puzzle)",
+      "color": "#f59e0b",
+      "avatar_sprite": "default_manager",
+      "desk_id": "furn_desk_agent_creative"
+    },
+    {
+      "id": "agent_art_audio",
+      "name": "Art & Audio Director",
+      "role": "Phase 1 (claude-3-7-sonnet): Định hướng mỹ thuật & Xuất MasterBlueprint (3 GDDs)",
+      "color": "#ec4899",
+      "avatar_sprite": "default_writer",
+      "desk_id": "furn_desk_agent_art_audio"
+    },
+    {
+      "id": "agent_level_designer",
+      "name": "Level Designer (3 Streams)",
+      "role": "Phase 2 (claude-3-7-sonnet): Thiết kế màn chơi song song (asyncio.gather)",
+      "color": "#a855f7",
+      "avatar_sprite": "default_scientist",
+      "desk_id": "furn_desk_agent_level_designer"
+    },
+    {
+      "id": "agent_dev_arcade",
+      "name": "Game Dev [Stream 1: Arcade]",
+      "role": "Stream 1 (claude-3-7-sonnet): Code Game Arcade/Physics [FileWriter/Patcher]",
+      "color": "#22c55e",
+      "avatar_sprite": "default_coder",
+      "desk_id": "furn_desk_agent_dev_arcade"
+    },
+    {
+      "id": "agent_dev_sim",
+      "name": "Game Dev [Stream 2: Sim]",
+      "role": "Stream 2 (claude-3-7-sonnet): Code Game Simulation [FileWriter/Patcher]",
+      "color": "#14b8a6",
+      "avatar_sprite": "default_coder",
+      "desk_id": "furn_desk_agent_dev_sim"
+    },
+    {
+      "id": "agent_dev_puzzle",
+      "name": "Game Dev [Stream 3: Puzzle]",
+      "role": "Stream 3 (claude-3-7-sonnet): Code Game Puzzle/Logic [FileWriter/Patcher]",
+      "color": "#6366f1",
+      "avatar_sprite": "default_coder",
+      "desk_id": "furn_desk_agent_dev_puzzle"
+    },
+    {
+      "id": "agent_portal_packager",
+      "name": "Portal UI Packager",
+      "role": "Phase 3 (claude-3-7-sonnet): Gom game PASS >= 1 [iframe + Fullscreen/Mute]",
+      "color": "#06b6d4",
+      "avatar_sprite": "default_writer",
+      "desk_id": "furn_desk_agent_portal_packager"
+    },
+    {
+      "id": "agent_qa_hunter",
+      "name": "Headless QA Hunter",
+      "role": "Phase 2 QA (gpt-4o-mini): Kiểm thử tự động 3 luồng [Playwright Browser]",
+      "color": "#f97316",
+      "avatar_sprite": "default_reviewer",
+      "desk_id": "furn_desk_agent_qa_hunter"
+    },
+    {
+      "id": "agent_vision_critic",
+      "name": "Vision Critic",
+      "role": "Phase 2 Critic (gpt-4o / claude-3.7): Chấm điểm [ImageReader] Score >= 8.0?",
+      "color": "#eab308",
+      "avatar_sprite": "default_reviewer",
+      "desk_id": "furn_desk_agent_vision_critic"
+    },
+    {
+      "id": "agent_devops_deployer",
+      "name": "DevOps Deployer",
+      "role": "Phase 3 Deploy (gpt-4o-mini): [Vercel/SSH + QR Code Lớp Học]",
+      "color": "#10b981",
+      "avatar_sprite": "default_manager",
+      "desk_id": "furn_desk_agent_devops_deployer"
+    }
+  ],
+  "edges": [
+    {
+      "from": "agent_pedagogy",
+      "to": "agent_creative",
+      "label": "Pedagogy Spec"
+    },
+    {
+      "from": "agent_creative",
+      "to": "agent_art_audio",
+      "label": "3 Game Mechanics"
+    },
+    {
+      "from": "agent_art_audio",
+      "to": "agent_level_designer",
+      "label": "MasterBlueprint (3 GDDs)"
+    },
+    {
+      "from": "agent_level_designer",
+      "to": "agent_dev_arcade",
+      "label": "Stream 1: Arcade GDD"
+    },
+    {
+      "from": "agent_level_designer",
+      "to": "agent_dev_sim",
+      "label": "Stream 2: Sim GDD"
+    },
+    {
+      "from": "agent_level_designer",
+      "to": "agent_dev_puzzle",
+      "label": "Stream 3: Puzzle GDD"
+    },
+    {
+      "from": "agent_dev_arcade",
+      "to": "agent_qa_hunter",
+      "label": "Arcade HTML5 Build"
+    },
+    {
+      "from": "agent_dev_sim",
+      "to": "agent_qa_hunter",
+      "label": "Sim HTML5 Build"
+    },
+    {
+      "from": "agent_dev_puzzle",
+      "to": "agent_qa_hunter",
+      "label": "Puzzle HTML5 Build"
+    },
+    {
+      "from": "agent_qa_hunter",
+      "to": "agent_vision_critic",
+      "label": "Playwright Captures"
+    },
+    {
+      "from": "agent_vision_critic",
+      "to": "agent_dev_sim",
+      "label": "NO (<8.0): Loop Fix UI"
+    },
+    {
+      "from": "agent_vision_critic",
+      "to": "agent_portal_packager",
+      "label": "PASS >= 8.0 (3 Games)"
+    },
+    {
+      "from": "agent_portal_packager",
+      "to": "agent_devops_deployer",
+      "label": "Portal + QR Package"
+    }
+  ]
+}

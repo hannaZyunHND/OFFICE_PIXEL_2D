@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8" />
+<title>Multi-Agent Game Factory Portal — Chế tạo game giải đố vật lý ma sát trượt</title>
+<style>
+  * { box-sizing: border-box; font-family: 'Segoe UI', system-ui, sans-serif; }
+  body { margin: 0; background: #020617; color: #f8fafc; display: flex; flex-direction: column; height: 100vh; overflow: hidden; }
+  header { display: flex; align-items: center; justify-content: space-between; padding: 10px 18px; background: #0f172a; border-bottom: 1px solid #334155; flex-wrap: wrap; gap: 8px; }
+  .llm-badge { background: #22c55e22; border: 1px solid #22c55e88; color: #4ade80; padding: 3px 10px; border-radius: 999px; font-size: 11px; font-weight: 800; margin-left: 8px; }
+  .tabs { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+  .tab { padding: 7px 12px; border-radius: 8px; background: #1e293b; color: #94a3b8; border: 1px solid #334155; font-size: 12px; font-weight: 700; cursor: pointer; text-decoration: none; }
+  .tab.active { background: #38bdf8; color: #020617; border-color: #38bdf8; }
+  .zip-btn { background: #a855f7; color: #fff; border-color: #a855f7; }
+  iframe { flex: 1; width: 100%; border: none; background: #0f172a; }
+  #codexPanel { display: none; flex: 1; overflow-y: auto; padding: 20px; background: #020617; }
+  pre { background: #0f172a; border: 1px solid #334155; padding: 16px; border-radius: 12px; color: #7dd3fc; font-family: Consolas, monospace; font-size: 12px; white-space: pre-wrap; }
+</style>
+</head>
+<body>
+  <header>
+    <div style="display:flex;align-items:center;flex-wrap:wrap;gap:4px;">
+      <strong style="color:#38bdf8;font-size:14px;">🎮 MULTI-AGENT GAME FACTORY PORTAL</strong>
+      <span style="font-size:12px;color:#f8fafc;margin-left:8px;font-weight:700;">Chủ đề: Chế tạo game giải đố vật lý ma sát trượt</span>
+      <span class="llm-badge">⚡ LLM: gpt-6-luna (codex-cli)</span>
+    </div>
+    <div class="tabs">
+      <button class="tab active" onclick="switchGame('stream1_arcade.html?v=1794717943735', this)">🎯 Stream 1: Arcade</button>
+      <button class="tab" onclick="switchGame('stream2_sim.html?v=1794717943735', this)">🔬 Stream 2: Sim Lab (v1.1)</button>
+      <button class="tab" onclick="switchGame('stream3_puzzle.html?v=1794717943735', this)">🧩 Stream 3: Puzzle</button>
+      <button class="tab" onclick="showCodexBlueprint(this)">📋 Codex CLI GDD & Critic</button>
+      <a class="tab zip-btn" href="game_factory_codex_bundle.zip?v=1794717943735" download="game_factory_codex_bundle.zip">📦 Tải .ZIP</a>
+      <button class="tab" onclick="document.documentElement.requestFullscreen?.()">⛶ Fullscreen</button>
+    </div>
+  </header>
+  <iframe id="gameFrame" src="stream1_arcade.html?v=1794717943735"></iframe>
+  <div id="codexPanel">
+    <h3 style="margin-top:0;color:#38bdf8;">⚡ Dữ Liệu MasterBlueprint & AI Critic Sinh Trực Tiếp Bởi gpt-6-luna (codex-cli)</h3>
+    <p style="font-size:13px;color:#94a3b8;">Công thức trọng tâm: <b style="color:#4ade80;">Fₘₛ = μₜN</b></p>
+    <pre>{
+  "topic_title": "Giải đố về lực ma sát trượt",
+  "grade": "Vật lí lớp 10",
+  "formula": "Fₘₛ = μₜN",
+  "core_competencies": [
+    "Xác định lực ma sát trượt từ hệ số ma sát và áp lực pháp tuyến.",
+    "Phân tích ảnh hưởng của vật liệu tiếp xúc và áp lực lên lực ma sát trượt.",
+    "Vận dụng lực ma sát trượt để dự đoán chuyển động và giải quyết tình huống thực tế."
+  ],
+  "stream_1_title": "Bắn trúng lực ma sát",
+  "stream_1_mechanic": "Đọc nhanh tình huống, tính lực ma sát trượt rồi bắn vào mục tiêu mang đáp án đúng. Độ chính xác và thời gian trả lời quyết định điểm số.",
+  "stream_2_title": "Phòng thí nghiệm mặt trượt",
+  "stream_2_mechanic": "Kéo thanh trượt để thay đổi khối lượng vật và hệ số ma sát của bề mặt. Quan sát lực ma sát trượt thay đổi theo Fₘₛ = μₜmg trên mặt phẳng ngang, đồng thời so sánh các vật liệu và tải trọng.",
+  "stream_3_title": "Ma trận ghép cặp ma sát",
+  "stream_3_mechanic": "Ghép các thẻ khái niệm, công thức và đại lượng với ý nghĩa hoặc giá trị tương ứng. Hoàn thành đủ các cặp trước khi hết giờ để mở khóa màn tiếp theo.",
+  "arcade_questions": [
+    {
+      "q": "Một thùng đang trượt trên sàn ngang. Hệ số ma sát trượt là 0,2 và phản lực của sàn lên thùng là 100 N. Lực ma sát trượt có độ lớn bao nhiêu?",
+      "ans": "20 N",
+      "opts": [
+        "20 N",
+        "5 N",
+        "100 N",
+        "120 N"
+      ],
+      "explain": "Fₘₛ = μₜN = 0,2 × 100 = 20 N."
+    },
+    {
+      "q": "Một hộp 5 kg trượt trên sàn ngang có hệ số ma sát trượt 0,4. Lấy g = 10 m/s². Lực ma sát trượt bằng bao nhiêu?",
+      "ans": "20 N",
+      "opts": [
+        "20 N",
+        "2 N",
+        "50 N",
+        "200 N"
+      ],
+      "explain": "Trên mặt phẳng ngang, N = mg = 50 N nên Fₘₛ = 0,4 × 50 = 20 N."
+    },
+    {
+      "q": "Một vật đang trượt sang phải trên mặt bàn. Lực ma sát trượt tác dụng lên vật hướng nào?",
+      "ans": "Sang trái",
+      "opts": [
+        "Sang trái",
+        "Sang phải",
+        "Thẳng đứng lên",
+        "Thẳng đứng xuống"
+      ],
+      "explain": "Lực ma sát trượt ngược chiều chuyển động tương đối giữa hai bề mặt tiếp xúc."
+    },
+    {
+      "q": "Vật trượt trên mặt phẳng ngang. Khối lượng giữ nguyên, còn hệ số ma sát trượt tăng gấp đôi. Lực ma sát trượt thay đổi thế nào?",
+      "ans": "Tăng gấp đôi",
+      "opts": [
+        "Tăng gấp đôi",
+        "Giảm một nửa",
+        "Không đổi",
+        "Tăng gấp bốn"
+      ],
+      "explain": "Vì Fₘₛ = μₜN và N không đổi, lực ma sát tỉ lệ thuận với hệ số ma sát."
+    },
+    {
+      "q": "Một kiện hàng 10 kg trượt trên sàn ngang với hệ số ma sát trượt 0,3. Lấy g = 10 m/s². Cần lực kéo ngang bao nhiêu để kiện hàng chuyển động thẳng đều?",
+      "ans": "30 N",
+      "opts": [
+        "30 N",
+        "10 N",
+        "100 N",
+        "300 N"
+      ],
+      "explain": "Chuyển động thẳng đều có hợp lực bằng 0, nên lực kéo cân bằng lực ma sát: F = μₜmg = 0,3 × 10 × 10 = 30 N."
+    }
+  ],
+  "sim_lab": {
+    "var1_label": "Khối lượng vật",
+    "var1_unit": "kg",
+    "var1_min": 1,
+    "var1_max": 50,
+    "var1_default": 10,
+    "var2_label": "Hệ số ma sát trượt",
+    "var2_unit": "không đơn vị",
+    "var2_min": 0.05,
+    "var2_max": 1,
+    "var2_default": 0.3,
+    "result_label": "Lực ma sát trượt",
+    "result_unit": "N",
+    "result_js": "v1 * v2 * 9.8",
+    "formula_note": "Với vật trượt trên mặt phẳng ngang, N = mg nên Fₘₛ = μₜmg. Giữ nguyên hệ số ma sát, tăng khối lượng làm lực ma sát tăng tương ứng; giữ nguyên khối lượng, tăng hệ số ma sát cũng làm lực ma sát tăng tương ứng. Mô hình lấy g = 9,8 m/s².",
+    "missions": [
+      "Nhiệm vụ 1: Đặt khối lượng 10 kg và hệ số ma sát 0,3; quan sát lực ma sát trượt là 29,4 N.",
+      "Nhiệm vụ 2: Giữ hệ số ma sát 0,3 và tăng khối lượng lên 20 kg; kiểm chứng lực ma sát tăng gấp đôi.",
+      "Nhiệm vụ 3: Với khối lượng 10 kg, điều chỉnh hệ số ma sát để lực ma sát trượt đạt 49 N."
+    ]
+  },
+  "puzzle_pairs": [
+    {
+      "left": "Fₘₛ = μₜN",
+      "right": "Công thức tính độ lớn lực ma sát trượt"
+    },
+    {
+      "left": "μₜ",
+      "right": "Hệ số ma sát trượt, phụ thuộc vào vật liệu và tình trạng bề mặt tiếp xúc"
+    },
+    {
+      "left": "N",
+      "right": "Độ lớn áp lực pháp tuyến giữa hai bề mặt"
+    },
+    {
+      "left": "Lực ma sát trượt",
+      "right": "Có hướng ngược chiều chuyển động tương đối tại mặt tiếp xúc"
+    },
+    {
+      "left": "Vật trượt trên mặt phẳng ngang",
+      "right": "N = mg, do đó Fₘₛ = μₜmg"
+    },
+    {
+      "left": "μₜ = 0,2 và N = 100 N",
+      "right": "Fₘₛ = 20 N"
+    }
+  ],
+  "mode": "codex_live",
+  "llm_engine": "gpt-6-luna (codex-cli)",
+  "codex_tokens": 3597,
+  "codex_session_id": "01a1dd85-d488-7d93-9f05-2284862505ff",
+  "sim_pro_tip": "Hãy nhớ: “μₜ cho biết bề mặt bám đến đâu, N cho biết hai mặt ép mạnh thế nào”; nhân hai yếu tố ấy sẽ ra lực ma sát trượt. Giữ nguyên μₜ thì tăng gấp đôi N sẽ làm Fₘₛ tăng gấp đôi.",
+  "critic_review": {
+    "arcade_score": 9.2,
+    "sim_initial_score": 7.3,
+    "puzzle_score": 9.4,
+    "sim_patch_feedback": "Stream 2 cần bổ sung hộp công thức trực quan làm rõ Fₘₛ = μₜN: lực ma sát trượt bằng hệ số ma sát trượt nhân với lực pháp tuyến. Thêm mẹo ghi nhớ nhanh để người chơi thấy ngay rằng μₜ hoặc N tăng thì Fₘₛ tăng tương ứng.",
+    "sim_pro_tip": "Hãy nhớ: “μₜ cho biết bề mặt bám đến đâu, N cho biết hai mặt ép mạnh thế nào”; nhân hai yếu tố ấy sẽ ra lực ma sát trượt. Giữ nguyên μₜ thì tăng gấp đôi N sẽ làm Fₘₛ tăng gấp đôi.",
+    "sim_final_score": 9.1,
+    "tokens_used": 4108,
+    "model": "gpt-6-luna (codex-cli)"
+  }
+}</pre>
+  </div>
+<script>
+function switchGame(src, btn) {
+  document.getElementById('codexPanel').style.display = 'none';
+  const frame = document.getElementById('gameFrame');
+  frame.style.display = 'block';
+  frame.src = src;
+  document.querySelectorAll('.tab').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+}
+function showCodexBlueprint(btn) {
+  document.getElementById('gameFrame').style.display = 'none';
+  document.getElementById('codexPanel').style.display = 'block';
+  document.querySelectorAll('.tab').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+}
+</script>
+</body>
+</html>

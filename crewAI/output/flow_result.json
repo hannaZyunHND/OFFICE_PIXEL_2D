@@ -1,0 +1,212 @@
+{
+  "flow_name": "MULTI-AGENT GAME FACTORY (gpt-6-luna (codex-cli))",
+  "prompt": "Chế tạo game giải đố vật lý ma sát trượt",
+  "topic": "Chế tạo game giải đố vật lý ma sát trượt",
+  "llm_engine": "gpt-6-luna (codex-cli)",
+  "elapsed_seconds": 47.12,
+  "portal_url": "http://localhost:8766/portal.html?v=1794717943735",
+  "result_url": "http://localhost:8766/history/ch_t_o_game_gi_i_v_t_l_ma_s_t_tr_t_1794717943735/portal.html",
+  "zip_url": "http://localhost:8766/history/ch_t_o_game_gi_i_v_t_l_ma_s_t_tr_t_1794717943735/game_factory_codex_bundle.zip",
+  "zip_filename": "game_factory_codex_bundle.zip",
+  "files_count": 6,
+  "streams": [
+    {
+      "stream_id": "stream_1_arcade",
+      "name": "Stream 1: Bắn trúng lực ma sát",
+      "file": "stream1_arcade.html",
+      "score": 9.0,
+      "iterations": 1,
+      "verdict": "PASS",
+      "url": "http://localhost:8766/history/ch_t_o_game_gi_i_v_t_l_ma_s_t_tr_t_1794717943735/stream1_arcade.html"
+    },
+    {
+      "stream_id": "stream_2_sim",
+      "name": "Stream 2: Phòng thí nghiệm mặt trượt",
+      "file": "stream2_sim.html",
+      "score": 8.8,
+      "iterations": 2,
+      "verdict": "PASS",
+      "url": "http://localhost:8766/history/ch_t_o_game_gi_i_v_t_l_ma_s_t_tr_t_1794717943735/stream2_sim.html"
+    },
+    {
+      "stream_id": "stream_3_puzzle",
+      "name": "Stream 3: Ma trận ghép cặp ma sát",
+      "file": "stream3_puzzle.html",
+      "score": 9.3,
+      "iterations": 1,
+      "verdict": "PASS",
+      "url": "http://localhost:8766/history/ch_t_o_game_gi_i_v_t_l_ma_s_t_tr_t_1794717943735/stream3_puzzle.html"
+    }
+  ],
+  "master_blueprint": {
+    "prompt": "Chế tạo game giải đố vật lý ma sát trượt",
+    "llm_engine": "gpt-6-luna (codex-cli)",
+    "generated_at": "2026-11-15 11:45:31",
+    "pedagogy": {
+      "prompt": "Chế tạo game giải đố vật lý ma sát trượt",
+      "llm_engine": "gpt-6-luna (codex-cli)",
+      "codex_session_id": "01a1dd85-d488-7d93-9f05-2284862505ff",
+      "domain_mode": "codex_live",
+      "grade": "Vật lí lớp 10",
+      "core_formula": "Fₘₛ = μₜN",
+      "core_competencies": [
+        "Xác định lực ma sát trượt từ hệ số ma sát và áp lực pháp tuyến.",
+        "Phân tích ảnh hưởng của vật liệu tiếp xúc và áp lực lên lực ma sát trượt.",
+        "Vận dụng lực ma sát trượt để dự đoán chuyển động và giải quyết tình huống thực tế."
+      ]
+    },
+    "gdds": {
+      "llm_engine": "gpt-6-luna (codex-cli)",
+      "stream_1_arcade": {
+        "title": "Bắn trúng lực ma sát",
+        "mechanic": "Đọc nhanh tình huống, tính lực ma sát trượt rồi bắn vào mục tiêu mang đáp án đúng. Độ chính xác và thời gian trả lời quyết định điểm số.",
+        "levels_count": 5
+      },
+      "stream_2_sim": {
+        "title": "Phòng thí nghiệm mặt trượt",
+        "mechanic": "Kéo thanh trượt để thay đổi khối lượng vật và hệ số ma sát của bề mặt. Quan sát lực ma sát trượt thay đổi theo Fₘₛ = μₜmg trên mặt phẳng ngang, đồng thời so sánh các vật liệu và tải trọng.",
+        "sim_lab": {
+          "var1_label": "Khối lượng vật",
+          "var1_unit": "kg",
+          "var1_min": 1,
+          "var1_max": 50,
+          "var1_default": 10,
+          "var2_label": "Hệ số ma sát trượt",
+          "var2_unit": "không đơn vị",
+          "var2_min": 0.05,
+          "var2_max": 1,
+          "var2_default": 0.3,
+          "result_label": "Lực ma sát trượt",
+          "result_unit": "N",
+          "result_js": "v1 * v2 * 9.8",
+          "formula_note": "Với vật trượt trên mặt phẳng ngang, N = mg nên Fₘₛ = μₜmg. Giữ nguyên hệ số ma sát, tăng khối lượng làm lực ma sát tăng tương ứng; giữ nguyên khối lượng, tăng hệ số ma sát cũng làm lực ma sát tăng tương ứng. Mô hình lấy g = 9,8 m/s².",
+          "missions": [
+            "Nhiệm vụ 1: Đặt khối lượng 10 kg và hệ số ma sát 0,3; quan sát lực ma sát trượt là 29,4 N.",
+            "Nhiệm vụ 2: Giữ hệ số ma sát 0,3 và tăng khối lượng lên 20 kg; kiểm chứng lực ma sát tăng gấp đôi.",
+            "Nhiệm vụ 3: Với khối lượng 10 kg, điều chỉnh hệ số ma sát để lực ma sát trượt đạt 49 N."
+          ]
+        }
+      },
+      "stream_3_puzzle": {
+        "title": "Ma trận ghép cặp ma sát",
+        "mechanic": "Ghép các thẻ khái niệm, công thức và đại lượng với ý nghĩa hoặc giá trị tương ứng. Hoàn thành đủ các cặp trước khi hết giờ để mở khóa màn tiếp theo.",
+        "pairs_count": 6
+      }
+    },
+    "arcade_questions": [
+      {
+        "q": "Một thùng đang trượt trên sàn ngang. Hệ số ma sát trượt là 0,2 và phản lực của sàn lên thùng là 100 N. Lực ma sát trượt có độ lớn bao nhiêu?",
+        "ans": "20 N",
+        "opts": [
+          "20 N",
+          "5 N",
+          "100 N",
+          "120 N"
+        ],
+        "explain": "Fₘₛ = μₜN = 0,2 × 100 = 20 N."
+      },
+      {
+        "q": "Một hộp 5 kg trượt trên sàn ngang có hệ số ma sát trượt 0,4. Lấy g = 10 m/s². Lực ma sát trượt bằng bao nhiêu?",
+        "ans": "20 N",
+        "opts": [
+          "20 N",
+          "2 N",
+          "50 N",
+          "200 N"
+        ],
+        "explain": "Trên mặt phẳng ngang, N = mg = 50 N nên Fₘₛ = 0,4 × 50 = 20 N."
+      },
+      {
+        "q": "Một vật đang trượt sang phải trên mặt bàn. Lực ma sát trượt tác dụng lên vật hướng nào?",
+        "ans": "Sang trái",
+        "opts": [
+          "Sang trái",
+          "Sang phải",
+          "Thẳng đứng lên",
+          "Thẳng đứng xuống"
+        ],
+        "explain": "Lực ma sát trượt ngược chiều chuyển động tương đối giữa hai bề mặt tiếp xúc."
+      },
+      {
+        "q": "Vật trượt trên mặt phẳng ngang. Khối lượng giữ nguyên, còn hệ số ma sát trượt tăng gấp đôi. Lực ma sát trượt thay đổi thế nào?",
+        "ans": "Tăng gấp đôi",
+        "opts": [
+          "Tăng gấp đôi",
+          "Giảm một nửa",
+          "Không đổi",
+          "Tăng gấp bốn"
+        ],
+        "explain": "Vì Fₘₛ = μₜN và N không đổi, lực ma sát tỉ lệ thuận với hệ số ma sát."
+      },
+      {
+        "q": "Một kiện hàng 10 kg trượt trên sàn ngang với hệ số ma sát trượt 0,3. Lấy g = 10 m/s². Cần lực kéo ngang bao nhiêu để kiện hàng chuyển động thẳng đều?",
+        "ans": "30 N",
+        "opts": [
+          "30 N",
+          "10 N",
+          "100 N",
+          "300 N"
+        ],
+        "explain": "Chuyển động thẳng đều có hợp lực bằng 0, nên lực kéo cân bằng lực ma sát: F = μₜmg = 0,3 × 10 × 10 = 30 N."
+      }
+    ],
+    "sim_lab": {
+      "var1_label": "Khối lượng vật",
+      "var1_unit": "kg",
+      "var1_min": 1,
+      "var1_max": 50,
+      "var1_default": 10,
+      "var2_label": "Hệ số ma sát trượt",
+      "var2_unit": "không đơn vị",
+      "var2_min": 0.05,
+      "var2_max": 1,
+      "var2_default": 0.3,
+      "result_label": "Lực ma sát trượt",
+      "result_unit": "N",
+      "result_js": "v1 * v2 * 9.8",
+      "formula_note": "Với vật trượt trên mặt phẳng ngang, N = mg nên Fₘₛ = μₜmg. Giữ nguyên hệ số ma sát, tăng khối lượng làm lực ma sát tăng tương ứng; giữ nguyên khối lượng, tăng hệ số ma sát cũng làm lực ma sát tăng tương ứng. Mô hình lấy g = 9,8 m/s².",
+      "missions": [
+        "Nhiệm vụ 1: Đặt khối lượng 10 kg và hệ số ma sát 0,3; quan sát lực ma sát trượt là 29,4 N.",
+        "Nhiệm vụ 2: Giữ hệ số ma sát 0,3 và tăng khối lượng lên 20 kg; kiểm chứng lực ma sát tăng gấp đôi.",
+        "Nhiệm vụ 3: Với khối lượng 10 kg, điều chỉnh hệ số ma sát để lực ma sát trượt đạt 49 N."
+      ]
+    },
+    "puzzle_pairs": [
+      {
+        "left": "Fₘₛ = μₜN",
+        "right": "Công thức tính độ lớn lực ma sát trượt"
+      },
+      {
+        "left": "μₜ",
+        "right": "Hệ số ma sát trượt, phụ thuộc vào vật liệu và tình trạng bề mặt tiếp xúc"
+      },
+      {
+        "left": "N",
+        "right": "Độ lớn áp lực pháp tuyến giữa hai bề mặt"
+      },
+      {
+        "left": "Lực ma sát trượt",
+        "right": "Có hướng ngược chiều chuyển động tương đối tại mặt tiếp xúc"
+      },
+      {
+        "left": "Vật trượt trên mặt phẳng ngang",
+        "right": "N = mg, do đó Fₘₛ = μₜmg"
+      },
+      {
+        "left": "μₜ = 0,2 và N = 100 N",
+        "right": "Fₘₛ = 20 N"
+      }
+    ],
+    "critic_review": {
+      "arcade_score": 9.2,
+      "sim_initial_score": 7.3,
+      "puzzle_score": 9.4,
+      "sim_patch_feedback": "Stream 2 cần bổ sung hộp công thức trực quan làm rõ Fₘₛ = μₜN: lực ma sát trượt bằng hệ số ma sát trượt nhân với lực pháp tuyến. Thêm mẹo ghi nhớ nhanh để người chơi thấy ngay rằng μₜ hoặc N tăng thì Fₘₛ tăng tương ứng.",
+      "sim_pro_tip": "Hãy nhớ: “μₜ cho biết bề mặt bám đến đâu, N cho biết hai mặt ép mạnh thế nào”; nhân hai yếu tố ấy sẽ ra lực ma sát trượt. Giữ nguyên μₜ thì tăng gấp đôi N sẽ làm Fₘₛ tăng gấp đôi.",
+      "sim_final_score": 9.1,
+      "tokens_used": 4108,
+      "model": "gpt-6-luna (codex-cli)"
+    }
+  },
+  "qr_svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 150 150\" width=\"150\" height=\"150\" shape-rendering=\"crispEdges\">\n  <rect width=\"150\" height=\"150\" rx=\"10\" fill=\"#F8FAFC\" />\n  <rect x=\"12\" y=\"12\" width=\"6\" height=\"6\" fill=\"#020617\" />\n  <rect x=\"18\" y=\"12\" width=\"6\" height=\"6\" fill=\"#020617\" />\n  <rect x=\"24\" y=\"12\" width=\"6\" height=\"6\" fill=\"#020617\" />\n  <rect x=\"30\" y=\"12\" width=\"6\" height=\"6\" fill=\"#020617\" />\n  <rect x=\"36\" y=\"12\" width=\"6\" height=\"6\" fill=\"#020617\" />\n  <rect x=\"42\" y=\"12\" width=\"6\" height=\"6\" fill=\"#020617\" />\n  <rect x=\"48\" y=\"12\" width=\"6\" height=\"6\" fill=\"#020617\" />\n  <rect x=\"66\" y=\"12\" width=\"6\" height=\"6\" fill=\"#020617\" />\n  <rect x=\"78\" y=\"12\" width=\"6\" height=\"6\" fill=\"#020617\" />\n  <rect x=\"84\" y=\"12\" width=\"6\" height=\"6\" fill=\"#020617\" />\n  <rect x=\"96\" y=\"12\" width=\"6\" height=\"6\" fill=\"#020617\" />\n  <rect x=\"102\" y=\"12\" width=\"6\" height=\"6\" fill=\"#020617\" />\n  <rect x=\"108\" y=\"12\" width=\"6\" height=\"6\" fill=\"#020617\" />\n  <rect x=\"114\" y=\"12\" width=\"6\" height=\"6\" fill=\"#020617\" />\n  <rect x=\"120\" y=\"12\" width=\"6\" height=\"6\" fill=\"#020617\" />\n  <rect x=\"126\" y=\"12\" width=\"6\" height=\"6\" fill=\"#020617\" />\n  <rect x=\"132\" y=\"12\" width=\"6\" height=\"6\" fill=\"#020617\" />\n  <rect x=\"12\" y=\"18\" width=\"6\" height=\"6\" fill=\"#020617\" />\n  <rect x=\"48\" y=\"18\" width=\"6\" height=\"6\" fill=\"#020617\" />\n  <rect x=\"60\" y=\"18\" width=\"6\" height=\"6\" fill=\"#020617\" />\n  <rect x=\"72\" y=\"18\" width=\"6\" height=\"6\" fill=\"#020617\" />\n  <rect x=\"96\" y=\"18\" width=\"6\" height=\"6\" fill=\"#020617\" />\n  <rect x=\"132\" y=\"18\" width=\"6\" height=\"6\" fill=\"#020617\" />\n  <rect x=\"12\" y=\"24\" width=\"6\" height=\"6\" fill=\"#020617\" />\n  <rect x=\"24\" y=\"24\" width=\"6\" height=\"6\" fill=\"#020617\" />\n  <rect x=\"30\" y=\"24\" width=\"6\" height=\"6\" fill=\"#020617\" />\n  <rect x=\"36\" y=\"24\" width=\"6\" height=\"6\" fill=\"#020617\" />\n  <rect x=\"48\" y=\"24\" width=\"6\" height=\"6\" fill=\"#020617\" />\n  <rect x=\"66\" y=\"24\" width=\"6\" height=\"6\" fill=\"#020617\" />\n  <rect x=\"78\" y=\"24\" width=\"6\" height=\"6\" fill=\"#020617\" />\n  <rect x=\"96\" y=\"24\" width=\"6\" height=\"6\" fill=\"#020617\" />\n  <rect x=\"108\" y=\"24\" width=\"6\" height=\"6\" fill=\"#020617\" />\n  <rect x=\"114\" y=\"24\" width=\"6\" height=\"6\" fill=\"#020617\" />\n  <rect x=\"120\" y=\"24\" width=\"6\" height=\"6\" fill=\"#020617\" />\n  <rect x=\"132\" y=\"24\" width=\"6\" height=\"6\" fill=\"#020617\" />\n  <rect x=\"12\" y=\"30\" width=\"6\" height=\"6\" fill=\"#020617\" />\n  <rect x=\"24\" y=\"30\" width=\"6\" height=\"6\" fill=\"#020617\" />\n  <rect x=\"30\" y=\"30\" width=\"6\" height=\"6\" fill=\"#020617\" />\n  <rect x=\"36\" y=\"30\" width=\"6\" height=\"6\" fill=\"#020617\" />\n  <rect x=\"48\" y=\"30\" width=\"6\" height=\"6\" fill=\"#020617\" />\n  <rect x=\"96\" y=\"30\" width=\"6\" height=\"6\" fill=\"#020617\" />\n  <rect x=\"108\" y=\"30\" width=\"6\" height=\"6\" fill=\"#020617\" />\n  <rect x=\"114\" y=\"30\" width=\"6\" height=\"6\" fill=\"#020617\" />\n  <rect x=\"120\" y=\"30\" width=\"6\" height=\"6\" fill=\"#020617\" />\n  <rect x=\"132\" y=\"30\" width=\"6\" height=\"6\" fill=\"#020617\" />\n  <rect x=\"12\" y=\"36\" width=\"6\" height=\"6\" fill=\"#020617\" />\n  <rect x=\"24\" y=\"36\" width=\"6\" height=\"6\" fill=\"#020617\" />\n  <rect x=\"30\" y=\"36\" width=\"6\" height=\"6\" fill=\"#020617\" />\n  <rect x=\"36\" y=\"36\" width=\"6\" height=\"6\" fill=\"#020617\" />\n  <rect x=\"48\" y=\"36\" width=\"6\" height=\"6\" fill=\"#020617\" />\n  <rect x=\"60\" y=\"36\" width=\"6\" height=\"6\" fill=\"#020617\" />\n  <rect x=\"96\" y=\"36\" width=\"6\" height=\"6\" fill=\"#020617\" />\n  <rect x=\"108\" y=\"36\" width=\"6\" height=\"6\" fill=\"#020617\" />\n  <rect x=\"114\" y=\"36\" width=\"6\" height=\"6\" fill=\"#020617\" />\n  <rect x=\"120\" y=\"36\" width=\"6\" height=\"6\" fill=\"#020617\" />\n  <rect x=\"132\" y=\"36\" width=\"6\" height=\"6\" fill=\"#020617\" />\n  <rect x=\"12\" y=\"42\" width=\"6\" height=\"6\" fill=\"#020617\" />\n  <rect x=\"48\" y=\"42\" width=\"6\" height=\"6\" fill=\"#020617\" />\n  <rect x=\"60\" y=\"42\" width=\"6\" height=\"6\" fill=\"#020617\" />\n  <rect x=\"66\" y=\"42\" width=\"6\" height=\"6\" fill=\"#020617\" />\n  <rect x=\"84\" y=\"42\" width=\"6\" height=\"6\" fill=\"#020617\" />\n  <rect x=\"96\" y=\"42\" width=\"6\" height=\"6\" fill=\"#020617\" />\n  <rect x=\"132\" y=\"42\" width=\"6\" height=\"6\" fill=\"#020617\" />\n  <rect x=\"12\" y=\"48\" width=\"6\" height=\"6\" fill=\"#020617\" />\n  <rect x=\"18\" y=\"48\" width=\"6\" height=\"6\" fill=\"#020617\" />\n  <rect x=\"24\" y=\"48\" width=\"6\" height=\"6\" fill=\"#020617\" />\n  <rect x=\"30\" y=\"48\" width=\"6\" height=\"6\" fill=\"#020617\" />\n  <rect x=\"36\" y=\"48\" width=\"6\" height=\"6\" fill=\"#020617\" />\n  <rect x=\"42\" y=\"48\" width=\"6\" height=\"6\" fill=\"#020617\" />\n  <rect x=\"48\" y=\"48\" width=\"6\" height=\"6\" fill=\"#020617\" />\n  <rect x=\"60\" y=\"48\" width=\"6\" height=\"6\" fill=\"#020617\" />\n  <rect x=\"72\" y=\"48\" width=\"6\" height=\"6\" fill=\"#020617\" />\n  <rect x=\"78\" y=\"48\" width=\"6\" height=\"6\" fill=\"#020617\" />\n  <rect x=\"96\" y=\"48\" width=\"6\" height=\"6\" fill=\"#020617\" />\n  <rect x=\"102\" y=\"48\" width=\"6\" height=\"6\" fill=\"#020617\" />\n  <rect x=\"108\" y=\"48\" width=\"6\" height=\"6\" fill=\"#020617\" />\n  <rect x=\"114\" y=\"48\" width=\"6\" height=\"6\" fill=\"#020617\" />\n  <rect x=\"120\" y=\"48\" width=\"6\" height=\"6\" fill=\"#020617\" />\n  <rect x=\"126\" y=\"48\" width=\"6\" height=\"6\" fill=\"#020617\" />\n  <rect x=\"132\" y=\"48\" width=\"6\" height=\"6\" fill=\"#020617\" />\n  <rect x=\"60\" y=\"54\" width=\"6\" height=\"6\" fill=\"#020617\" />\n  <rect x=\"72\" y=\"54\" width=\"6\" height=\"6\" fill=\"#020617\" />\n  <rect x=\"78\" y=\"54\" width=\"6\" height=\"6\" fill=\"#020617\" />\n  <rect x=\"12\" y=\"60\" width=\"6\" height=\"6\" fill=\"#020617\" />\n  <rect x=\"30\" y=\"60\" width=\"6\" height=\"6\" fill=\"#020617\" />\n  <rect x=\"36\" y=\"60\" width=\"6\" height=\"6\" fill=\"#020617\" />\n  <rect x=\"54\" y=\"60\" width=\"6\" height=\"6\" fill=\"#020617\" />\n  <rect x=\"72\" y=\"60\" width=\"6\" height=\"6\" fill=\"#020617\" />\n  <rect x=\"90\" y=\"60\" width=\"6\" height=\"6\" fill=\"#020617\" />\n  <rect x=\"96\" y=\"60\" width=\"6\" height=\"6\" fill=\"#020617\" />\n  <rect x=\"102\" y=\"60\" width=\"6\" height=\"6\" fill=\"#020617\" />\n  <rect x=\"108\" y=\"60\" width=\"6\" height=\"6\" fill=\"#020617\" />\n  <rect x=\"114\" y=\"60\" width=\"6\" height=\"6\" fill=\"#020617\" />\n  <rect x=\"120\" y=\"60\" width=\"6\" height=\"6\" fill=\"#020617\" />\n  <rect x=\"126\" y=\"60\" width=\"6\" height=\"6\" fill=\"#020617\" />\n  <rect x=\"132\" y=\"60\" width=\"6\" height=\"6\" fill=\"#020617\" />\n  <rect x=\"18\" y=\"66\" width=\"6\" height=\"6\" fill=\"#020617\" />\n  <rect x=\"30\" y=\"66\" width=\"6\" height=\"6\" fill=\"#020617\" />\n  <rect x=\"42\" y=\"66\" width=\"6\" height=\"6\" fill=\"#020617\" />\n  <rect x=\"60\" y=\"66\" width=\"6\" height=\"6\" fill=\"#020617\" />\n  <rect x=\"66\" y=\"66\" width=\"6\" height=\"6\" fill=\"#020617\" />\n  <rect x=\"90\" y=\"66\" width=\"6\" height=\"6\" fill=\"#020617\" />\n  <rect x=\"96\" y=\"66\" width=\"6\" height=\"6\" fill=\"#020617\" />\n  <rect x=\"108\" y=\"66\" width=\"6\" height=\"6\" fill=\"#020617\" />\n  <rect x=\"114\" y=\"66\" width=\"6\" height=\"6\" fill=\"#020617\" />\n  <rect x=\"126\" y=\"66\" width=\"6\" height=\"6\" fill=\"#020617\" />\n  <rect x=\"12\" y=\"72\" width=\"6\" height=\"6\" fill=\"#020617\" />\n  <rect x=\"18\" y=\"72\" width=\"6\" height=\"6\" fill=\"#020617\" />\n  <rect x=\"42\" y=\"72\" width=\"6\" height=\"6\" fill=\"#020617\" />\n  <rect x=\"48\" y=\"72\" width=\"6\" height=\"6\" fill=\"#020617\" />\n  <rect x=\"60\" y=\"72\" width=\"6\" height=\"6\" fill=\"#020617\" />\n  <rect x=\"66\" y=\"72\" width=\"6\" height=\"6\" fill=\"#020617\" />\n  <rect x=\"108\" y=\"72\" width=\"6\" height=\"6\" fill=\"#020617\" />\n  <rect x=\"114\" y=\"72\" width=\"6\" height=\"6\" fill=\"#020617\" />\n  <rect x=\"126\" y=\"72\" width=\"6\" height=\"6\" fill=\"#020617\" />\n  <rect x=\"12\" y=\"78\" width=\"6\" height=\"6\" fill=\"#020617\" />\n  <rect x=\"48\" y=\"78\" width=\"6\" height=\"6\" fill=\"#020617\" />\n  <rect x=\"54\" y=\"78\" width=\"6\" height=\"6\" fill=\"#020617\" />\n  <rect x=\"60\" y=\"78\" width=\"6\" height=\"6\" fill=\"#020617\" />\n  <rect x=\"66\" y=\"78\" width=\"6\" height=\"6\" fill=\"#020617\" />\n  <rect x=\"84\" y=\"78\" width=\"6\" height=\"6\" fill=\"#020617\" />\n  <rect x=\"96\" y=\"78\" width=\"6\" height=\"6\" fill=\"#020617\" />\n  <rect x=\"114\" y=\"78\" width=\"6\" height=\"6\" fill=\"#020617\" />\n  <rect x=\"132\" y=\"78\" width=\"6\" height=\"6\" fill=\"#020617\" />\n  <rect x=\"30\" y=\"84\" width=\"6\" height=\"6\" fill=\"#020617\" />\n  <rect x=\"42\" y=\"84\" width=\"6\" height=\"6\" fill=\"#020617\" />\n  <rect x=\"54\" y=\"84\" width=\"6\" height=\"6\" fill=\"#020617\" />\n  <rect x=\"60\" y=\"84\" width=\"6\" height=\"6\" fill=\"#020617\" />\n  <rect x=\"66\" y=\"84\" width=\"6\" height=\"6\" fill=\"#020617\" />\n  <rect x=\"72\" y=\"84\" width=\"6\" height=\"6\" fill=\"#020617\" />\n  <rect x=\"84\" y=\"84\" width=\"6\" height=\"6\" fill=\"#020617\" />\n  <rect x=\"90\" y=\"84\" width=\"6\" height=\"6\" fill=\"#020617\" />\n  <rect x=\"102\" y=\"84\" width=\"6\" height=\"6\" fill=\"#020617\" />\n  <rect x=\"108\" y=\"84\" width=\"6\" height=\"6\" fill=\"#020617\" />\n  <rect x=\"120\" y=\"84\" width=\"6\" height=\"6\" fill=\"#020617\" />\n  <rect x=\"66\" y=\"90\" width=\"6\" height=\"6\" fill=\"#020617\" />\n  <rect x=\"78\" y=\"90\" width=\"6\" height=\"6\" fill=\"#020617\" />\n  <rect x=\"96\" y=\"90\" width=\"6\" height=\"6\" fill=\"#020617\" />\n  <rect x=\"102\" y=\"90\" width=\"6\" height=\"6\" fill=\"#020617\" />\n  <rect x=\"120\" y=\"90\" width=\"6\" height=\"6\" fill=\"#020617\" />\n  <rect x=\"126\" y=\"90\" width=\"6\" height=\"6\" fill=\"#020617\" />\n  <rect x=\"12\" y=\"96\" width=\"6\" height=\"6\" fill=\"#020617\" />\n  <rect x=\"18\" y=\"96\" width=\"6\" height=\"6\" fill=\"#020617\" />\n  <rect x=\"24\" y=\"96\" width=\"6\" height=\"6\" fill=\"#020617\" />\n  <rect x=\"30\" y=\"96\" width=\"6\" height=\"6\" fill=\"#020617\" />\n  <rect x=\"36\" y=\"96\" width=\"6\" height=\"6\" fill=\"#020617\" />\n  <rect x=\"42\" y=\"96\" width=\"6\" height=\"6\" fill=\"#020617\" />\n  <rect x=\"48\" y=\"96\" width=\"6\" height=\"6\" fill=\"#020617\" />\n  <rect x=\"60\" y=\"96\" width=\"6\" height=\"6\" fill=\"#020617\" />\n  <rect x=\"78\" y=\"96\" width=\"6\" height=\"6\" fill=\"#020617\" />\n  <rect x=\"84\" y=\"96\" width=\"6\" height=\"6\" fill=\"#020617\" />\n  <rect x=\"90\" y=\"96\" width=\"6\" height=\"6\" fill=\"#020617\" />\n  <rect x=\"102\" y=\"96\" width=\"6\" height=\"6\" fill=\"#020617\" />\n  <rect x=\"114\" y=\"96\" width=\"6\" height=\"6\" fill=\"#020617\" />\n  <rect x=\"120\" y=\"96\" width=\"6\" height=\"6\" fill=\"#020617\" />\n  <rect x=\"126\" y=\"96\" width=\"6\" height=\"6\" fill=\"#020617\" />\n  <rect x=\"12\" y=\"102\" width=\"6\" height=\"6\" fill=\"#020617\" />\n  <rect x=\"48\" y=\"102\" width=\"6\" height=\"6\" fill=\"#020617\" />\n  <rect x=\"60\" y=\"102\" width=\"6\" height=\"6\" fill=\"#020617\" />\n  <rect x=\"66\" y=\"102\" width=\"6\" height=\"6\" fill=\"#020617\" />\n  <rect x=\"96\" y=\"102\" width=\"6\" height=\"6\" fill=\"#020617\" />\n  <rect x=\"102\" y=\"102\" width=\"6\" height=\"6\" fill=\"#020617\" />\n  <rect x=\"108\" y=\"102\" width=\"6\" height=\"6\" fill=\"#020617\" />\n  <rect x=\"114\" y=\"102\" width=\"6\" height=\"6\" fill=\"#020617\" />\n  <rect x=\"12\" y=\"108\" width=\"6\" height=\"6\" fill=\"#020617\" />\n  <rect x=\"24\" y=\"108\" width=\"6\" height=\"6\" fill=\"#020617\" />\n  <rect x=\"30\" y=\"108\" width=\"6\" height=\"6\" fill=\"#020617\" />\n  <rect x=\"36\" y=\"108\" width=\"6\" height=\"6\" fill=\"#020617\" />\n  <rect x=\"48\" y=\"108\" width=\"6\" height=\"6\" fill=\"#020617\" />\n  <rect x=\"60\" y=\"108\" width=\"6\" height=\"6\" fill=\"#020617\" />\n  <rect x=\"72\" y=\"108\" width=\"6\" height=\"6\" fill=\"#020617\" />\n  <rect x=\"90\" y=\"108\" width=\"6\" height=\"6\" fill=\"#020617\" />\n  <rect x=\"96\" y=\"108\" width=\"6\" height=\"6\" fill=\"#020617\" />\n  <rect x=\"126\" y=\"108\" width=\"6\" height=\"6\" fill=\"#020617\" />\n  <rect x=\"12\" y=\"114\" width=\"6\" height=\"6\" fill=\"#020617\" />\n  <rect x=\"24\" y=\"114\" width=\"6\" height=\"6\" fill=\"#020617\" />\n  <rect x=\"30\" y=\"114\" width=\"6\" height=\"6\" fill=\"#020617\" />\n  <rect x=\"36\" y=\"114\" width=\"6\" height=\"6\" fill=\"#020617\" />\n  <rect x=\"48\" y=\"114\" width=\"6\" height=\"6\" fill=\"#020617\" />\n  <rect x=\"60\" y=\"114\" width=\"6\" height=\"6\" fill=\"#020617\" />\n  <rect x=\"78\" y=\"114\" width=\"6\" height=\"6\" fill=\"#020617\" />\n  <rect x=\"84\" y=\"114\" width=\"6\" height=\"6\" fill=\"#020617\" />\n  <rect x=\"90\" y=\"114\" width=\"6\" height=\"6\" fill=\"#020617\" />\n  <rect x=\"108\" y=\"114\" width=\"6\" height=\"6\" fill=\"#020617\" />\n  <rect x=\"120\" y=\"114\" width=\"6\" height=\"6\" fill=\"#020617\" />\n  <rect x=\"12\" y=\"120\" width=\"6\" height=\"6\" fill=\"#020617\" />\n  <rect x=\"24\" y=\"120\" width=\"6\" height=\"6\" fill=\"#020617\" />\n  <rect x=\"30\" y=\"120\" width=\"6\" height=\"6\" fill=\"#020617\" />\n  <rect x=\"36\" y=\"120\" width=\"6\" height=\"6\" fill=\"#020617\" />\n  <rect x=\"48\" y=\"120\" width=\"6\" height=\"6\" fill=\"#020617\" />\n  <rect x=\"84\" y=\"120\" width=\"6\" height=\"6\" fill=\"#020617\" />\n  <rect x=\"96\" y=\"120\" width=\"6\" height=\"6\" fill=\"#020617\" />\n  <rect x=\"102\" y=\"120\" width=\"6\" height=\"6\" fill=\"#020617\" />\n  <rect x=\"126\" y=\"120\" width=\"6\" height=\"6\" fill=\"#020617\" />\n  <rect x=\"132\" y=\"120\" width=\"6\" height=\"6\" fill=\"#020617\" />\n  <rect x=\"12\" y=\"126\" width=\"6\" height=\"6\" fill=\"#020617\" />\n  <rect x=\"48\" y=\"126\" width=\"6\" height=\"6\" fill=\"#020617\" />\n  <rect x=\"66\" y=\"126\" width=\"6\" height=\"6\" fill=\"#020617\" />\n  <rect x=\"78\" y=\"126\" width=\"6\" height=\"6\" fill=\"#020617\" />\n  <rect x=\"96\" y=\"126\" width=\"6\" height=\"6\" fill=\"#020617\" />\n  <rect x=\"108\" y=\"126\" width=\"6\" height=\"6\" fill=\"#020617\" />\n  <rect x=\"114\" y=\"126\" width=\"6\" height=\"6\" fill=\"#020617\" />\n  <rect x=\"12\" y=\"132\" width=\"6\" height=\"6\" fill=\"#020617\" />\n  <rect x=\"18\" y=\"132\" width=\"6\" height=\"6\" fill=\"#020617\" />\n  <rect x=\"24\" y=\"132\" width=\"6\" height=\"6\" fill=\"#020617\" />\n  <rect x=\"30\" y=\"132\" width=\"6\" height=\"6\" fill=\"#020617\" />\n  <rect x=\"36\" y=\"132\" width=\"6\" height=\"6\" fill=\"#020617\" />\n  <rect x=\"42\" y=\"132\" width=\"6\" height=\"6\" fill=\"#020617\" />\n  <rect x=\"48\" y=\"132\" width=\"6\" height=\"6\" fill=\"#020617\" />\n  <rect x=\"60\" y=\"132\" width=\"6\" height=\"6\" fill=\"#020617\" />\n  <rect x=\"72\" y=\"132\" width=\"6\" height=\"6\" fill=\"#020617\" />\n  <rect x=\"78\" y=\"132\" width=\"6\" height=\"6\" fill=\"#020617\" />\n  <rect x=\"114\" y=\"132\" width=\"6\" height=\"6\" fill=\"#020617\" />\n  <rect x=\"120\" y=\"132\" width=\"6\" height=\"6\" fill=\"#020617\" />\n  <rect x=\"132\" y=\"132\" width=\"6\" height=\"6\" fill=\"#020617\" />\n</svg>"
+}

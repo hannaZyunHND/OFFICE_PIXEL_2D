@@ -1,0 +1,240 @@
+{
+  "meta": {
+    "project_name": "Autonomous Research Crew",
+    "grid_cols": 34,
+    "grid_rows": 16,
+    "tile_size": 32
+  },
+  "zones": [
+    {
+      "id": "zone_work",
+      "name": "Khu Phát Triển & Phân Tích",
+      "type": "WORK",
+      "rect": [1, 1, 15, 14]
+    },
+    {
+      "id": "zone_boss",
+      "name": "Phòng Kiểm Duyệt",
+      "type": "APPROVAL",
+      "rect": [17, 1, 6, 6]
+    },
+    {
+      "id": "zone_pantry",
+      "name": "Pantry & Thư Giãn",
+      "type": "IDLE",
+      "rect": [17, 8, 6, 7]
+    },
+    {
+      "id": "zone_director",
+      "name": "Phòng Giám Đốc (Tôi)",
+      "type": "DIRECTOR",
+      "rect": [24, 1, 9, 14]
+    }
+  ],
+  "furniture": [
+    {
+      "id": "furn_desk_1",
+      "type": "DESK_PC",
+      "x": 3,
+      "y": 4,
+      "footprint": [2, 1],
+      "interaction_point": [3, 5],
+      "facing": "UP",
+      "agent_id": "agent_researcher"
+    },
+    {
+      "id": "furn_desk_2",
+      "type": "DESK_PC",
+      "x": 9,
+      "y": 4,
+      "footprint": [2, 1],
+      "interaction_point": [9, 5],
+      "facing": "UP",
+      "agent_id": "agent_analyst"
+    },
+    {
+      "id": "furn_desk_3",
+      "type": "DESK_PC",
+      "x": 6,
+      "y": 10,
+      "footprint": [2, 1],
+      "interaction_point": [6, 11],
+      "facing": "UP",
+      "agent_id": "agent_writer"
+    },
+    {
+      "id": "furn_desk_4",
+      "type": "DESK_PC",
+      "x": 19,
+      "y": 3,
+      "footprint": [2, 1],
+      "interaction_point": [19, 4],
+      "facing": "UP",
+      "agent_id": "agent_reviewer"
+    },
+    {
+      "id": "furn_whiteboard_1",
+      "type": "WHITEBOARD",
+      "x": 13,
+      "y": 2,
+      "footprint": [2, 1],
+      "interaction_point": [13, 3],
+      "facing": "UP"
+    },
+    {
+      "id": "furn_bookshelf_1",
+      "type": "BOOKSHELF",
+      "x": 2,
+      "y": 2,
+      "footprint": [2, 1],
+      "interaction_point": [2, 3],
+      "facing": "UP"
+    },
+    {
+      "id": "furn_plant_1",
+      "type": "PLANT",
+      "x": 14,
+      "y": 13,
+      "footprint": [1, 1],
+      "interaction_point": [13, 13],
+      "facing": "RIGHT"
+    },
+    {
+      "id": "furn_plant_2",
+      "type": "PLANT",
+      "x": 18,
+      "y": 2,
+      "footprint": [1, 1],
+      "interaction_point": [18, 3],
+      "facing": "UP"
+    },
+    {
+      "id": "furn_coffee_1",
+      "type": "COFFEE_MACHINE",
+      "x": 18,
+      "y": 9,
+      "footprint": [1, 1],
+      "interaction_point": [18, 10],
+      "facing": "UP"
+    },
+    {
+      "id": "furn_aquarium_1",
+      "type": "AQUARIUM",
+      "x": 20,
+      "y": 9,
+      "footprint": [2, 1],
+      "interaction_point": [20, 10],
+      "facing": "UP"
+    },
+    {
+      "id": "furn_sofa_1",
+      "type": "SOFA",
+      "x": 19,
+      "y": 13,
+      "footprint": [2, 1],
+      "interaction_point": [19, 12],
+      "facing": "DOWN"
+    },
+    {
+      "id": "furn_director_desk",
+      "type": "DIRECTOR_DESK",
+      "x": 27,
+      "y": 4,
+      "footprint": [3, 1],
+      "interaction_point": [28, 5],
+      "facing": "UP"
+    },
+    {
+      "id": "furn_director_bookshelf",
+      "type": "BOOKSHELF",
+      "x": 25,
+      "y": 2,
+      "footprint": [2, 1],
+      "interaction_point": [25, 3],
+      "facing": "UP"
+    },
+    {
+      "id": "furn_director_globe",
+      "type": "HOLOGRAM_GLOBE",
+      "x": 31,
+      "y": 2,
+      "footprint": [1, 1],
+      "interaction_point": [31, 3],
+      "facing": "UP"
+    },
+    {
+      "id": "furn_director_plant",
+      "type": "PLANT",
+      "x": 25,
+      "y": 13,
+      "footprint": [1, 1],
+      "interaction_point": [25, 12],
+      "facing": "DOWN"
+    },
+    {
+      "id": "furn_director_sofa",
+      "type": "SOFA",
+      "x": 30,
+      "y": 13,
+      "footprint": [2, 1],
+      "interaction_point": [30, 12],
+      "facing": "DOWN"
+    }
+  ],
+  "agents": [
+    {
+      "id": "agent_researcher",
+      "name": "Alice (Researcher)",
+      "role": "Thu thập & Tổng hợp dữ liệu thị trường",
+      "color": "#38bdf8",
+      "avatar_sprite": "default_scientist",
+      "desk_id": "furn_desk_1"
+    },
+    {
+      "id": "agent_analyst",
+      "name": "Bob (Data Analyst)",
+      "role": "Phân tích định lượng & Kiểm chứng nguồn",
+      "color": "#f59e0b",
+      "avatar_sprite": "default_coder",
+      "desk_id": "furn_desk_2"
+    },
+    {
+      "id": "agent_writer",
+      "name": "Clara (Tech Writer)",
+      "role": "Biên tập báo cáo & Trực quan hóa",
+      "color": "#22c55e",
+      "avatar_sprite": "default_writer",
+      "desk_id": "furn_desk_3"
+    },
+    {
+      "id": "agent_reviewer",
+      "name": "Viktor (QA Supervisor)",
+      "role": "Thẩm định chất lượng & Phê duyệt xuất bản",
+      "color": "#c084fc",
+      "avatar_sprite": "default_reviewer",
+      "desk_id": "furn_desk_4"
+    }
+  ],
+  "edges": [
+    {
+      "from": "agent_researcher",
+      "to": "agent_analyst",
+      "label": "Raw Market Data"
+    },
+    {
+      "from": "agent_analyst",
+      "to": "agent_writer",
+      "label": "Verified Insights"
+    },
+    {
+      "from": "agent_writer",
+      "to": "agent_reviewer",
+      "label": "Draft Report"
+    },
+    {
+      "from": "agent_reviewer",
+      "to": "agent_writer",
+      "label": "Revision Feedback"
+    }
+  ]
+}

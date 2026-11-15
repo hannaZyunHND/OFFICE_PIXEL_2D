@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8" />
+<title>Bắn trúng lực ma sát</title>
+<style>
+  * { box-sizing: border-box; font-family: 'Segoe UI', system-ui, sans-serif; }
+  body { margin: 0; background: #0f172a; color: #f8fafc; padding: 14px; display: flex; flex-direction: column; align-items: center; user-select: none; }
+  .box { width: 100%; max-width: 820px; background: #1e293b; border: 1px solid #334155; border-radius: 16px; padding: 16px; box-shadow: 0 12px 32px rgba(0,0,0,0.45); }
+  .top-row { display: flex; justify-content: space-between; align-items: center; gap: 10px; flex-wrap: wrap; border-bottom: 1px solid #334155; padding-bottom: 10px; }
+  .badge { background: #020617; border: 1px solid #38bdf8; color: #38bdf8; padding: 4px 10px; border-radius: 999px; font-size: 12px; font-weight: 800; }
+  .arena { display: grid; grid-template-columns: 340px 1fr; gap: 16px; margin-top: 12px; align-items: stretch; }
+  @media (max-width: 720px) { .arena { grid-template-columns: 1fr; } }
+  canvas { background: radial-gradient(circle at 50% 50%, #0f172a 0%, #020617 85%); border: 1px solid #38bdf866; border-radius: 12px; width: 100%; height: 260px; cursor: crosshair; }
+  .q-panel { display: flex; flex-direction: column; justify-content: space-between; gap: 10px; background: #020617; border: 1px solid #334155; border-radius: 12px; padding: 14px; }
+  .formula-pill { background: #1e293b; border-left: 4px solid #38bdf8; padding: 8px 10px; border-radius: 6px; font-size: 12px; color: #7dd3fc; font-weight: 700; }
+  .opts-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .opt-btn { background: #1e293b; color: #f8fafc; border: 1px solid #475569; border-radius: 10px; padding: 10px; font-size: 13px; font-weight: 700; cursor: pointer; transition: 0.15s; text-align: left; }
+  .opt-btn:hover { background: #38bdf8; color: #020617; border-color: #38bdf8; }
+  .explain-box { min-height: 38px; padding: 8px 10px; border-radius: 8px; background: #0f172a; font-size: 12px; font-weight: 600; color: #cbd5e1; border: 1px solid #1e293b; }
+</style>
+</head>
+<body>
+  <div class="box">
+    <div class="top-row">
+      <div>
+        <div style="font-size:15px;font-weight:900;color:#38bdf8;">🎯 Bắn trúng lực ma sát</div>
+        <div style="font-size:11px;color:#94a3b8;margin-top:2px;">⚡ Sinh bởi <b>gpt-6-luna (codex-cli)</b> • Đọc nhanh tình huống, tính lực ma sát trượt rồi bắn vào mục tiêu mang đáp án đúng. Độ chính xác và thời gian trả lời quyết định điểm số.</div>
+      </div>
+      <div style="display:flex;gap:8px;align-items:center;">
+        <span class="badge" id="lvBadge" style="border-color:#facc15;color:#facc15;">Màn: 1/5</span>
+        <span class="badge" id="comboBadge" style="border-color:#c084fc;color:#c084fc;">Combo: x1</span>
+        <span class="badge" id="scBadge" style="border-color:#4ade80;color:#4ade80;">Điểm: 0</span>
+      </div>
+    </div>
+
+    <div class="arena">
+      <canvas id="cv" width="340" height="260"></canvas>
+      <div class="q-panel">
+        <div>
+          <div class="formula-pill">📐 Nguyên lý / Công thức: Fₘₛ = μₜN</div>
+          <div id="qText" style="font-size:14px;font-weight:800;color:#f8fafc;margin-top:10px;line-height:1.45;"></div>
+        </div>
+        <div class="opts-grid" id="optsHost"></div>
+        <div class="explain-box" id="explainBox">💡 Bắn trực tiếp vào mục tiêu A/B/C/D trên рада Canvas hoặc bấm chọn đáp án bên trên!</div>
+      </div>
+    </div>
+  </div>
+
+<script>
+const questions = [{"q": "Một thùng đang trượt trên sàn ngang. Hệ số ma sát trượt là 0,2 và phản lực của sàn lên thùng là 100 N. Lực ma sát trượt có độ lớn bao nhiêu?", "ans": "20 N", "opts": ["20 N", "5 N", "100 N", "120 N"], "explain": "Fₘₛ = μₜN = 0,2 × 100 = 20 N."}, {"q": "Một hộp 5 kg trượt trên sàn ngang có hệ số ma sát trượt 0,4. Lấy g = 10 m/s². Lực ma sát trượt bằng bao nhiêu?", "ans": "20 N", "opts": ["20 N", "2 N", "50 N", "200 N"], "explain": "Trên mặt phẳng ngang, N = mg = 50 N nên Fₘₛ = 0,4 × 50 = 20 N."}, {"q": "Một vật đang trượt sang phải trên mặt bàn. Lực ma sát trượt tác dụng lên vật hướng nào?", "ans": "Sang trái", "opts": ["Sang trái", "Sang phải", "Thẳng đứng lên", "Thẳng đứng xuống"], "explain": "Lực ma sát trượt ngược chiều chuyển động tương đối giữa hai bề mặt tiếp xúc."}, {"q": "Vật trượt trên mặt phẳng ngang. Khối lượng giữ nguyên, còn hệ số ma sát trượt tăng gấp đôi. Lực ma sát trượt thay đổi thế nào?", "ans": "Tăng gấp đôi", "opts": ["Tăng gấp đôi", "Giảm một nửa", "Không đổi", "Tăng gấp bốn"], "explain": "Vì Fₘₛ = μₜN và N không đổi, lực ma sát tỉ lệ thuận với hệ số ma sát."}, {"q": "Một kiện hàng 10 kg trượt trên sàn ngang với hệ số ma sát trượt 0,3. Lấy g = 10 m/s². Cần lực kéo ngang bao nhiêu để kiện hàng chuyển động thẳng đều?", "ans": "30 N", "opts": ["30 N", "10 N", "100 N", "300 N"], "explain": "Chuyển động thẳng đều có hợp lực bằng 0, nên lực kéo cân bằng lực ma sát: F = μₜmg = 0,3 × 10 × 10 = 30 N."}];
+let qIdx = 0;
+let score = 0;
+let combo = 1;
+let laserEffect = null;
+
+const cv = document.getElementById('cv');
+const ctx = cv.getContext('2d');
+const letters = ['A', 'B', 'C', 'D'];
+let orbs = [];
+
+function loadQuestion() {
+  const cur = questions[qIdx % questions.length];
+  document.getElementById('lvBadge').textContent = `Màn: ${(qIdx % questions.length) + 1}/${questions.length}`;
+  document.getElementById('qText').textContent = `Câu ${(qIdx % questions.length) + 1}: ${cur.q}`;
+
+  const opts = (Array.isArray(cur.opts) && cur.opts.length > 0 ? [...cur.opts] : [cur.ans, 'Phương án B', 'Phương án C', 'Phương án D'])
+    .sort(() => Math.random() - 0.5);
+  const host = document.getElementById('optsHost');
+  host.innerHTML = '';
+
+  orbs = opts.slice(0, 4).map((optText, i) => ({
+    idx: i,
+    letter: letters[i] || String(i + 1),
+    text: String(optText),
+    x: 65 + (i % 2) * 185,
+    y: 65 + Math.floor(i / 2) * 110,
+    vx: (i % 2 === 0 ? 1.15 : -1.15),
+    vy: (i < 2 ? 0.95 : -0.95),
+    r: 30,
+    color: ['#38bdf8', '#a855f7', '#f59e0b', '#22c55e'][i % 4]
+  }));
+
+  orbs.forEach((orb) => {
+    const btn = document.createElement('button');
+    btn.className = 'opt-btn';
+    btn.innerHTML = `<span style="color:${orb.color};font-weight:900;">[${orb.letter}]</span> ${orb.text}`;
+    btn.onclick = () => checkAnswer(orb);
+    host.appendChild(btn);
+  });
+}
+
+function checkAnswer(orb) {
+  const cur = questions[qIdx % questions.length];
+  const ex = document.getElementById('explainBox');
+  const isCorrect = String(orb.text).trim().toLowerCase() === String(cur.ans).trim().toLowerCase();
+  laserEffect = { tx: orb.x, ty: orb.y, ok: isCorrect, alpha: 1.0 };
+
+  if (isCorrect) {
+    score += 25 * combo;
+    combo = Math.min(5, combo + 1);
+    document.getElementById('scBadge').textContent = `Điểm: ${score}`;
+    document.getElementById('comboBadge').textContent = `Combo: x${combo}`;
+    ex.style.borderColor = '#22c55e';
+    ex.style.color = '#4ade80';
+    ex.innerHTML = `🎯 <b>Chính xác (+${25 * (combo - 1)}đ)!</b> ${cur.explain || 'Tuyệt vời!'}`;
+    qIdx++;
+    setTimeout(loadQuestion, 1300);
+  } else {
+    combo = 1;
+    document.getElementById('comboBadge').textContent = `Combo: x1`;
+    ex.style.borderColor = '#ef4444';
+    ex.style.color = '#f87171';
+    ex.innerHTML = `❌ <b>Chưa chính xác!</b> Hãy thử lại. Gợi ý: ${cur.explain || 'Xem kỹ nguyên lý trên thanh công thức.'}`;
+  }
+}
+
+cv.addEventListener('click', (e) => {
+  const rect = cv.getBoundingClientRect();
+  const mx = (e.clientX - rect.left) * (cv.width / rect.width);
+  const my = (e.clientY - rect.top) * (cv.height / rect.height);
+  for (const orb of orbs) {
+    if (Math.hypot(mx - orb.x, my - orb.y) <= orb.r + 6) {
+      checkAnswer(orb);
+      break;
+    }
+  }
+});
+
+function renderCanvas() {
+  ctx.clearRect(0, 0, cv.width, cv.height);
+
+  // Radar grid
+  ctx.strokeStyle = 'rgba(56, 189, 248, 0.12)';
+  ctx.lineWidth = 1;
+  for (let x = 0; x < cv.width; x += 34) {
+    ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, cv.height); ctx.stroke();
+  }
+  for (let y = 0; y < cv.height; y += 34) {
+    ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(cv.width, y); ctx.stroke();
+  }
+
+  // Player turret at bottom center
+  const tx = cv.width / 2, ty = cv.height - 14;
+  ctx.fillStyle = '#38bdf8';
+  ctx.beginPath(); ctx.arc(tx, ty, 12, Math.PI, 0); ctx.fill();
+
+  // Orbiting answer orbs
+  for (const orb of orbs) {
+    orb.x += orb.vx;
+    orb.y += orb.vy;
+    if (orb.x < orb.r + 8 || orb.x > cv.width - orb.r - 8) orb.vx *= -1;
+    if (orb.y < orb.r + 8 || orb.y > cv.height - 46) orb.vy *= -1;
+
+    ctx.beginPath();
+    ctx.arc(orb.x, orb.y, orb.r, 0, Math.PI * 2);
+    ctx.fillStyle = 'rgba(15, 23, 42, 0.9)';
+    ctx.fill();
+    ctx.lineWidth = 3;
+    ctx.strokeStyle = orb.color;
+    ctx.stroke();
+
+    ctx.fillStyle = orb.color;
+    ctx.font = '900 15px sans-serif';
+    ctx.textAlign = 'center';
+    ctx.fillText(orb.letter, orb.x, orb.y - 3);
+
+    ctx.fillStyle = '#e2e8f0';
+    ctx.font = '700 10px sans-serif';
+    const shortTxt = orb.text.length > 10 ? orb.text.slice(0, 9) + '…' : orb.text;
+    ctx.fillText(shortTxt, orb.x, orb.y + 12);
+  }
+
+  // Laser beam
+  if (laserEffect && laserEffect.alpha > 0) {
+    ctx.beginPath();
+    ctx.moveTo(tx, ty - 8);
+    ctx.lineTo(laserEffect.tx, laserEffect.ty);
+    ctx.strokeStyle = laserEffect.ok ? `rgba(74, 222, 128, ${laserEffect.alpha})` : `rgba(248, 113, 113, ${laserEffect.alpha})`;
+    ctx.lineWidth = 4;
+    ctx.stroke();
+    laserEffect.alpha -= 0.05;
+  }
+
+  requestAnimationFrame(renderCanvas);
+}
+
+loadQuestion();
+renderCanvas();
+</script>
+</body>
+</html>

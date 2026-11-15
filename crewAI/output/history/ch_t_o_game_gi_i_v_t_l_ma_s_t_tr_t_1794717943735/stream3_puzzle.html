@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8" />
+<title>Ma trận ghép cặp ma sát</title>
+<style>
+  * { box-sizing: border-box; font-family: 'Segoe UI', system-ui, sans-serif; }
+  body { margin: 0; background: #0f172a; color: #f8fafc; padding: 14px; display: flex; flex-direction: column; align-items: center; user-select: none; }
+  .box { width: 100%; max-width: 820px; background: #1e293b; border: 1px solid #334155; border-radius: 16px; padding: 16px; }
+  .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 14px; }
+  @media (max-width: 640px) { .grid { grid-template-columns: repeat(2, 1fr); } }
+  .tile { background: #020617; border: 2px solid #334155; border-radius: 12px; padding: 12px; text-align: center; cursor: pointer; transition: 0.15s; min-height: 78px; display: flex; flex-direction: column; justify-content: center; }
+  .tile:hover { border-color: #818cf8; transform: translateY(-2px); }
+  .tile.selected { border-color: #38bdf8; background: #38bdf822; }
+  .tile.matched { border-color: #22c55e; background: #22c55e22; opacity: 0.65; pointer-events: none; }
+</style>
+</head>
+<body>
+  <div class="box">
+    <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;">
+      <div>
+        <div style="font-size:15px;font-weight:900;color:#a855f7;">🧩 Ma trận ghép cặp ma sát</div>
+        <div style="font-size:11px;color:#94a3b8;">⚡ Sinh bởi <b>gpt-6-luna (codex-cli)</b> • Ghép các thẻ khái niệm, công thức và đại lượng với ý nghĩa hoặc giá trị tương ứng. Hoàn thành đủ các cặp trước khi hết giờ để mở khóa màn tiếp theo.</div>
+      </div>
+      <div id="puzStatus" style="font-weight:800;color:#4ade80;background:#020617;padding:4px 12px;border-radius:999px;border:1px solid #22c55e;">Đã ghép: 0 / 6 cặp</div>
+    </div>
+    <div class="grid" id="puzzleGrid"></div>
+    <div id="puzMsg" style="margin-top:12px;font-weight:700;font-size:13px;text-align:center;min-height:20px;color:#cbd5e1;">💡 Chọn 1 thẻ Khái niệm và 1 thẻ Ý nghĩa tương ứng để giải mã ma trận!</div>
+  </div>
+<script>
+const rawCards = [{"id": 1, "text": "Fₘₛ = μₜN", "kind": "Khái niệm / Công thức", "key": 1}, {"id": 2, "text": "Công thức tính độ lớn lực ma sát trượt", "kind": "Ý nghĩa / Kết quả", "key": 1}, {"id": 3, "text": "μₜ", "kind": "Khái niệm / Công thức", "key": 2}, {"id": 4, "text": "Hệ số ma sát trượt, phụ thuộc vào vật liệu và tình trạng bề mặt tiếp xúc", "kind": "Ý nghĩa / Kết quả", "key": 2}, {"id": 5, "text": "N", "kind": "Khái niệm / Công thức", "key": 3}, {"id": 6, "text": "Độ lớn áp lực pháp tuyến giữa hai bề mặt", "kind": "Ý nghĩa / Kết quả", "key": 3}, {"id": 7, "text": "Lực ma sát trượt", "kind": "Khái niệm / Công thức", "key": 4}, {"id": 8, "text": "Có hướng ngược chiều chuyển động tương đối tại mặt tiếp xúc", "kind": "Ý nghĩa / Kết quả", "key": 4}, {"id": 9, "text": "Vật trượt trên mặt phẳng ngang", "kind": "Khái niệm / Công thức", "key": 5}, {"id": 10, "text": "N = mg, do đó Fₘₛ = μₜmg", "kind": "Ý nghĩa / Kết quả", "key": 5}, {"id": 11, "text": "μₜ = 0,2 và N = 100 N", "kind": "Khái niệm / Công thức", "key": 6}, {"id": 12, "text": "Fₘₛ = 20 N", "kind": "Ý nghĩa / Kết quả", "key": 6}];
+const cards = [...rawCards].sort(() => Math.random() - 0.5);
+let firstPick = null;
+const matched = new Set();
+
+function render() {
+  const host = document.getElementById('puzzleGrid');
+  host.innerHTML = '';
+  cards.forEach(c => {
+    const d = document.createElement('div');
+    d.className = 'tile' + (matched.has(c.id) ? ' matched' : '') + (firstPick && firstPick.id === c.id ? ' selected' : '');
+    const tagColor = c.kind.includes('Khái niệm') ? '#38bdf8' : '#c084fc';
+    d.innerHTML = `<div style="font-size:10px;font-weight:800;color:${tagColor};margin-bottom:4px;">${c.kind}</div><div style="font-size:13px;font-weight:800;color:#f8fafc;">${c.text}</div>`;
+    d.onclick = () => pick(c);
+    host.appendChild(d);
+  });
+}
+
+function pick(c) {
+  if (matched.has(c.id)) return;
+  const msg = document.getElementById('puzMsg');
+  if (!firstPick) { firstPick = c; render(); return; }
+  if (firstPick.id === c.id) { firstPick = null; render(); return; }
+  if (firstPick.key === c.key) {
+    matched.add(firstPick.id);
+    matched.add(c.id);
+    msg.style.color = '#4ade80';
+    msg.textContent = `✨ Chính xác! Đã ghép thành công cặp kiến thức "${firstPick.text}" ↔ "${c.text}"!`;
+    firstPick = null;
+    document.getElementById('puzStatus').textContent = `Đã ghép: ${matched.size / 2} / 6 cặp`;
+  } else {
+    msg.style.color = '#f87171';
+    msg.textContent = `❌ Chưa khớp! Hãy tìm thẻ có nội dung tương ứng nhé!`;
+    firstPick = null;
+  }
+  render();
+}
+render();
+</script>
+</body>
+</html>

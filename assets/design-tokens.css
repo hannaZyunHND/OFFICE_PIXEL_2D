@@ -1,0 +1,93 @@
+/* ==========================================================================
+   PIXEL AGENT OFFICE — THREE-LAYER DESIGN TOKENS (Primitive -> Semantic -> Component)
+   Generated from assets/design-tokens.json & design-system/pixel-agent-office/MASTER.md
+   ========================================================================== */
+
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&family=Silkscreen:wght@400;700&display=swap');
+
+:root {
+  /* --- Layer 1: Primitive Tokens --- */
+  --primitive-slate-950: #020617;
+  --primitive-slate-900: #0F172A;
+  --primitive-slate-850: #1B2336;
+  --primitive-slate-800: #1E293B;
+  --primitive-slate-700: #334155;
+  --primitive-slate-600: #475569;
+  --primitive-slate-400: #94A3B8;
+  --primitive-slate-50:  #F8FAFC;
+
+  --primitive-emerald-500: #22C55E;
+  --primitive-emerald-600: #16A34A;
+  --primitive-emerald-400: #4ADE80;
+  --primitive-sky-400:     #38BDF8;
+  --primitive-amber-500:   #F59E0B;
+  --primitive-purple-500:  #A855F7;
+  --primitive-purple-400:  #C084FC;
+  --primitive-red-500:     #EF4444;
+
+  /* --- Layer 2: Semantic Tokens (Dark OLED Observatory) --- */
+  --color-canvas-void:      var(--primitive-slate-950);
+  --color-background:       var(--primitive-slate-900);
+  --color-foreground:       var(--primitive-slate-50);
+  --color-card:             var(--primitive-slate-850);
+  --color-card-foreground:  var(--primitive-slate-50);
+  --color-muted:            var(--primitive-slate-800);
+  --color-muted-foreground: var(--primitive-slate-400);
+  --color-border:           var(--primitive-slate-700);
+  --color-ring:             var(--primitive-sky-400);
+
+  --color-primary:          var(--primitive-slate-800);
+  --color-on-primary:       var(--primitive-slate-50);
+  --color-secondary:        var(--primitive-slate-700);
+  --color-on-secondary:     var(--primitive-slate-50);
+  --color-accent:           var(--primitive-emerald-500);
+  --color-on-accent:        var(--primitive-slate-950);
+  --color-destructive:      var(--primitive-red-500);
+  --color-on-destructive:   var(--primitive-slate-50);
+
+  /* Mode & FSM Semantic Accents */
+  --color-godview:          var(--primitive-sky-400);
+  --color-handoff:          var(--primitive-amber-500);
+  --color-editmode:         var(--primitive-purple-500);
+  --color-fsm-idle:         #10B981;
+  --color-fsm-moving:       var(--primitive-sky-400);
+  --color-fsm-working:      var(--primitive-emerald-500);
+  --color-fsm-tool:         var(--primitive-amber-500);
+  --color-fsm-handoff:      var(--primitive-purple-400);
+  --color-fsm-complete:     var(--primitive-emerald-400);
+  --color-fsm-error:        var(--primitive-red-500);
+
+  /* Typography Tokens */
+  --font-pixel: 'Silkscreen', 'JetBrains Mono', monospace;
+  --font-mono:  'JetBrains Mono', monospace;
+  --font-sans:  'IBM Plex Sans', system-ui, -apple-system, sans-serif;
+
+  /* High-Density Dashboard Spacing (Density 8/10) */
+  --space-2xs: 2px;
+  --space-xs:  4px;
+  --space-sm:  8px;
+  --space-md:  12px;
+  --space-lg:  16px;
+  --space-xl:  24px;
+  --space-2xl: 32px;
+
+  /* Pixel Grid Constants */
+  --tile-base-size: 32px;
+  --tile-default-scale: 2;
+
+  /* --- Layer 3: Component Tokens --- */
+  --hud-topbar-height: 48px;
+  --hud-surface-bg: rgba(15, 23, 42, 0.90);
+  --hud-drawer-width: 380px;
+  --hud-drawer-bg: rgba(15, 23, 42, 0.95);
+  --hud-backdrop-blur: blur(8px);
+}
+
+/* Crisp Pixel Canvas Enforcement */
+canvas.pixel-office-canvas {
+  image-rendering: -moz-crisp-edges;
+  image-rendering: -webkit-crisp-edges;
+  image-rendering: pixelated;
+  image-rendering: crisp-edges;
+  background-color: var(--color-canvas-void);
+}

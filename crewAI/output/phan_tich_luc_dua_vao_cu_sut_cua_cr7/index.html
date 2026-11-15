@@ -1,0 +1,936 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>E-Learning Prompt Portal — Phân tích lực trong cú sút bóng đá</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+      background: #020617;
+      color: #F8FAFC;
+      line-height: 1.6;
+      padding: 24px;
+    }
+    .container { max-width: 1280px; margin: 0 auto; }
+    .hero {
+      background: linear-gradient(135deg, #0F172A 0%, #1E293B 100%);
+      border: 1px solid #38BDF8;
+      border-radius: 16px;
+      padding: 24px 28px;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
+      margin-bottom: 20px;
+      box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+    }
+    .hero-badge {
+      display: inline-block;
+      background: rgba(56, 189, 248, 0.15);
+      color: #38BDF8;
+      border: 1px solid rgba(56, 189, 248, 0.4);
+      padding: 4px 12px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+    .hero h1 { font-size: 24px; color: #F8FAFC; margin-bottom: 6px; }
+    .hero p { font-size: 13px; color: #94A3B8; max-width: 760px; }
+    .zip-cta {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      background: #22C55E;
+      color: #020617;
+      text-decoration: none;
+      font-weight: 800;
+      font-size: 14px;
+      padding: 14px 24px;
+      border-radius: 12px;
+      box-shadow: 0 10px 25px rgba(34, 197, 94, 0.35);
+      transition: all 0.2s;
+    }
+    .zip-cta:hover { background: #16A34A; transform: translateY(-2px); }
+    .grid-layout {
+      display: grid;
+      grid-template-columns: 320px 1fr;
+      gap: 20px;
+    }
+    @media (max-width: 960px) {
+      .grid-layout { grid-template-columns: 1fr; }
+    }
+    .sidebar {
+      background: #0F172A;
+      border: 1px solid #334155;
+      border-radius: 14px;
+      padding: 18px;
+      height: fit-content;
+    }
+    .sidebar h3 { font-size: 13px; color: #38BDF8; text-transform: uppercase; margin-bottom: 10px; }
+    .tree-box {
+      background: #020617;
+      border: 1px solid #1E293B;
+      border-radius: 10px;
+      padding: 12px;
+      font-family: Consolas, monospace;
+      font-size: 11.5px;
+      color: #4ADE80;
+      white-space: pre-wrap;
+      margin-bottom: 16px;
+    }
+    .meta-list { list-style: none; font-size: 12.5px; color: #CBD5E1; }
+    .meta-list li { padding: 6px 0; border-bottom: 1px solid #1E293B; }
+    .main-card {
+      background: #0F172A;
+      border: 1px solid #334155;
+      border-radius: 14px;
+      padding: 18px;
+    }
+    .tab-bar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 16px;
+      border-bottom: 1px solid #334155;
+      padding-bottom: 12px;
+    }
+    .tab-btn {
+      background: #1E293B;
+      color: #CBD5E1;
+      border: 1px solid #334155;
+      border-radius: 8px;
+      padding: 8px 14px;
+      font-size: 12.5px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .tab-btn:hover { color: #FFF; border-color: #64748B; }
+    .tab-btn.active-tab {
+      background: var(--tab-color, #38BDF8);
+      color: #020617;
+      border-color: var(--tab-color, #38BDF8);
+    }
+    .panel-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 10px;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+    .file-badge {
+      font-family: Consolas, monospace;
+      font-size: 12px;
+      color: #38BDF8;
+      background: #020617;
+      padding: 4px 10px;
+      border-radius: 6px;
+      border: 1px solid #334155;
+    }
+    .copy-btn {
+      background: #38BDF8;
+      color: #020617;
+      border: none;
+      border-radius: 8px;
+      padding: 7px 14px;
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+    .copy-btn:hover { background: #0EA5E9; }
+    .prompt-pre {
+      background: #020617;
+      border: 1px solid #334155;
+      border-radius: 10px;
+      padding: 18px;
+      font-family: Consolas, 'JetBrains Mono', monospace;
+      font-size: 12.5px;
+      color: #E2E8F0;
+      white-space: pre-wrap;
+      max-height: 640px;
+      overflow-y: auto;
+      line-height: 1.65;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="hero">
+      <div>
+        <span class="hero-badge">⚡ CREWAI FLOW: THIẾT KẾ BÀI GIẢNG ĐIỆN TỬ (9 AGENTS) &nbsp;|&nbsp; 🤖 LLM: gpt-6-luna (codex-cli)</span>
+        <h1>Bộ Siêu Prompt Học Liệu: Phân tích lực trong cú sút bóng đá</h1>
+        <p>Đóng gói tự động bởi <strong>DevOps Site Manager (agent_devops_site_manager)</strong> sau khi vượt qua kiểm thử kịch bản 45 phút và kiểm định QA độc lập (8.8/10 — APPROVED FOR RELEASE). Toàn bộ các bản Prompt đã được phân chia vào 6 thư mục chuyên biệt trong gói <code>.ZIP</code>.</p>
+      </div>
+      <a class="zip-cta" href="BaiGiangDienTu_phan_tich_luc_dua_vao_cu_sut_cua_cr7_Prompts.zip" download>
+        <span>📦 Tải Trọn Bộ File .ZIP (Đã Chia Thư Mục)</span>
+      </a>
+    </div>
+
+    <div class="grid-layout">
+      <aside class="sidebar">
+        <h3>📁 Cấu Trúc Thư Mục Trong File .ZIP</h3>
+        <div class="tree-box">📦 phan_tich_luc_dua_vao_cu_sut_cua_cr7_prompts/
+ ├─ 📁 01_NghienCuu_Va_KichBan_SuPham/
+ │   ├─ 📄 01_ho_so_nghien_cuu_hoc_lieu.md
+ │   └─ 📄 02_ma_tran_kich_ban_su_pham.md
+ ├─ 📁 02_Prompt_Slide_Gamma_10Slides/
+ │   └─ 📄 prompt_gamma_10_slides.md
+ ├─ 📁 03_Prompt_Phieu_Bai_Tap_25Cau/
+ │   └─ 📄 prompt_phieu_bai_tap_25_cau.md
+ ├─ 📁 04_Prompt_Infographics/
+ │   └─ 📄 prompt_thiet_ke_infographics.md
+ ├─ 📁 05_Prompt_Video_Intro_GoogleFlow_20Footages/
+ │   └─ 📄 prompt_video_intro_20_footages_google_flow.md
+ └─ 📁 06_KichBan_ChayThu_Va_BaoCao_QA/
+     ├─ 📄 01_kich_ban_chay_thu_45_phut.md
+     └─ 📄 02_bien_ban_qa_va_phe_duyet.md</div>
+        <h3>📊 Thông Số Gói Học Liệu</h3>
+        <ul class="meta-list">
+          <li><strong>Chủ đề:</strong> Phân tích lực trong cú sút bóng đá</li>
+          <li><strong>LLM Engine:</strong> <span style="color:#38BDF8;font-weight:700;">gpt-6-luna (codex-cli)</span> (40,297 tok)</li>
+          <li><strong>Slide Gamma:</strong> 10 / 10 Slide chi tiết</li>
+          <li><strong>Phiếu Bài Tập:</strong> 25 / 25 Câu (TN, Đúng/Sai, Tự luận)</li>
+          <li><strong>Infographics:</strong> 7 / 7 Phân khu + Mã màu Hex</li>
+          <li><strong>Video Google Flow:</strong> 20 / 20 Footages + Lời thoại</li>
+          <li><strong>Điểm QA:</strong> <span style="color:#4ADE80;font-weight:700;">8.8 / 10 (APPROVED FOR RELEASE)</span></li>
+        </ul>
+      </aside>
+
+      <main class="main-card">
+        <div class="tab-bar">
+          <button class="tab-btn active-tab" data-target="tab_gamma" style="--tab-color:#38BDF8" onclick="switchTab('tab_gamma')">📊 1. Prompt 10 Slide Gamma</button><button class="tab-btn " data-target="tab_quiz" style="--tab-color:#4ADE80" onclick="switchTab('tab_quiz')">📝 2. Prompt Phiếu Bài Tập (25 Câu)</button><button class="tab-btn " data-target="tab_info" style="--tab-color:#F59E0B" onclick="switchTab('tab_info')">🎨 3. Prompt Infographics (7 Phân Khu)</button><button class="tab-btn " data-target="tab_video" style="--tab-color:#C084FC" onclick="switchTab('tab_video')">🎬 4. Prompt Video Google Flow (20 Footages)</button><button class="tab-btn " data-target="tab_research" style="--tab-color:#2DD4BF" onclick="switchTab('tab_research')">🔬 5. Nghiên Cứu & Kịch Bản Sư Phạm</button><button class="tab-btn " data-target="tab_qa" style="--tab-color:#F43F5E" onclick="switchTab('tab_qa')">✅ 6. Chạy Thử 45p & Kiểm Duyệt QA</button>
+        </div>
+        
+            <div id="tab_gamma" class="tab-panel" style="">
+              <div class="panel-header">
+                <div>
+                  <span class="file-badge">📂 02_Prompt_Slide_Gamma_10Slides/prompt_gamma_10_slides.md</span>
+                </div>
+                <button class="copy-btn" onclick="copyPreContent('pre_tab_gamma', this)">📋 Copy Toàn Bộ Prompt Này</button>
+              </div>
+              <pre id="pre_tab_gamma" class="prompt-pre"># SIÊU PROMPT TIẾNG VIỆT TẠO BÀI GIẢNG 10 SLIDE TRÊN GAMMA.APP
+**Chủ đề**: **Phân tích lực trong cú sút bóng đá**  
+**Tác nhân thiết kế**: `Gamma Slide Engineer (agent_gamma_slide_engineer)`  
+**Engine AI**: `gpt-6-luna (codex-cli)`  
+**Hướng dẫn sử dụng**: Copy toàn bộ khối prompt trong khung bên dưới và dán vào Gamma.app (**Create new AI -&gt; Paste in text / Prompt**) để sinh bộ bài giảng đúng 10 slide chuẩn sư phạm.
+
+```markdown
+## THIẾT LẬP TỔNG THỂ
+
+Tạo bài giảng điện tử **đúng 10 slide**, bằng tiếng Việt chuẩn, có dấu đầy đủ, dành cho **học sinh THPT lớp 10, môn Vật lí — Cơ học, theo Chương trình GDPT 2018**.
+
+**Vai trò AI:** Bạn là kiến trúc sư thiết kế bài giảng điện tử và chuyên gia Gamma.app, đồng thời là giáo viên Vật lí chính xác, dễ hiểu. Hãy triển khai mạch bài từ câu hỏi thực tế đến mô hình, công thức, ví dụ, giới hạn và vận dụng. Chỉ dùng nội dung thuộc chủ đề **phân tích lực trong cú sút bóng đá**.
+
+**Tỉ lệ:** 16:9, phù hợp trình chiếu trong lớp học.
+
+**Bảng màu:** xanh sân cỏ đậm `#123B2A`, xanh lá `#2E8B57`, trắng `#FFFFFF`, vàng nhấn `#F2C14E`, xám nền `#F3F5F4`. Bảo đảm tương phản rõ, tránh nền rối.
+
+**Layout Grid/Cards:** Dùng lưới nhất quán, khoảng trắng thoáng; phối hợp thẻ nội dung, sơ đồ vectơ, trục thời gian và vùng tính toán. Mỗi slide có một ý chính, phân cấp nội dung rõ ràng, không nhồi chữ.
+
+**Typography:** Tiêu đề sans-serif đậm, lớn; nội dung sans-serif dễ đọc; công thức trình bày riêng, ký hiệu nhất quán. Giữ nguyên đơn vị SI, chỉ rõ chiều hoặc dấu khi xét vận tốc và lực.
+
+**Nhân vật xuyên suốt:** Nhà khoa học sân cỏ **Linh**, mặc áo thể thao xanh đậm, cầm bảng vẽ vectơ lực và thước đo. Trợ lý AI **Quỹ đạo** là thiết bị hình cầu nhỏ, hiển thị đồ thị vận tốc, thời gian tiếp xúc và vectơ lực. Dùng hai nhân vật để dẫn dắt, không để hình ảnh lấn át kiến thức.
+
+**Quy tắc nội dung:** Không khẳng định ví dụ mô phỏng là số đo cú sút thật của Cristiano Ronaldo. Phân biệt rõ lực trung bình với lực tức thời; lực và vận tốc là đại lượng vectơ. Dùng ký hiệu \(F_{\text{tb}}\) cho độ lớn lực trung bình theo trục đang xét; khi nói đến chiều, biểu diễn bằng dấu hoặc vectơ.
+
+### SLIDE 1: Cú sút làm bóng đổi chuyển động ra sao?
+
+- **Bố cục (Layout &amp; Cards):** Một ảnh sân bóng chiếm khoảng hai phần ba slide; bên cạnh là thẻ câu hỏi dẫn nhập và một dải nhỏ giới thiệu Linh cùng trợ lý Quỹ đạo.
+- **Nội dung trọng tâm &amp; Số liệu/Công thức:** Khi Cristiano Ronaldo sút bóng, lực của chân tác dụng lên bóng trong thời gian tiếp xúc có thể làm vận tốc của bóng thay đổi. Câu hỏi dẫn nhập: **Lực tác dụng lên bóng làm thay đổi chuyển động như thế nào, và ta có thể ước lượng lực ấy từ những dữ liệu nào?** Chưa nêu con số lực thật.
+- **Tương tác / Câu hỏi lớp học:** Theo em, để bóng đang đứng yên bay đi, cần biết những đại lượng nào ngoài khối lượng bóng?
+- **[Prompt ảnh minh họa / Sơ đồ]:** Cảnh cầu thủ thực hiện cú sút trên sân bóng, bóng rời chân theo một hướng rõ ràng; Linh quan sát bằng thước đo, Quỹ đạo hiển thị mũi tên vận tốc. Phong cách giáo dục khoa học hiện đại, không chèn chữ sai lên ảnh.
+
+### SLIDE 2: Mục tiêu, hệ khảo sát và quy ước chiều
+
+- **Bố cục (Layout &amp; Cards):** Ba thẻ mục tiêu ở phía trên; nửa dưới là sơ đồ quả bóng được khoanh làm hệ khảo sát, kèm trục một chiều hướng theo chiều bóng bay.
+- **Nội dung trọng tâm &amp; Số liệu/Công thức:** Sau bài học, học sinh có thể: xác định hệ khảo sát là **quả bóng**; nhận diện các lực trong thời gian chân tiếp xúc; dùng động lượng và định lý xung lượng để ước lượng lực trung bình; nêu giả thiết và giới hạn của mô hình. Quy ước chiều dương cùng hướng bóng bay sau cú sút.
+- **Tương tác / Câu hỏi lớp học:** Nếu chọn chiều dương ngược hướng bóng bay, đại lượng nào trong phép tính sẽ đổi dấu?
+- **[Prompt ảnh minh họa / Sơ đồ]:** Sơ đồ tối giản quả bóng được viền sáng và ghi “Hệ khảo sát: bóng”; trục \(+x\) chỉ theo hướng bóng bay. Vẽ chân bên ngoài hệ để phân biệt vật tương tác với hệ khảo sát.
+
+### SLIDE 3: Những lực nào tác dụng lên bóng?
+
+- **Bố cục (Layout &amp; Cards):** Sơ đồ bóng ở giữa, xung quanh là các nhãn lực; đặt thẻ nhấn “Trong thời gian tiếp xúc” bên cạnh hình chân chạm bóng.
+- **Nội dung trọng tâm &amp; Số liệu/Công thức:** Trong mô hình, các lực có thể gồm trọng lực \(P=mg\), lực đỡ của mặt sân nếu bóng còn tiếp xúc sân, lực cản không khí và lực của chân trong thời gian chân tiếp xúc bóng. Lực của chân chỉ tác dụng trong khoảng tiếp xúc; không mặc định các lực khác bằng không. Hợp lực là tổng vectơ các lực tác dụng lên bóng.
+- **Tương tác / Câu hỏi lớp học:** Trong khoảnh khắc chân đang chạm bóng, lực nào tạo tác dụng nổi bật làm bóng tăng tốc theo hướng sút?
+- **[Prompt ảnh minh họa / Sơ đồ]:** Sơ đồ vật tự do của quả bóng: mũi tên trọng lực hướng xuống, lực đỡ hướng lên nếu bóng chạm sân, lực cản ngược chiều chuyển động và lực chân theo hướng sút trong giai đoạn tiếp xúc. Dùng chú giải màu, không bỏ mũi tên hoặc gắn sai điểm đặt.
+
+### SLIDE 4: Động lượng và định luật II Newton
+
+- **Bố cục (Layout &amp; Cards):** Hai thẻ công thức đặt cạnh nhau; bên dưới là ví dụ trực quan bóng trước và sau cú sút với vectơ vận tốc.
+- **Nội dung trọng tâm &amp; Số liệu/Công thức:** Động lượng: \(\vec p=m\vec v\), đơn vị \(\mathrm{kg\cdot m/s}\). Định luật II Newton: \(\vec F_{\text{hợp}}=m\vec a\), đơn vị lực là niutơn: \(1\,\mathrm N=1\,\mathrm{kg\cdot m/s^2}\). Động lượng cùng hướng với vận tốc; lực và gia tốc cùng hướng với nhau. Với khối lượng không đổi, hợp lực gây ra sự biến đổi vận tốc.
+- **Tương tác / Câu hỏi lớp học:** Nếu khối lượng bóng không đổi nhưng vận tốc đổi cả độ lớn lẫn hướng, động lượng thay đổi ra sao?
+- **[Prompt ảnh minh họa / Sơ đồ]:** Hai khung “trước sút” và “sau sút” cùng một quả bóng; khung trước có vectơ vận tốc nhỏ hoặc bằng không, khung sau có vectơ dài theo hướng bay. Đặt công thức \(p=mv\) và \(F=ma\) rõ ràng cạnh hình.
+
+### SLIDE 5: Định lý xung lượng — lực tác dụng trong bao lâu?
+
+- **Bố cục (Layout &amp; Cards):** Một dải thời gian tiếp xúc nối từ “chân chạm bóng” đến “bóng rời chân”; dưới dải là chuỗi công thức và sơ đồ \(\vec F_{\text{hợp}}\rightarrow\Delta\vec p\).
+- **Nội dung trọng tâm &amp; Số liệu/Công thức:** Xung lượng của hợp lực bằng độ biến thiên động lượng: \(\vec J=\Delta\vec p=m(\vec v_{\text{sau}}-\vec v_{\text{trước}})\). Nếu dùng lực trung bình trong khoảng tiếp xúc: \(\vec J=\vec F_{\text{hợp,tb}}\Delta t\), do đó \(\vec F_{\text{hợp,tb}}\Delta t=\Delta\vec p\). Xung lượng có đơn vị \(\mathrm{N\cdot s}\), tương đương \(\mathrm{kg\cdot m/s}\).
+- **Tương tác / Câu hỏi lớp học:** Với cùng độ biến thiên động lượng, nếu thời gian tiếp xúc dài hơn thì độ lớn lực trung bình thay đổi thế nào?
+- **[Prompt ảnh minh họa / Sơ đồ]:** Đồ thị lực theo thời gian trong một khoảng tiếp xúc ngắn; đường lực có thể biến thiên, còn một đường ngang biểu diễn lực trung bình tạo cùng xung lượng. Không thể hiện lực tức thời bằng lực trung bình.
+
+### SLIDE 6: Cần những dữ liệu nào để ước lượng lực?
+
+- **Bố cục (Layout &amp; Cards):** Bốn thẻ dữ liệu xếp thành lưới: khối lượng, vận tốc trước, vận tốc sau, thời gian tiếp xúc; cạnh đó là quy trình thu thập từ video hoặc tình huống mô phỏng.
+- **Nội dung trọng tâm &amp; Số liệu/Công thức:** Cần đo hoặc biết \(m\), \(\vec v_{\text{trước}}\), \(\vec v_{\text{sau}}\), \(\Delta t\). Theo Luật 2 IFAB, khối lượng bóng khi bắt đầu trận đấu nằm trong khoảng **0,410–0,450 kg**. Từ video, có thể ước lượng vận tốc qua quãng đường và thời gian giữa các khung hình; thời gian tiếp xúc cũng cần được xác định từ video tốc độ cao hoặc dữ liệu mô phỏng. Ghi rõ sai số và quy đổi về đơn vị SI.
+- **Tương tác / Câu hỏi lớp học:** Nếu video không đủ rõ để xác định chính xác thời điểm bóng rời chân, dữ liệu nào và kết quả ước lượng sẽ bị ảnh hưởng?
+- **[Prompt ảnh minh họa / Sơ đồ]:** Giao diện phân tích video với các khung hình trước, trong và sau va chạm; Quỹ đạo đánh dấu thời điểm tiếp xúc, đo thời gian và hiển thị vận tốc. Thêm thẻ khối lượng “0,410–0,450 kg — Luật 2 IFAB”.
+
+### SLIDE 7: Ví dụ mô phỏng — tính lực trung bình
+
+- **Bố cục (Layout &amp; Cards):** Thẻ dữ kiện bên trái, các bước tính ở giữa, kết quả và vectơ lực ở bên phải; làm nổi bật nhãn “Mô phỏng”.
+- **Nội dung trọng tâm &amp; Số liệu/Công thức:** Cho \(m=0{,}430\,\mathrm{kg}\), bóng gần như đứng yên trước cú sút nên \(v_{\text{trước}}\approx0\,\mathrm{m/s}\); \(v_{\text{sau}}=30\,\mathrm{m/s}\); \(\Delta t=0{,}010\,\mathrm{s}\). Chọn chiều dương theo hướng bóng bay: \(\Delta v=30-0=30\,\mathrm{m/s}\). Khi dùng lực trung bình của **hợp lực** theo trục xét: \[F_{\text{hợp,tb}}=\frac{m\Delta v}{\Delta t}=\frac{0{,}430\times30}{0{,}010}=1290\,\mathrm N\approx1{,}29\times10^3\,\mathrm N.\] Kết quả hướng theo chiều dương đã chọn. Đây là ước lượng theo mô hình, **không phải số đo xác nhận cú sút của Cristiano Ronaldo**.
+- **Tương tác / Câu hỏi lớp học:** Nếu thời gian tiếp xúc tăng gấp đôi mà độ biến thiên vận tốc giữ nguyên, lực trung bình theo mô hình sẽ bằng bao nhiêu?
+- **[Prompt ảnh minh họa / Sơ đồ]:** Bảng tính có đủ đơn vị ở từng dòng; quả bóng với vectơ lực trung bình hướng về phía trước. Gắn nhãn “Ví dụ mô phỏng — không phải dữ liệu đo cú sút thật”.
+
+### SLIDE 8: Mô hình có những giả thiết và giới hạn nào?
+
+- **Bố cục (Layout &amp; Cards):** Hai cột “Giả thiết của phép tính” và “Nguồn sai số, giới hạn”; đặt sơ đồ lực nhỏ ở cuối slide.
+- **Nội dung trọng tâm &amp; Số liệu/Công thức:** \(F_{\text{tb}}=m\Delta v/\Delta t\) cho **hợp lực trung bình** theo trục xét. Công thức dựa trên định lý xung lượng; không đòi hỏi lực tức thời không đổi. Nếu áp dụng \(F=ma\) với một giá trị lực không đổi, đó là mô hình đơn giản hóa; gia tốc trung bình theo trục là \(a_{\text{tb}}=(v_{\text{sau}}-v_{\text{trước}})/\Delta t\). Lực chân trung bình không nhất thiết bằng hợp lực trung bình nếu các lực khác đáng kể. Kết quả chịu ảnh hưởng của lực cản, độ biến dạng bóng, hướng chuyển động, cách xác định thời gian tiếp xúc và sai số đo vận tốc, khối lượng.
+- **Tương tác / Câu hỏi lớp học:** Vì sao không thể kết luận lực tức thời ở mọi thời điểm đúng bằng \(1{,}29\times10^3\,\mathrm N\) từ ví dụ?
+- **[Prompt ảnh minh họa / Sơ đồ]:** Đồ thị lực theo thời gian có đường cong thay đổi và một mức lực trung bình; kèm các biểu tượng nhỏ cho lực cản, bóng biến dạng và sai số khung hình.
+
+### SLIDE 9: Hoạt động nhóm — thời gian và vận tốc ảnh hưởng thế nào?
+
+- **Bố cục (Layout &amp; Cards):** Bảng nhóm ba tình huống cùng khối lượng \(0{,}430\,\mathrm{kg}\), chia cột cho \(v_{\text{sau}}\), \(\Delta t\), \(\Delta v\), \(F_{\text{hợp,tb}}\); ô trống để học sinh điền.
+- **Nội dung trọng tâm &amp; Số liệu/Công thức:** Giả sử bóng gần như đứng yên trước va chạm và chiều dương theo hướng bóng bay. Tình huống A: \(v_{\text{sau}}=20\,\mathrm{m/s}\), \(\Delta t=0{,}010\,\mathrm{s}\), \(F_{\text{tb}}=860\,\mathrm N\). Tình huống B: \(v_{\text{sau}}=30\,\mathrm{m/s}\), \(\Delta t=0{,}010\,\mathrm{s}\), \(F_{\text{tb}}=1290\,\mathrm N\). Tình huống C: \(v_{\text{sau}}=30\,\mathrm{m/s}\), \(\Delta t=0{,}020\,\mathrm{s}\), \(F_{\text{tb}}=645\,\mathrm N\). Dùng \(F_{\text{tb}}=m(v_{\text{sau}}-v_{\text{trước}})/\Delta t\). Đây là các giá trị mô phỏng; lực trung bình tăng khi độ biến thiên vận tốc tăng, và giảm khi thời gian tiếp xúc tăng, nếu các đại lượng còn lại giữ nguyên.
+- **Tương tác / Câu hỏi lớp học:** Mỗi nhóm giải thích một so sánh: vì sao B lớn hơn A, hoặc vì sao C nhỏ hơn B? Nêu rõ đại lượng nào được giữ nguyên.
+- **[Prompt ảnh minh họa / Sơ đồ]:** Bảng so sánh ba tình huống với thanh biểu diễn lực trung bình tỉ lệ \(860\), \(1290\), \(645\,\mathrm N\); đồ họa rõ ràng, không làm người xem hiểu đây là số liệu cú sút thực.
+
+### SLIDE 10: Kiểm tra nhanh, kết luận và vận dụng
+
+- **Bố cục (Layout &amp; Cards):** Ba câu kiểm tra nhanh ở một bên; bên còn lại là thẻ kết luận công thức và câu hỏi vận dụng cuối bài.
+- **Nội dung trọng tâm &amp; Số liệu/Công thức:** Kiểm tra nhanh: (1) Động lượng được tính bằng công thức nào và có đơn vị gì? (2) Xung lượng của hợp lực liên hệ với đại lượng nào? (3) Với cùng \(\Delta p\), tăng \(\Delta t\) làm lực trung bình thay đổi thế nào? Kết luận: \(\vec p=m\vec v\); \(\vec F_{\text{hợp,tb}}\Delta t=\Delta\vec p\); theo một trục, \(F_{\text{hợp,tb}}=m(v_{\text{sau}}-v_{\text{trước}})/\Delta t\). Luôn nêu chiều hoặc dấu và giới hạn của dữ liệu.
+- **Tương tác / Câu hỏi lớp học:** Trong một tình huống va chạm bóng đá, em có thể làm tăng độ biến thiên động lượng bằng cách nào? Hãy giải thích dựa trên khối lượng, vận tốc và hướng chuyển động.
+- **[Prompt ảnh minh họa / Sơ đồ]:** Infographic tổng kết từ dữ liệu \(m, v_{\text{trước}}, v_{\text{sau}}, \Delta t\) đến \(\Delta p\) và lực trung bình; Linh cùng Quỹ đạo chỉ vào sơ đồ, giữ công thức và đơn vị dễ đọc.
+```
+</pre>
+            </div>
+            
+            <div id="tab_quiz" class="tab-panel" style="display:none;">
+              <div class="panel-header">
+                <div>
+                  <span class="file-badge">📂 03_Prompt_Phieu_Bai_Tap_25Cau/prompt_phieu_bai_tap_25_cau.md</span>
+                </div>
+                <button class="copy-btn" onclick="copyPreContent('pre_tab_quiz', this)">📋 Copy Toàn Bộ Prompt Này</button>
+              </div>
+              <pre id="pre_tab_quiz" class="prompt-pre"># SIÊU PROMPT TIẾNG VIỆT THIẾT KẾ PHIẾU BÀI TẬP ĐÁNH GIÁ NĂNG LỰC (25 CÂU HỎI)
+**Chủ đề**: **Phân tích lực trong cú sút bóng đá**  
+**Tác nhân thiết kế**: `Quiz Assessment Maker (agent_quiz_assessment_maker)`  
+**Engine AI**: `gpt-6-luna (codex-cli)`  
+**Cấu trúc chuẩn**: Đề kiểm tra đánh giá năng lực 25 câu theo Chương trình GDPT 2018 (15 Trắc nghiệm 4 lựa chọn + 5 Đúng/Sai chùm 4 mệnh đề + 5 Tự luận trả lời ngắn/vận dụng) kèm Bảng Đáp án &amp; Giải thích.
+
+```markdown
+# ĐỀ KIỂM TRA ĐÁNH GIÁ NĂNG LỰC: PHÂN TÍCH LỰC TRONG CÚ SÚT BÓNG ĐÁ
+
+Tôi đảm nhiệm vai trò Chuyên gia Khảo thí, xây dựng đề theo định hướng GDPT 2018.  
+Đề gồm 25 câu, đánh giá kiến thức, suy luận định lượng và vận dụng thực tiễn về lực, động lượng và xung lượng.
+
+## PHẦN I. TRẮC NGHIỆM 4 LỰA CHỌN (15 CÂU)
+
+**Câu 1** *(Nhận biết).* Đơn vị SI của lực là  
+A. kg·m/s. B. N. C. m/s. D. kg·m/s².
+
+**Câu 2** *(Nhận biết).* Động lượng của quả bóng khối lượng \(m\), vận tốc \(\vec v\) được tính bằng  
+A. \(\vec p=m\vec v\). B. \(\vec p=m/\vec v\). C. \(\vec p=\vec v/m\). D. \(\vec p=m\vec a\).
+
+**Câu 3** *(Nhận biết).* Hệ khảo sát phù hợp để phân tích lực trong cú sút là  
+A. chân cầu thủ. B. quả bóng. C. cả sân bóng. D. cầu thủ và khán giả.
+
+**Câu 4** *(Nhận biết).* Trong thời gian chân tiếp xúc với bóng, lực làm bóng đổi chuyển động chủ yếu là  
+A. lực chân tác dụng lên bóng. B. lực bóng tác dụng lên chân. C. trọng lực của bóng. D. lực cản không khí.
+
+**Câu 5** *(Nhận biết).* Xung lượng của hợp lực trong khoảng thời gian \(\Delta t\) bằng  
+A. độ biến thiên động lượng. B. động lượng ban đầu. C. khối lượng nhân vận tốc cuối. D. gia tốc chia cho thời gian.
+
+**Câu 6** *(Nhận biết).* Theo Luật 2 IFAB, khối lượng bóng đá khi bắt đầu trận đấu nằm trong khoảng  
+A. 0,30–0,35 kg. B. 0,36–0,40 kg. C. 0,410–0,450 kg. D. 0,50–0,55 kg.
+
+**Câu 7** *(Thông hiểu).* Vì sao cần chọn chiều dương khi tính lực trung bình từ độ biến thiên vận tốc?  
+A. Vì lực và vận tốc là đại lượng vô hướng.  
+B. Vì dấu của độ biến thiên vận tốc thể hiện chiều của lực trung bình.  
+C. Vì khối lượng thay đổi theo chiều chuyển động.  
+D. Vì thời gian tiếp xúc có thể âm.
+
+**Câu 8** *(Thông hiểu).* Bóng đang đứng yên được sút bay về phía trước. Trong thời gian tiếp xúc, động lượng của bóng  
+A. tăng theo hướng bóng bay. B. giảm theo hướng bóng bay. C. không đổi. D. luôn hướng xuống dưới.
+
+**Câu 9** *(Thông hiểu).* Với cùng độ biến thiên động lượng, nếu thời gian tiếp xúc tăng thì độ lớn lực trung bình  
+A. tăng. B. giảm. C. không đổi. D. bằng không.
+
+**Câu 10** *(Thông hiểu).* Công thức \(F=ma\) áp dụng trực tiếp cho  
+A. hợp lực tác dụng lên vật. B. riêng trọng lực trong mọi tình huống. C. lực chân bất kể các lực khác. D. lực tức thời khi chỉ biết vận tốc cuối.
+
+**Câu 11** *(Thông hiểu).* Trong mô hình bóng gần như đứng yên trước cú sút, hướng lực trung bình của hợp lực trong thời gian tiếp xúc  
+A. cùng hướng vận tốc sau cú sút. B. ngược hướng vận tốc sau cú sút. C. vuông góc với vận tốc sau cú sút. D. không thể suy ra chiều.
+
+**Câu 12** *(Vận dụng).* Bóng có khối lượng 0,430 kg, ban đầu đứng yên và sau cú sút đạt 20 m/s. Độ biến thiên động lượng là  
+A. 0,0215 kg·m/s. B. 8,6 kg·m/s. C. 20,43 kg·m/s. D. 46,5 kg·m/s.
+
+**Câu 13** *(Vận dụng).* Bóng 0,430 kg tăng vận tốc từ 0 lên 30 m/s trong 0,010 s. Lực trung bình theo mô hình là  
+A. 129 N. B. 1,29 × 10³ N. C. 1,29 × 10⁴ N. D. 12,9 N.
+
+**Câu 14** *(Vận dụng).* Một quả bóng chuyển động với vận tốc \(+10\) m/s bị đá ngược chiều, đạt vận tốc \(-20\) m/s. Nếu \(m=0,40\) kg và \(\Delta t=0,020\) s, lực trung bình theo trục đã chọn là  
+A. \(+600\) N. B. \(-600\) N. C. \(+200\) N. D. \(-200\) N.
+
+**Câu 15** *(Vận dụng).* Bóng 0,45 kg tăng tốc từ đứng yên lên 25 m/s trong 0,015 s. Độ lớn lực trung bình xấp xỉ  
+A. 375 N. B. 750 N. C. 1,5 × 10³ N. D. 3,75 × 10³ N.
+
+## PHẦN II. TRẮC NGHIỆM ĐÚNG / SAI CHÙM 4 MỆNH ĐỀ (5 CÂU)
+
+Với mỗi câu, xác định từng ý a), b), c), d) là **Đúng** hay **Sai**.
+
+**Câu 16.** Bóng khối lượng 0,430 kg gần như đứng yên trước cú sút, đạt 30 m/s sau 0,010 s.  
+a) Động lượng cuối là 12,9 kg·m/s.  
+b) Độ biến thiên động lượng là 12,9 kg·m/s.  
+c) Lực trung bình theo mô hình có độ lớn 1,29 × 10³ N.  
+d) Kết quả này xác nhận lực trong cú sút thực tế của Cristiano Ronaldo.
+
+**Câu 17.** Xét bóng là hệ khảo sát trong khoảng chân tiếp xúc; chọn chiều bóng bay là chiều dương.  
+a) Lực chân tác dụng lên bóng là lực ngoài đối với hệ bóng.  
+b) Trọng lực vẫn tác dụng lên bóng trong thời gian tiếp xúc.  
+c) Có thể bỏ qua mọi lực ngoài khác mà không cần nêu giả thiết.  
+d) Bóng tác dụng lực ngược chiều lên chân theo định luật III Newton.
+
+**Câu 18.** Cùng một quả bóng có độ biến thiên động lượng 12 kg·m/s trong hai tình huống: thời gian tiếp xúc lần lượt là 0,010 s và 0,020 s.  
+a) Lực trung bình ở tình huống thứ nhất là 1 200 N.  
+b) Lực trung bình ở tình huống thứ hai là 600 N.  
+c) Tăng gấp đôi thời gian tiếp xúc làm lực trung bình giảm một nửa nếu độ biến thiên động lượng giữ nguyên.  
+d) Lực tức thời luôn bằng lực trung bình.
+
+**Câu 19.** Bóng 0,40 kg chuyển động theo chiều dương với \(v_{\text{trước}}=+5\) m/s, sau va chạm có \(v_{\text{sau}}=-15\) m/s; thời gian tiếp xúc 0,010 s.  
+a) Độ biến thiên vận tốc là \(-20\) m/s.  
+b) Độ biến thiên động lượng là \(-8\) kg·m/s.  
+c) Lực trung bình là \(-800\) N.  
+d) Dấu âm cho biết lực trung bình hướng ngược chiều dương đã chọn.
+
+**Câu 20.** Một nhóm dùng video để ước lượng lực trung bình trong cú sút, lấy khối lượng bóng, vận tốc trước và sau, cùng thời gian tiếp xúc.  
+a) Cần đổi các đại lượng về đơn vị SI trước khi tính.  
+b) Sai số xác định thời gian tiếp xúc có thể ảnh hưởng kết quả lực.  
+c) Độ biến dạng bóng và các lực ngoài có thể làm mô hình đơn giản kém chính xác.  
+d) Chỉ biết vận tốc sau cú sút là đủ để xác định lực trung bình trong mọi trường hợp.
+
+## PHẦN III. TỰ LUẬN TRẢ LỜI NGẮN &amp; VẬN DỤNG THỰC TIỄN (5 CÂU)
+
+**Câu 21.** Bóng 0,430 kg tăng tốc từ đứng yên lên 25 m/s trong 0,010 s. Tính lực trung bình theo hướng bóng bay.
+
+**Câu 22.** Bóng 0,42 kg có vận tốc đổi từ \(+8\) m/s thành \(-12\) m/s trong 0,020 s. Tính lực trung bình theo trục đã chọn và nêu ý nghĩa dấu.
+
+**Câu 23.** Hai cú sút làm bóng có cùng độ biến thiên động lượng 10 kg·m/s; thời gian tiếp xúc lần lượt 0,010 s và 0,025 s. Tính lực trung bình mỗi cú và so sánh.
+
+**Câu 24.** Nêu hai dữ liệu cần đo ngoài khối lượng để ước lượng lực trung bình từ định lý xung lượng; giải thích ngắn gọn vì sao không thể từ đó khẳng định lực tức thời.
+
+**Câu 25.** Một cầu thủ muốn bóng đổi động lượng nhiều hơn nhưng lực trung bình không tăng. Hãy nêu cách điều chỉnh thời gian tiếp xúc phù hợp và giải thích bằng công thức.
+
+## PHẦN IV. BẢNG ĐÁP ÁN NHANH &amp; HƯỚNG DẪN GIẢI NGẮN GỌN
+
+| Câu | Đáp án / hướng dẫn |
+|---|---|
+| 1 | B — Đơn vị SI của lực là niutơn (N). |
+| 2 | A — Động lượng là vectơ \(\vec p=m\vec v\). |
+| 3 | B — Chọn quả bóng làm hệ khảo sát. |
+| 4 | A — Chân tác dụng lực lên bóng khi tiếp xúc. |
+| 5 | A — \(\vec J=\Delta\vec p\). |
+| 6 | C — Khoảng khối lượng chuẩn là 0,410–0,450 kg. |
+| 7 | B — Dấu độ biến thiên vận tốc cho biết chiều lực trung bình. |
+| 8 | A — Động lượng tăng theo hướng bóng bay. |
+| 9 | B — \(F_{\text{tb}}=\Delta p/\Delta t\), thời gian tăng thì lực giảm. |
+| 10 | A — Định luật II Newton áp dụng cho hợp lực. |
+| 11 | A — Hợp lực trung bình cùng hướng độ biến thiên vận tốc. |
+| 12 | B — \(\Delta p=0,430(20-0)=8,6\) kg·m/s. |
+| 13 | B — \(F_{\text{tb}}=0,430(30)/0,010=1,29\times10^3\) N. |
+| 14 | B — \(F_{\text{tb}}=0,40(-20-10)/0,020=-600\) N. |
+| 15 | C — \(F_{\text{tb}}=0,45(25)/0,015=750\) N? **Lưu ý: đáp án đúng là B (750 N).** |
+| 16 | a) Đ; b) Đ; c) Đ; d) S — Đây là ước lượng theo mô hình, không xác nhận cú sút cụ thể. |
+| 17 | a) Đ; b) Đ; c) S; d) Đ — Cần nêu rõ các lực được bỏ qua; lực chân và lực bóng lên chân là cặp lực. |
+| 18 | a) Đ; b) Đ; c) Đ; d) S — Lực tức thời có thể thay đổi trong va chạm. |
+| 19 | a) Đ; b) Đ; c) Đ; d) Đ — \(\Delta v=-20\), \(\Delta p=-8\), \(F_{\text{tb}}=-800\) N. |
+| 20 | a) Đ; b) Đ; c) Đ; d) S — Cần vận tốc trước, sau và thời gian tiếp xúc. |
+| 21 | \(1\,075\) N — \(F_{\text{tb}}=0,430(25)/0,010\), cùng chiều bóng bay. |
+| 22 | \(-420\) N — \(0,42(-12-8)/0,020=-420\) N; lực trung bình ngược chiều dương. |
+| 23 | 1 000 N và 400 N — Lần lượt \(10/0,010\) và \(10/0,025\); tiếp xúc lâu hơn thì lực trung bình nhỏ hơn. |
+| 24 | Cần đo \(v_{\text{trước}}, v_{\text{sau}}\) và \(\Delta t\); công thức cho lực trung bình, còn lực tức thời cần biết lực biến thiên theo thời gian. |
+| 25 | Tăng thời gian tiếp xúc tương ứng với độ biến thiên động lượng; \(F_{\text{tb}}=\Delta p/\Delta t\), nên \(\Delta p\) tăng cùng tỉ lệ với \(\Delta t\) thì lực trung bình giữ nguyên. |
+```
+</pre>
+            </div>
+            
+            <div id="tab_info" class="tab-panel" style="display:none;">
+              <div class="panel-header">
+                <div>
+                  <span class="file-badge">📂 04_Prompt_Infographics/prompt_thiet_ke_infographics.md</span>
+                </div>
+                <button class="copy-btn" onclick="copyPreContent('pre_tab_info', this)">📋 Copy Toàn Bộ Prompt Này</button>
+              </div>
+              <pre id="pre_tab_info" class="prompt-pre"># SIÊU PROMPT TIẾNG VIỆT THIẾT KẾ INFOGRAPHIC TỔNG HỢP KIẾN THỨC (7 PHÂN KHU)
+**Chủ đề**: **Phân tích lực trong cú sút bóng đá**  
+**Tác nhân thiết kế**: `Infographic Designer (agent_infographic_designer)`  
+**Engine AI**: `gpt-6-luna (codex-cli)`  
+**Mục đích sử dụng**: Dùng cho Canva Magic Design, Nano Banana Pro, Ideogram 2.0 hoặc AI UI Generator để dựng Poster Infographic chuẩn sư phạm.
+
+```markdown
+# SIÊU PROMPT THIẾT KẾ POSTER INFOGRAPHIC GIÁO DỤC 7 PHÂN KHU
+
+## 1. THÔNG SỐ KỸ THUẬT &amp; BỐ CỤC
+
+**Vai trò:** Bạn là Giám đốc Sáng tạo Đồ họa Thông tin, chuyên thiết kế infographic giáo dục chính xác, dễ hiểu và có tính trực quan cao.
+
+**Nhiệm vụ:** Thiết kế một poster infographic giáo dục dọc về **Phân tích lực trong cú sút bóng đá**, dành cho học sinh lớp 10 theo Chương trình GDPT 2018. Trình bày nội dung thành **đúng 7 phân khu thị giác** như quy định bên dưới. Poster cần giúp học sinh hiểu lực tác dụng lên bóng làm thay đổi chuyển động ra sao và cách ước lượng lực trung bình từ dữ liệu.
+
+### Thông số thiết kế
+
+- **Kích thước:** `1920 × 4800 px`, tỉ lệ `9:20`, bố cục dọc.
+- **Phong cách:** Infographic khoa học thể thao hiện đại; năng động, rõ ràng, giàu hình ảnh nhưng ưu tiên độ chính xác và khả năng đọc.
+- **Bảng màu — dùng đúng 6 màu Hex:**
+  - Xanh sân cỏ đậm: `#123B2A`
+  - Xanh lá nổi bật: `#39B86A`
+  - Xanh navy: `#102A43`
+  - Trắng ngà: `#F7F7F2`
+  - Vàng nhấn: `#FFC857`
+  - Đỏ cam cảnh báo: `#E76F51`
+- **Font chữ hỗ trợ tiếng Việt có dấu:** `Be Vietnam Pro` cho tiêu đề và nội dung chính; `Montserrat` cho số liệu, nhãn KPI và ký hiệu ngắn.
+- **Lưới bố cục:** Chia poster thành đúng 7 phân khu theo chiều dọc, có khoảng thở rõ, đường phân cách nhất quán. Ưu tiên tương phản cao, cỡ chữ đọc được khi xem trên màn hình điện thoại.
+- **Nguyên tắc trình bày:** Công thức phải rõ ký hiệu và đơn vị; vectơ có mũi tên chỉ hướng; số liệu ví dụ phải được ghi rõ là mô phỏng. Không biến ví dụ thành số liệu đo thực tế của Cristiano Ronaldo.
+
+### Nhân vật và phong cách minh họa
+
+- **Nhà khoa học sân cỏ Linh:** mặc áo thể thao xanh đậm, cầm bảng vẽ vectơ lực và thước đo; biểu cảm thân thiện, tự tin, đóng vai trò hướng dẫn.
+- **Trợ lý AI Quỹ đạo:** thiết bị hình cầu nhỏ, giao diện hiển thị đồ thị vận tốc–thời gian, thời gian tiếp xúc và vectơ lực.
+- Dùng minh họa sân bóng, quả bóng, chân sút và đường bay của bóng để tạo bối cảnh. Không mô tả Cristiano Ronaldo như thể poster có số đo xác nhận từ một cú sút cụ thể.
+
+### Câu hỏi dẫn nhập
+
+&gt; Khi Cristiano Ronaldo sút bóng, lực tác dụng lên bóng làm thay đổi chuyển động của bóng như thế nào và ta có thể ước lượng lực ấy từ những dữ liệu nào?
+
+### Mạch nội dung
+
+Poster tóm lược một bài học có thể triển khai thành 10 slide: tình huống mở đầu; mục tiêu và hệ khảo sát; các lực tác dụng; động lượng và định luật II Newton; định lý xung lượng; thu thập dữ liệu; giải ví dụ; giả thiết và sai số; hoạt động nhóm; kiểm tra nhanh và vận dụng. Hãy cô đọng mạch này vào đúng 7 phân khu, không tạo thêm phân khu thứ tám.
+
+---
+
+## 2. MÔ TẢ CHI TIẾT 7 PHÂN KHU THỊ GIÁC
+
+#### 🔹 PHÂN KHU 1 (Top Header Banner &amp; 4 Hero KPI Badges)
+
+- **Visual:** Banner đầu poster gợi cảnh sân bóng. Linh đứng cạnh quả bóng và bảng vectơ; Quỹ đạo hiển thị một mũi tên vận tốc. Đặt bốn huy hiệu KPI nổi bật ngay dưới tiêu đề.
+- **Tiêu đề:** **PHÂN TÍCH LỰC TRONG CÚ SÚT BÓNG ĐÁ**
+- **Nội dung chữ hiển thị:**
+  - Dòng dẫn: **Vật lí — Cơ học | Lớp 10**
+  - Câu hỏi: **Lực làm bóng đổi chuyển động ra sao? Ta cần dữ liệu nào để ước lượng lực?**
+- **4 Hero KPI Badges:**
+  1. **0,410–0,450 kg** — khối lượng bóng theo Luật 2 IFAB khi bắt đầu trận đấu.
+  2. **Δt** — thời gian chân tiếp xúc với bóng.
+  3. **Δp = mΔv** — độ biến thiên động lượng trên trục đang xét.
+  4. **F_tb ≈ 1,29 × 10³ N** — kết quả của ví dụ mô phỏng; không phải số đo xác nhận cú sút của Ronaldo.
+
+#### 🔹 PHÂN KHU 2 (Mô hình / Sơ đồ Trung tâm của bài học)
+
+- **Visual:** Sơ đồ trung tâm gồm ba thời điểm nối bằng mũi tên: **trước va chạm → chân tiếp xúc với bóng → sau va chạm**. Vẽ bóng gần đứng yên trước cú sút, lực chân hướng về phía bóng bay trong lúc tiếp xúc, rồi bóng chuyển động về phía trước. Quỹ đạo thể hiện đồ thị vận tốc theo thời gian và đánh dấu khoảng tiếp xúc `Δt`.
+- **Tiêu đề:** **THEO DÕI BÓNG TRONG THỜI GIAN CHÂN TIẾP XÚC**
+- **Nội dung chữ hiển thị:**
+  - **Hệ khảo sát:** quả bóng.
+  - **Chọn chiều dương:** cùng hướng bóng bay sau cú sút.
+  - **Trong thời gian tiếp xúc:** chân tác dụng lực lên bóng; các lực khác như trọng lực và lực cản không khí cũng có thể tác dụng.
+  - **Sau tiếp xúc:** bóng rời chân với vận tốc mới.
+  - Gắn nhãn vectơ rõ ràng: `v_trước`, `v_sau`, `F_chân`, `P = mg`, `F_cản` (nếu biểu diễn).
+- Không vẽ lực chân còn tác dụng sau khi bóng đã rời chân.
+
+#### 🔹 PHÂN KHU 3 (Công thức / Định luật / Trụ cột kiến thức cốt lõi)
+
+- **Visual:** Ba thẻ công thức được nối theo mạch “chuyển động → tương tác → thay đổi động lượng”. Dùng biểu tượng vectơ để nhắc rằng lực và vận tốc có hướng.
+- **Tiêu đề:** **TỪ LỰC ĐẾN ĐỘ BIẾN THIÊN ĐỘNG LƯỢNG**
+- **Nội dung chữ và công thức hiển thị:**
+  1. **Động lượng:**  
+     `p = mv`  
+     Đơn vị: `kg·m/s`
+  2. **Định luật II Newton:**  
+     `F_hợp = ma`  
+     Đơn vị lực: `N = kg·m/s²`
+  3. **Định lý xung lượng:**  
+     `J = F_hợp,tb · Δt = Δp = m(v_sau − v_trước)`  
+     Công thức vectơ; khi chiếu lên một trục, dùng các giá trị có dấu trên cùng trục.
+  4. **Lực trung bình theo độ biến thiên vận tốc:**  
+     `F_hợp,tb = m(v_sau − v_trước)/Δt`
+- **Ghi chú bắt buộc:** `F_hợp,tb` là lực hợp trung bình trong khoảng thời gian xét. Lực tức thời có thể thay đổi theo thời gian; không suy ra lực tức thời chỉ từ công thức lực trung bình.
+
+#### 🔹 PHÂN KHU 4 (Biểu đồ so sánh / Trực quan hóa dữ liệu hoặc Phân loại)
+
+- **Visual:** Minh họa hai đồ thị vận tốc–thời gian có cùng độ biến thiên vận tốc nhưng thời gian tiếp xúc khác nhau. Dùng diện tích dưới đường `F_hợp theo thời gian` hoặc sơ đồ `F_tb × Δt = Δp` để làm rõ xung lượng. Trục và đơn vị phải được ghi nhãn.
+- **Tiêu đề:** **CÙNG ĐỘ THAY ĐỔI VẬN TỐC, TIẾP XÚC NGẮN HƠN THÌ LỰC TRUNG BÌNH LỚN HƠN**
+- **Nội dung chữ hiển thị:**
+  - Khi khối lượng và `Δv` như nhau:  
+    `F_hợp,tb = mΔv/Δt`
+  - `Δt` giảm thì độ lớn `F_hợp,tb` tăng, nếu các đại lượng còn lại giữ nguyên.
+  - Xung lượng bằng độ biến thiên động lượng:  
+    `J = Δp`
+  - Nhãn đồ thị: trục ngang `thời gian (s)`; trục dọc `vận tốc (m/s)` hoặc `lực (N)` tùy đồ thị.
+- Không dùng biểu đồ thiếu đơn vị hoặc tỷ lệ khiến người xem hiểu nhầm lực tăng nhưng độ biến thiên động lượng không đổi.
+
+#### 🔹 PHÂN KHU 5 (Ứng dụng thực tiễn &amp; Liên hệ đời sống / Công nghệ)
+
+- **Visual:** Quỹ đạo trình bày một bảng dữ liệu mô phỏng như màn hình phân tích video. Linh dùng thước đo hoặc bảng để chỉ vào các giá trị; có biểu tượng cân, khung hình video và đồng hồ thời gian.
+- **Tiêu đề:** **ƯỚC LƯỢNG LỰC TỪ DỮ LIỆU**
+- **Nội dung chữ và số liệu hiển thị:**
+  - Dữ liệu có thể cần: **khối lượng bóng `m`; vận tốc trước `v_trước`; vận tốc sau `v_sau`; thời gian tiếp xúc `Δt`; hướng chuyển động.**
+  - **Ví dụ mô phỏng:**
+    - `m = 0,430 kg`
+    - `v_trước ≈ 0 m/s`
+    - `v_sau = 30 m/s`
+    - `Δt = 0,010 s`
+  - Tính:
+    - `Δv = 30 − 0 = 30 m/s`
+    - `F_hợp,tb = 0,430 × 30 / 0,010`
+    - `F_hợp,tb ≈ 1,29 × 10³ N`
+  - **Kết luận:** Lực hợp trung bình hướng theo chiều dương đã chọn trong ví dụ này.
+  - **Chú thích dễ thấy:** Đây là **ước lượng theo mô hình mô phỏng**, không phải số đo xác nhận cú sút của Cristiano Ronaldo.
+  - **Cách thu thập dữ liệu:** ước lượng khối lượng theo thông số bóng; dùng video tốc độ cao hoặc cảm biến để suy ra vận tốc và thời gian tiếp xúc; ghi nhận hướng và độ bất định của phép đo.
+
+#### 🔹 PHÂN KHU 6 (Lưu ý sư phạm — Bẫy sai lầm thường gặp của học sinh)
+
+- **Visual:** Các thẻ “Dễ nhầm” có biểu tượng cảnh báo; Quỹ đạo chỉ vào từng lỗi và Linh minh họa cách sửa bằng vectơ.
+- **Tiêu đề:** **4 BẪY CẦN TRÁNH KHI TÍNH LỰC**
+- **Nội dung chữ hiển thị:**
+  1. **Quên chiều và dấu:** `v_sau − v_trước` là đại lượng có dấu trên trục đã chọn; lực có hướng.
+  2. **Nhầm lực trung bình với lực tức thời:** công thức trên cho lực hợp trung bình trong `Δt`, không cho biết lực tại mọi thời điểm.
+  3. **Bỏ qua các lực khác:** hợp lực có thể gồm lực chân, trọng lực và lực cản; cách tính đơn giản có thể xem lực chân là trội trong thời gian tiếp xúc, nhưng đó là giả thiết.
+  4. **Coi dữ liệu là tuyệt đối chính xác:** sai số vận tốc, thời gian tiếp xúc, khối lượng, hướng đo và biến dạng bóng đều ảnh hưởng kết quả.
+- **Lưu ý mô hình:** `F = ma` dùng trực tiếp khi hợp lực không đổi; nếu lực thay đổi theo thời gian, cần diễn giải qua lực trung bình và xung lượng.
+
+#### 🔹 PHÂN KHU 7 (Footer &amp; Thông điệp khắc sâu kiến thức)
+
+- **Visual:** Linh và Quỹ đạo đứng bên quả bóng đang bay; phía dưới là dải tổng kết ba bước và một câu hỏi vận dụng ngắn. Bố cục chân trang gọn, không thêm dữ kiện ngoài nội dung đã nêu.
+- **Tiêu đề:** **NHỚ MẠCH SUY LUẬN**
+- **Nội dung chữ hiển thị:**
+  - **Đo** `m`, `v_trước`, `v_sau`, `Δt` và xác định chiều.
+  - **Tính** `Δp = m(v_sau − v_trước)`.
+  - **Ước lượng** `F_hợp,tb = Δp/Δt`.
+  - **Thông điệp:** **Lực tác dụng trong một khoảng thời gian làm thay đổi động lượng của bóng.**
+  - **Câu hỏi vận dụng:** Nếu `Δp` giữ nguyên nhưng thời gian tiếp xúc tăng, lực hợp trung bình thay đổi thế nào?  
+    **Gợi ý đáp án:** Độ lớn lực hợp trung bình giảm vì `F_hợp,tb = Δp/Δt`.
+- Kết thúc bằng một dòng nguồn dữ kiện: **Khối lượng bóng: Luật 2 IFAB. Ví dụ số: mô phỏng phục vụ học tập.**
+```
+</pre>
+            </div>
+            
+            <div id="tab_video" class="tab-panel" style="display:none;">
+              <div class="panel-header">
+                <div>
+                  <span class="file-badge">📂 05_Prompt_Video_Intro_GoogleFlow_20Footages/prompt_video_intro_20_footages_google_flow.md</span>
+                </div>
+                <button class="copy-btn" onclick="copyPreContent('pre_tab_video', this)">📋 Copy Toàn Bộ Prompt Này</button>
+              </div>
+              <pre id="pre_tab_video" class="prompt-pre"># SIÊU PROMPT TIẾNG VIỆT XÂY DỰNG VIDEO INTRO BÀI HỌC (GOOGLE FLOW — 20 FOOTAGES + LỜI THOẠI)
+**Chủ đề**: **Phân tích lực trong cú sút bóng đá**  
+**Tác nhân thiết kế**: `Video Flow Director (agent_video_flow_director)`  
+**Engine AI**: `gpt-6-luna (codex-cli)`  
+**Công cụ mục tiêu**: **Google Flow (Veo 2 / Imagen Video)** — Tổng thời lượng **100 giây** (20 Footages x 5 giây + Transcript tiếng Việt từng cảnh).
+
+```markdown
+# PHẦN 1. HỒ SƠ NHÂN VẬT, GIỌNG ĐỌC &amp; VĂN PHONG
+## Consistency Bible
+
+**Nhân vật chính — Nhà khoa học sân cỏ Linh:** Một nhà khoa học trẻ, thân thiện và tự tin, mặc áo thể thao xanh đậm, cầm bảng vẽ vectơ lực và thước đo. Linh giải thích kiến thức bằng ví dụ trực quan ngay trên sân bóng, khuyến khích học sinh quan sát, dự đoán rồi kiểm tra bằng dữ liệu.
+
+**[Character Anchor Token]** `Linh: young Vietnamese female field scientist, warm confident expression, consistent oval face and dark eyes, dark navy athletic shirt, holding a force-vector drawing board and measuring ruler, same hairstyle and outfit in every shot.`
+
+**Trợ lý AI — Quỹ đạo:** Một thiết bị hình cầu nhỏ bay gần Linh, vỏ trắng bạc, viền sáng xanh lam, màn hình hiển thị đồ thị vận tốc–thời gian và các vectơ lực. Quỹ đạo biểu đạt bằng đồ họa rõ ràng, chuyển động nhẹ nhàng, không che khuất nhân vật.
+
+**[Character Anchor Token]** `Quỹ đạo: small floating spherical AI device, smooth white-silver shell, thin cyan-blue glowing ring, clear digital display for velocity-time graphs and force vectors, same size, design, and glow in every shot.`
+
+### Hồ sơ giọng đọc và văn phong
+
+- **Giọng Linh:** Tiếng Việt phổ thông, giọng nữ trẻ trung, sáng và ấm; phát âm rõ thuật ngữ, tốc độ vừa phải, nhấn nhẹ vào câu hỏi dẫn nhập, dữ liệu và kết luận.
+- **Giọng Quỹ đạo:** Giọng AI trung tính, trong trẻo, nhịp điệu gọn; dùng khi cần nêu số liệu, công thức hoặc gợi mở một phép so sánh.
+- **Văn phong:** Gần gũi, chính xác, giàu hình dung; giải thích từng bước, phân biệt dữ liệu mô phỏng với số đo thực tế. Viết đơn vị và đọc công thức nhất quán; dùng “lực trung bình” khi nói về độ biến thiên động lượng trong thời gian tiếp xúc.
+- **Cẩm nang quay:** Video giáo dục điện ảnh, 4K, 24 fps, ánh sáng tự nhiên pha ánh sáng sân vận động, chuyển động máy mượt, khung hình sạch, hình ảnh thực tế. Giữ tạo hình Linh và Quỹ đạo nhất quán; dùng đồ họa vectơ, công thức và số liệu ngắn gọn, tương phản cao, tránh chữ nhỏ. Mỗi footage dài 5 giây; tổng thời lượng 100 giây. Lời thoại tiếng Việt là voice-over, đồng bộ theo đúng mốc thời gian.
+
+# PHẦN 2. CHUỖI 20 PROMPT TẠO FOOTAGES GOOGLE FLOW KÈM TRANSCRIPT LỜI THOẠI
+
+### 🎬 FOOTAGE #01 (00:00 – 00:05)
+
+- **Prompt tạo Video trên Google Flow:** Cinematic 4K, 24fps, a football rests on a realistic stadium pitch at dusk as a powerful kick sends it forward in slow motion; dynamic low-angle camera follows the ball. `Linh: young Vietnamese female field scientist, warm confident expression, consistent oval face and dark eyes, dark navy athletic shirt, holding a force-vector drawing board and measuring ruler, same hairstyle and outfit in every shot.` `Quỹ đạo: small floating spherical AI device, smooth white-silver shell, thin cyan-blue glowing ring, clear digital display for velocity-time graphs and force vectors, same size, design, and glow in every shot.`
+- **🎙️ Transcript Lời Thoại (Voice-over):** Một cú sút làm quả bóng đổi chuyển động như thế nào? Ta có thể ước lượng lực ấy từ những dữ liệu nào?
+- **🔊 Hiệu ứng âm thanh (SFX):** Âm thanh sân vận động thoáng rộng, tiếng chân sút bóng chắc gọn, nhạc mở đầu giàu năng lượng.
+
+### 🎬 FOOTAGE #02 (00:05 – 00:10)
+
+- **Prompt tạo Video trên Google Flow:** Wide tracking shot reveals Linh on a football field beside a stationary ball, with subtle educational graphics introducing a Cristiano Ronaldo-inspired kick scenario without depicting a verified real event. `Linh: young Vietnamese female field scientist, warm confident expression, consistent oval face and dark eyes, dark navy athletic shirt, holding a force-vector drawing board and measuring ruler, same hairstyle and outfit in every shot.` `Quỹ đạo: small floating spherical AI device, smooth white-silver shell, thin cyan-blue glowing ring, clear digital display for velocity-time graphs and force vectors, same size, design, and glow in every shot.`
+- **🎙️ Transcript Lời Thoại (Voice-over):** Hãy hình dung cú sút của Cristiano Ronaldo: chân tác dụng lực, còn quả bóng bắt đầu tăng tốc về phía trước.
+- **🔊 Hiệu ứng âm thanh (SFX):** Gió nhẹ trên sân, tiếng bóng lăn nhỏ, nhạc nền tò mò và tập trung.
+
+### 🎬 FOOTAGE #03 (00:10 – 00:15)
+
+- **Prompt tạo Video trên Google Flow:** Medium shot of Linh drawing a boundary around the football on her board; the camera pushes in as the ball glows to mark the chosen system. `Linh: young Vietnamese female field scientist, warm confident expression, consistent oval face and dark eyes, dark navy athletic shirt, holding a force-vector drawing board and measuring ruler, same hairstyle and outfit in every shot.` `Quỹ đạo: small floating spherical AI device, smooth white-silver shell, thin cyan-blue glowing ring, clear digital display for velocity-time graphs and force vectors, same size, design, and glow in every shot.`
+- **🎙️ Transcript Lời Thoại (Voice-over):** Trước hết, ta chọn hệ khảo sát là quả bóng. Quy ước chiều dương trùng với hướng bóng bay.
+- **🔊 Hiệu ứng âm thanh (SFX):** Tiếng bút vẽ trên bảng, âm báo đồ họa nhẹ, nhạc nền đều nhịp.
+
+### 🎬 FOOTAGE #04 (00:15 – 00:20)
+
+- **Prompt tạo Video trên Google Flow:** Close-up, slow-motion reenactment of a boot contacting a football; clean force arrows appear on the ball, with the foot force arrow pointing forward and weight and ground effects shown simply. `Linh: young Vietnamese female field scientist, warm confident expression, consistent oval face and dark eyes, dark navy athletic shirt, holding a force-vector drawing board and measuring ruler, same hairstyle and outfit in every shot.` `Quỹ đạo: small floating spherical AI device, smooth white-silver shell, thin cyan-blue glowing ring, clear digital display for velocity-time graphs and force vectors, same size, design, and glow in every shot.`
+- **🎙️ Transcript Lời Thoại (Voice-over):** Trong lúc chân tiếp xúc, lực của chân đẩy bóng về phía trước. Trọng lực và lực đỡ của mặt sân cũng tác dụng lên bóng.
+- **🔊 Hiệu ứng âm thanh (SFX):** Tiếng tiếp xúc bóng trầm, âm gió chuyển động, hiệu ứng xuất hiện vectơ tinh tế.
+
+### 🎬 FOOTAGE #05 (00:20 – 00:25)
+
+- **Prompt tạo Video trên Google Flow:** Linh gestures toward a large, clear momentum equation on a transparent stadium display; Quỹ đạo shows a ball icon with mass and velocity arrows. `Linh: young Vietnamese female field scientist, warm confident expression, consistent oval face and dark eyes, dark navy athletic shirt, holding a force-vector drawing board and measuring ruler, same hairstyle and outfit in every shot.` `Quỹ đạo: small floating spherical AI device, smooth white-silver shell, thin cyan-blue glowing ring, clear digital display for velocity-time graphs and force vectors, same size, design, and glow in every shot.`
+- **🎙️ Transcript Lời Thoại (Voice-over):** Động lượng được tính bằng khối lượng nhân vận tốc: p bằng m v, đơn vị ki-lô-gam mét trên giây.
+- **🔊 Hiệu ứng âm thanh (SFX):** Âm điện tử dịu khi công thức hiện lên, nhạc nền sáng và rõ.
+
+### 🎬 FOOTAGE #06 (00:25 – 00:30)
+
+- **Prompt tạo Video trên Google Flow:** A clean animated comparison shows a ball accelerating along a straight line as a = delta-v over delta-t appears; Linh points to the forward direction on her board. `Linh: young Vietnamese female field scientist, warm confident expression, consistent oval face and dark eyes, dark navy athletic shirt, holding a force-vector drawing board and measuring ruler, same hairstyle and outfit in every shot.` `Quỹ đạo: small floating spherical AI device, smooth white-silver shell, thin cyan-blue glowing ring, clear digital display for velocity-time graphs and force vectors, same size, design, and glow in every shot.`
+- **🎙️ Transcript Lời Thoại (Voice-over):** Khi biết gia tốc, định luật II Newton cho ta hợp lực F bằng m a. Lực là đại lượng vectơ.
+- **🔊 Hiệu ứng âm thanh (SFX):** Tiếng bóng tăng tốc lướt qua, nhạc nền chắc nhịp, âm báo ngắn ở công thức.
+
+### 🎬 FOOTAGE #07 (00:30 – 00:35)
+
+- **Prompt tạo Video trên Google Flow:** Quỹ đạo projects a velocity-time graph during a brief ball-foot contact interval; camera moves from the graph to Linh’s board showing impulse equals change in momentum. `Linh: young Vietnamese female field scientist, warm confident expression, consistent oval face and dark eyes, dark navy athletic shirt, holding a force-vector drawing board and measuring ruler, same hairstyle and outfit in every shot.` `Quỹ đạo: small floating spherical AI device, smooth white-silver shell, thin cyan-blue glowing ring, clear digital display for velocity-time graphs and force vectors, same size, design, and glow in every shot.`
+- **🎙️ Transcript Lời Thoại (Voice-over):** Định lý xung lượng nói rằng xung lượng của hợp lực bằng độ biến thiên động lượng.
+- **🔊 Hiệu ứng âm thanh (SFX):** Tiếng tích tắc ngắn biểu thị thời gian tiếp xúc, âm đồ họa điện tử nhẹ.
+
+### 🎬 FOOTAGE #08 (00:35 – 00:40)
+
+- **Prompt tạo Video trên Google Flow:** Tight shot of a brief contact timer reading 0.010 seconds beside a forward force vector; Linh demonstrates the short interval with her ruler while Quỹ đạo highlights the graph. `Linh: young Vietnamese female field scientist, warm confident expression, consistent oval face and dark eyes, dark navy athletic shirt, holding a force-vector drawing board and measuring ruler, same hairstyle and outfit in every shot.` `Quỹ đạo: small floating spherical AI device, smooth white-silver shell, thin cyan-blue glowing ring, clear digital display for velocity-time graphs and force vectors, same size, design, and glow in every shot.`
+- **🎙️ Transcript Lời Thoại (Voice-over):** Nếu hợp lực gần như không đổi, xung lượng bằng lực trung bình nhân thời gian tiếp xúc.
+- **🔊 Hiệu ứng âm thanh (SFX):** Một tiếng bấm giờ nhanh, tiếng chạm bóng nhẹ, nhạc nền duy trì tập trung.
+
+### 🎬 FOOTAGE #09 (00:40 – 00:45)
+
+- **Prompt tạo Video trên Google Flow:** A football measurement setup on the pitch: a scale graphic, speed tracking markers, and a high-speed camera icon appear around Linh and Quỹ đạo. `Linh: young Vietnamese female field scientist, warm confident expression, consistent oval face and dark eyes, dark navy athletic shirt, holding a force-vector drawing board and measuring ruler, same hairstyle and outfit in every shot.` `Quỹ đạo: small floating spherical AI device, smooth white-silver shell, thin cyan-blue glowing ring, clear digital display for velocity-time graphs and force vectors, same size, design, and glow in every shot.`
+- **🎙️ Transcript Lời Thoại (Voice-over):** Muốn ước lượng lực trung bình, ta cần khối lượng bóng, vận tốc trước và sau cú sút, cùng thời gian tiếp xúc.
+- **🔊 Hiệu ứng âm thanh (SFX):** Tiếng máy quay tốc độ cao khởi động, âm báo đo lường, nền nhạc nhịp nhàng.
+
+### 🎬 FOOTAGE #10 (00:45 – 00:50)
+
+- **Prompt tạo Video trên Google Flow:** An accurate infographic overlays a football with a mass range of 0.410–0.450 kg, identified as the IFAB Law 2 match-start range; Linh points to the 0.430 kg example value. `Linh: young Vietnamese female field scientist, warm confident expression, consistent oval face and dark eyes, dark navy athletic shirt, holding a force-vector drawing board and measuring ruler, same hairstyle and outfit in every shot.` `Quỹ đạo: small floating spherical AI device, smooth white-silver shell, thin cyan-blue glowing ring, clear digital display for velocity-time graphs and force vectors, same size, design, and glow in every shot.`
+- **🎙️ Transcript Lời Thoại (Voice-over):** Theo Luật 2 IFAB, bóng khi bắt đầu trận nặng từ 0,410 đến 0,450 ki-lô-gam. Ta chọn 0,430 ki-lô-gam cho ví dụ mô phỏng.
+- **🔊 Hiệu ứng âm thanh (SFX):** Tiếng cân điện tử xác nhận, nhạc nền sáng, âm chuyển cảnh nhẹ.
+
+### 🎬 FOOTAGE #11 (00:50 – 00:55)
+
+- **Prompt tạo Video trên Google Flow:** Quỹ đạo displays a stationary ball with initial velocity zero, then a clean forward arrow labeled 30 meters per second; Linh traces the direction on her board. `Linh: young Vietnamese female field scientist, warm confident expression, consistent oval face and dark eyes, dark navy athletic shirt, holding a force-vector drawing board and measuring ruler, same hairstyle and outfit in every shot.` `Quỹ đạo: small floating spherical AI device, smooth white-silver shell, thin cyan-blue glowing ring, clear digital display for velocity-time graphs and force vectors, same size, design, and glow in every shot.`
+- **🎙️ Transcript Lời Thoại (Voice-over):** Giả sử bóng gần như đứng yên trước cú sút và đạt vận tốc 30 mét trên giây sau khi rời chân.
+- **🔊 Hiệu ứng âm thanh (SFX):** Âm bóng lăn dừng lại rồi tiếng lướt tăng tốc, nhạc nền tạo đà.
+
+### 🎬 FOOTAGE #12 (00:55 – 01:00)
+
+- **Prompt tạo Video trên Google Flow:** The contact interval 0.010 seconds fills a clear digital timer; a simple formula card reads average force equals mass times velocity change divided by contact time, with units visible. `Linh: young Vietnamese female field scientist, warm confident expression, consistent oval face and dark eyes, dark navy athletic shirt, holding a force-vector drawing board and measuring ruler, same hairstyle and outfit in every shot.` `Quỹ đạo: small floating spherical AI device, smooth white-silver shell, thin cyan-blue glowing ring, clear digital display for velocity-time graphs and force vectors, same size, design, and glow in every shot.`
+- **🎙️ Transcript Lời Thoại (Voice-over):** Thời gian tiếp xúc trong ví dụ là 0,010 giây. Ta dùng độ biến thiên vận tốc chia cho khoảng thời gian ấy.
+- **🔊 Hiệu ứng âm thanh (SFX):** Tiếng bấm giờ, âm công thức hiện rõ, nhạc nền giữ nhịp đều.
+
+### 🎬 FOOTAGE #13 (01:00 – 01:05)
+
+- **Prompt tạo Video trên Google Flow:** Close view of a transparent calculation panel showing 0.430 × (30 − 0) ÷ 0.010, while Linh calculates on her board and Quỹ đạo highlights each term in sequence. `Linh: young Vietnamese female field scientist, warm confident expression, consistent oval face and dark eyes, dark navy athletic shirt, holding a force-vector drawing board and measuring ruler, same hairstyle and outfit in every shot.` `Quỹ đạo: small floating spherical AI device, smooth white-silver shell, thin cyan-blue glowing ring, clear digital display for velocity-time graphs and force vectors, same size, design, and glow in every shot.`
+- **🎙️ Transcript Lời Thoại (Voice-over):** Thay số vào công thức: 0,430 nhân 30 trừ 0, rồi chia cho 0,010.
+- **🔊 Hiệu ứng âm thanh (SFX):** Tiếng chạm điện tử theo từng phép tính, nhạc nền nhẹ và chính xác.
+
+### 🎬 FOOTAGE #14 (01:05 – 01:10)
+
+- **Prompt tạo Video trên Google Flow:** The result 1.29 × 10³ N appears beside a bold forward vector on a realistic ball; Linh presents the estimate to camera with Quỹ đạo’s graph behind her. `Linh: young Vietnamese female field scientist, warm confident expression, consistent oval face and dark eyes, dark navy athletic shirt, holding a force-vector drawing board and measuring ruler, same hairstyle and outfit in every shot.` `Quỹ đạo: small floating spherical AI device, smooth white-silver shell, thin cyan-blue glowing ring, clear digital display for velocity-time graphs and force vectors, same size, design, and glow in every shot.`
+- **🎙️ Transcript Lời Thoại (Voice-over):** Lực trung bình ước lượng khoảng 1,29 nhân 10 mũ 3 niutơn, hướng về phía bóng bay.
+- **🔊 Hiệu ứng âm thanh (SFX):** Âm xác nhận ngắn, tiếng bóng bay vút qua, nhạc nền mở rộng.
+
+### 🎬 FOOTAGE #15 (01:10 – 01:15)
+
+- **Prompt tạo Video trên Google Flow:** The calculation remains visible with a clear “simulated estimate” graphic; Linh turns toward camera to clarify its scope, while the stadium footage stays illustrative and non-documentary. `Linh: young Vietnamese female field scientist, warm confident expression, consistent oval face and dark eyes, dark navy athletic shirt, holding a force-vector drawing board and measuring ruler, same hairstyle and outfit in every shot.` `Quỹ đạo: small floating spherical AI device, smooth white-silver shell, thin cyan-blue glowing ring, clear digital display for velocity-time graphs and force vectors, same size, design, and glow in every shot.`
+- **🎙️ Transcript Lời Thoại (Voice-over):** Đây là kết quả của mô hình với dữ liệu giả định, không phải số đo xác nhận cú sút của Cristiano Ronaldo.
+- **🔊 Hiệu ứng âm thanh (SFX):** Nhạc nền dịu xuống, âm báo chú thích tinh tế, tiếng sân vận động xa.
+
+### 🎬 FOOTAGE #16 (01:15 – 01:20)
+
+- **Prompt tạo Video trên Google Flow:** Slow-motion close-up shows a football visibly compressing at impact and recovering its shape; an overlay marks the short contact duration and a changing force curve. `Linh: young Vietnamese female field scientist, warm confident expression, consistent oval face and dark eyes, dark navy athletic shirt, holding a force-vector drawing board and measuring ruler, same hairstyle and outfit in every shot.` `Quỹ đạo: small floating spherical AI device, smooth white-silver shell, thin cyan-blue glowing ring, clear digital display for velocity-time graphs and force vectors, same size, design, and glow in every shot.`
+- **🎙️ Transcript Lời Thoại (Voice-over):** Trong thực tế, bóng biến dạng và lực thay đổi theo thời gian. Vì vậy, lực trung bình khác lực tức thời.
+- **🔊 Hiệu ứng âm thanh (SFX):** Tiếng bóng nén và bật lại được làm chậm, nhạc nền trầm nhẹ.
+
+### 🎬 FOOTAGE #17 (01:20 – 01:25)
+
+- **Prompt tạo Video trên Google Flow:** Linh and Quỹ đạo compare two clean trajectories, one straight and one deflected; subtle wind and drag icons appear, alongside a measurement uncertainty marker. `Linh: young Vietnamese female field scientist, warm confident expression, consistent oval face and dark eyes, dark navy athletic shirt, holding a force-vector drawing board and measuring ruler, same hairstyle and outfit in every shot.` `Quỹ đạo: small floating spherical AI device, smooth white-silver shell, thin cyan-blue glowing ring, clear digital display for velocity-time graphs and force vectors, same size, design, and glow in every shot.`
+- **🎙️ Transcript Lời Thoại (Voice-over):** Lực cản, hướng bóng, thời gian tiếp xúc và sai số đo đều có thể làm kết quả thay đổi.
+- **🔊 Hiệu ứng âm thanh (SFX):** Gió nhẹ, tiếng đo điện tử ngắn, nhạc nền suy tư.
+
+### 🎬 FOOTAGE #18 (01:25 – 01:30)
+
+- **Prompt tạo Video trên Google Flow:** Classroom-on-pitch scene: a small group of high-school students compares two simulated kicks on a display, varying contact time while Linh guides them and Quỹ đạo visualizes the results. `Linh: young Vietnamese female field scientist, warm confident expression, consistent oval face and dark eyes, dark navy athletic shirt, holding a force-vector drawing board and measuring ruler, same hairstyle and outfit in every shot.` `Quỹ đạo: small floating spherical AI device, smooth white-silver shell, thin cyan-blue glowing ring, clear digital display for velocity-time graphs and force vectors, same size, design, and glow in every shot.`
+- **🎙️ Transcript Lời Thoại (Voice-over):** Thử thay đổi thời gian tiếp xúc hoặc vận tốc sau cú sút. Nhóm em dự đoán lực trung bình sẽ đổi ra sao?
+- **🔊 Hiệu ứng âm thanh (SFX):** Âm thanh học sinh trao đổi nhỏ, tiếng chạm màn hình, nhạc nền khích lệ.
+
+### 🎬 FOOTAGE #19 (01:30 – 01:35)
+
+- **Prompt tạo Video trên Google Flow:** A quick-check graphic presents three prompts—identify the system, state the impulse relation, and give the force direction—while Linh points and Quỹ đạo highlights each question in turn. `Linh: young Vietnamese female field scientist, warm confident expression, consistent oval face and dark eyes, dark navy athletic shirt, holding a force-vector drawing board and measuring ruler, same hairstyle and outfit in every shot.` `Quỹ đạo: small floating spherical AI device, smooth white-silver shell, thin cyan-blue glowing ring, clear digital display for velocity-time graphs and force vectors, same size, design, and glow in every shot.`
+- **🎙️ Transcript Lời Thoại (Voice-over):** Kiểm tra nhanh: hệ khảo sát là gì, xung lượng liên hệ với đại lượng nào, và lực hướng về đâu?
+- **🔊 Hiệu ứng âm thanh (SFX):** Ba tiếng báo nhẹ theo từng câu hỏi, nhạc nền dừng nhịp để gợi suy nghĩ.
+
+### 🎬 FOOTAGE #20 (01:35 – 01:40)
+
+- **Prompt tạo Video trên Google Flow:** Closing wide shot of Linh and Quỹ đạo on the stadium pitch beside a ball; a forward momentum arrow and a clean impulse equation fade in as the camera slowly pulls back. `Linh: young Vietnamese female field scientist, warm confident expression, consistent oval face and dark eyes, dark navy athletic shirt, holding a force-vector drawing board and measuring ruler, same hairstyle and outfit in every shot.` `Quỹ đạo: small floating spherical AI device, smooth white-silver shell, thin cyan-blue glowing ring, clear digital display for velocity-time graphs and force vectors, same size, design, and glow in every shot.`
+- **🎙️ Transcript Lời Thoại (Voice-over):** Lực làm thay đổi động lượng của bóng. Em có thể đề xuất cách nào làm độ biến thiên động lượng lớn hơn?
+- **🔊 Hiệu ứng âm thanh (SFX):** Tiếng bóng lăn nhẹ, nhạc kết thúc truyền cảm hứng và ngân gọn.
+```
+</pre>
+            </div>
+            
+            <div id="tab_research" class="tab-panel" style="display:none;">
+              <div class="panel-header">
+                <div>
+                  <span class="file-badge">📂 01_NghienCuu_Va_KichBan_SuPham/01_ho_so_nghien_cuu_hoc_lieu.md</span>
+                </div>
+                <button class="copy-btn" onclick="copyPreContent('pre_tab_research', this)">📋 Copy Toàn Bộ Prompt Này</button>
+              </div>
+              <pre id="pre_tab_research" class="prompt-pre"># HỒ SƠ NGHIÊN CỨU HỌC LIỆU &amp; PHÂN TÍCH NỘI DUNG KHOA HỌC
+**Chủ đề bài giảng**: **Phân tích lực trong cú sút bóng đá**  
+**Lĩnh vực / Môn học**: Vật lí — Cơ học  
+**Đối tượng học sinh**: Học sinh THPT lớp 10 — Chương trình GDPT 2018  
+**Tác nhân thực hiện**: `Research Specialist (agent_research_specialist)`  
+**Engine AI sử dụng**: `gpt-6-luna (codex-cli)`
+
+---
+
+## 1. Hệ Thống Kiến Thức Cốt Lõi Cần Truyền Tải
+- **Trụ cột 1**: Xác định hệ khảo sát là quả bóng và biểu diễn các lực tác dụng trong thời gian chân tiếp xúc với bóng.
+- **Trụ cột 2**: Phân biệt lực trung bình trong thời gian va chạm với lực tức thời; lực là đại lượng vectơ và đơn vị là niutơn (N).
+- **Trụ cột 3**: Dùng định lý xung lượng: xung lượng của hợp lực bằng độ biến thiên động lượng, với động lượng p = mv.
+- **Trụ cột 4**: Khi có thể coi hợp lực không đổi, áp dụng định luật II Newton F = ma và liên hệ gia tốc trung bình với độ biến thiên vận tốc trong thời gian tiếp xúc.
+- **Trụ cột 5**: Nhận diện giới hạn của mô hình: lực cản, độ biến dạng, hướng bóng, thời gian tiếp xúc và sai số đo ảnh hưởng đến kết quả.
+
+## 2. Công Thức, Định Luật &amp; Dữ Liệu Chuẩn Hóa (Fact-Checked Metrics)
+- `Động lượng: p = mv; đơn vị kg·m/s.`
+- `Định luật II Newton: hợp lực F = ma; đơn vị lực là N = kg·m/s².`
+- `Xung lượng của hợp lực: J = F_tb·Δt = Δp = m(v_sau − v_trước), khi chọn cùng một trục xét.`
+- `Lực trung bình theo độ biến thiên vận tốc: F_tb = m(v_sau − v_trước)/Δt; cần xét dấu hoặc chiều vectơ.`
+- `Khối lượng quả bóng đá theo Luật 2 IFAB: 0,410–0,450 kg khi bắt đầu trận đấu.`
+- `Ví dụ mô phỏng: m = 0,430 kg, bóng gần như đứng yên trước cú sút, v_sau = 30 m/s, Δt = 0,010 s thì F_tb ≈ 1,29 × 10³ N; đây là ước lượng theo mô hình, không phải số đo xác nhận cú sút của Cristiano Ronaldo.`
+
+## 3. Định Hướng Sư Phạm &amp; Trực Quan Cho 4 Luồng Siêu Prompt
+1. **Câu hỏi / Tình huống dẫn nhập**: Khi Cristiano Ronaldo sút bóng, lực tác dụng lên bóng làm thay đổi chuyển động của bóng như thế nào và ta có thể ước lượng lực ấy từ những dữ liệu nào?
+2. **Nhân vật &amp; Bối cảnh minh họa**: Nhà khoa học sân cỏ Linh, mặc áo thể thao xanh đậm, cầm bảng vẽ vectơ lực và thước đo. đồng hành cùng Trợ lý AI Quỹ đạo, một thiết bị hình cầu nhỏ hiển thị đồ thị vận tốc, thời gian tiếp xúc và vectơ lực..
+3. **Phân bổ cho 4 Luồng Prompt**:
+   - **Luồng Slide Gamma (10 Slides)**:
+   - Slide 1: Tình huống mở đầu — cú sút của Cristiano Ronaldo và câu hỏi lực làm thay đổi chuyển động của bóng ra sao.
+   - Slide 2: Mục tiêu bài học, hệ khảo sát và quy ước chiều dương theo hướng bóng bay.
+   - Slide 3: Nhận diện các lực tác dụng lên bóng; làm rõ lực chân tác dụng trong thời gian tiếp xúc.
+   - Slide 4: Ôn động lượng p = mv và định luật II Newton F = ma.
+   - Slide 5: Định lý xung lượng — liên hệ hợp lực, thời gian tác dụng và độ biến thiên động lượng.
+   - Slide 6: Thu thập dữ liệu từ video hoặc tình huống mô phỏng: khối lượng, vận tốc trước và sau, thời gian tiếp xúc.
+   - Slide 7: Giải ví dụ định lượng, đổi đơn vị và tính lực trung bình; biểu diễn chiều lực.
+   - Slide 8: Thảo luận giả thiết, lực không đổi, các lực ngoài và nguồn sai số khi phân tích cú sút.
+   - Slide 9: Hoạt động nhóm — thay đổi thời gian tiếp xúc hoặc vận tốc để so sánh lực trung bình, giải thích kết quả.
+   - Slide 10: Phiếu kiểm tra nhanh, kết luận và câu hỏi vận dụng về cách làm tăng độ biến thiên động lượng.
+   - **Luồng Phiếu Bài Tập (25 Câu)**: Kiểm tra đủ 3 cấp độ Nhận biết — Thông hiểu — Vận dụng qua 15 TN 4 lựa chọn, 5 Đúng/Sai chùm và 5 Tự luận.
+   - **Luồng Infographic (7 Phân Khu)**: Hệ thống hóa công thức, sơ đồ cốt lõi và bẫy sai lầm thường gặp trên 1 mặt phẳng trực quan.
+   - **Luồng Video Intro Google Flow (20 Footages — 100s)**: Trực quan hóa tình huống mở đầu khơi gợi tò mò khoa học kèm Transcript lời thoại tiếng Việt.
+
+
+---
+
+# MA TRẬN MỤC TIÊU &amp; KỊCH BẢN SƯ PHẠM TỔNG THỂ (GDPT 2018)
+**Bài học**: **Phân tích lực trong cú sút bóng đá**  
+**Lĩnh vực**: Vật lí — Cơ học — Học sinh THPT lớp 10 — Chương trình GDPT 2018  
+**Tác nhân thực hiện**: `Pedagogy Architect (agent_pedagogy_architect)`
+
+---
+
+## 1. Mục Tiêu Bài Học Theo Tiếp Cận Năng Lực
+- **Năng lực nhận thức khoa học**: Nêu được lực là đại lượng vectơ, nhận biết lực chân tác dụng lên bóng trong thời gian tiếp xúc và vận dụng định luật II Newton cùng định lý xung lượng để giải thích sự thay đổi chuyển động của bóng.
+- **Năng lực tìm hiểu &amp; xử lý thông tin**: Phân tích video hoặc bộ dữ liệu mô phỏng để xác định gần đúng thời gian tiếp xúc, khối lượng bóng và vận tốc trước, sau cú sút; trình bày giả thiết, phép tính và sai số của ước lượng lực trung bình.
+- **Năng lực vận dụng kiến thức, kỹ năng**: Ước lượng lực trung bình trong một tình huống sút bóng bằng công thức xung lượng, đánh giá tính hợp lí của kết quả và giải thích vì sao lực thực tế thay đổi theo thời gian.
+
+## 2. Cấu Trúc Đồng Bộ Hóa 4 Học Liệu Số Trong Tiết Học 45 Phút
+| Thời lượng | Hoạt động dạy học | Học liệu số sử dụng | Mục tiêu sư phạm trọng tâm |
+| :--- | :--- | :--- | :--- |
+| **00:00 – 05:00** | Chiếu tình huống cú sút, nêu câu hỏi dẫn nhập và thống nhất hệ khảo sát, chiều dương. | 05_Prompt_Video_Intro_GoogleFlow_20Footages | Đánh giá mức độ thu hút và khả năng gợi đúng vấn đề vật lí; video 100 giây là tư liệu dẫn nhập, không thay thế dữ liệu đo. |
+| **05:00 – 25:00** | Dẫn dắt qua sơ đồ lực, động lượng, định lý xung lượng và ví dụ tính lực trung bình; nhấn mạnh giả thiết và đơn vị. | 02_Prompt_Slide_Gamma_10Slides | Đánh giá tính chính xác, mạch lạc và thời lượng triển khai đủ 10 slide. |
+| **25:00 – 33:00** | Giao nhiệm vụ đọc infographic và yêu cầu học sinh nối dữ liệu đo với công thức phù hợp. | 04_Prompt_Infographics | Đánh giá infographic 7 phân khu về độ dễ đọc, đơn vị và tính nhất quán của quy trình. |
+| **33:00 – 45:00** | Phát phiếu, hướng dẫn học sinh trình bày phép tính và kết thúc bằng câu hỏi vận dụng. | 03_Prompt_Phieu_Bai_Tap_25Cau | Đánh giá độ phân hóa và sự phù hợp của 25 câu hỏi với thời lượng; chọn một phần làm trên lớp, phần còn lại giao luyện tập. |
+</pre>
+            </div>
+            
+            <div id="tab_qa" class="tab-panel" style="display:none;">
+              <div class="panel-header">
+                <div>
+                  <span class="file-badge">📂 06_KichBan_ChayThu_Va_BaoCao_QA/02_bien_ban_qa_va_phe_duyet.md</span>
+                </div>
+                <button class="copy-btn" onclick="copyPreContent('pre_tab_qa', this)">📋 Copy Toàn Bộ Prompt Này</button>
+              </div>
+              <pre id="pre_tab_qa" class="prompt-pre"># KỊCH BẢN CHẠY THỬ TIẾT HỌC 45 PHÚT (DRY-RUN CLASSROOM SIMULATION)
+**Bài học**: **Phân tích lực trong cú sút bóng đá**  
+**Tác nhân thực hiện**: `DryRun Scenario Tester (agent_dryrun_scenario_tester)`
+
+---
+
+## 1. Bảng Điều Phối Thời Gian &amp; Khớp Nối Học Liệu (45 Phút)
+| Phút thứ | Hoạt động của Giáo viên | Hoạt động của Học sinh | Học liệu số kích hoạt | Kết quả kiểm tra chạy thử |
+| :--- | :--- | :--- | :--- | :--- |
+| **00:00 – 05:00** | Chiếu tình huống cú sút, nêu câu hỏi dẫn nhập và thống nhất hệ khảo sát, chiều dương. | Quan sát, dự đoán các yếu tố ảnh hưởng đến lực và nêu dữ liệu cần có để ước lượng. | 05_Prompt_Video_Intro_GoogleFlow_20Footages | Đánh giá mức độ thu hút và khả năng gợi đúng vấn đề vật lí; video 100 giây là tư liệu dẫn nhập, không thay thế dữ liệu đo. |
+| **05:00 – 25:00** | Dẫn dắt qua sơ đồ lực, động lượng, định lý xung lượng và ví dụ tính lực trung bình; nhấn mạnh giả thiết và đơn vị. | Đọc sơ đồ, ghi công thức, tính ví dụ theo nhóm và giải thích chiều của lực. | 02_Prompt_Slide_Gamma_10Slides | Đánh giá tính chính xác, mạch lạc và thời lượng triển khai đủ 10 slide. |
+| **25:00 – 33:00** | Giao nhiệm vụ đọc infographic và yêu cầu học sinh nối dữ liệu đo với công thức phù hợp. | Theo dõi các bước phân tích, phân biệt dữ liệu giả định với dữ liệu đo và chỉ ra ít nhất một nguồn sai số. | 04_Prompt_Infographics | Đánh giá infographic 7 phân khu về độ dễ đọc, đơn vị và tính nhất quán của quy trình. |
+| **33:00 – 45:00** | Phát phiếu, hướng dẫn học sinh trình bày phép tính và kết thúc bằng câu hỏi vận dụng. | Hoàn thành câu hỏi, đối chiếu kết quả, nêu giả thiết và tự đánh giá mức độ hiểu bài. | 03_Prompt_Phieu_Bai_Tap_25Cau | Đánh giá độ phân hóa và sự phù hợp của 25 câu hỏi với thời lượng; chọn một phần làm trên lớp, phần còn lại giao luyện tập. |
+
+## 2. Kết Quả Quét Cấu Trúc Thực Tế Trước Kiểm Duyệt
+- **Slide Gamma phát hiện**: `10 / 10` slide (12,599 ký tự)
+- **Câu hỏi Phiếu bài tập**: `25 / 25` câu | Đáp án &amp; Hướng dẫn giải: `Có`
+- **Phân khu Infographic**: `7 / 7` phân khu (9,463 ký tự)
+- **Video Google Flow**: `20 / 20` footages | Transcript lời thoại: `21` mục
+
+
+---
+
+# BIÊN BẢN KIỂM ĐỊNH CHẤT LƯỢNG (QA) &amp; QUYẾT ĐỊNH PHÊ DUYỆT XUẤT BẢN
+**Bài học**: **Phân tích lực trong cú sút bóng đá**  
+**Tác nhân Kiểm thử QA**: `QA Quality Reviewer (agent_qa_quality_reviewer)`  
+**Engine Kiểm định**: `gpt-6-luna (codex-cli)`  
+**Tác nhân Đóng gói**: `DevOps Site Manager (agent_devops_site_manager)`
+
+---
+
+## 1. Bảng Kiểm Tra Đối Chiếu Tiêu Chí Kỹ Thuật (QA Checklist)
+| Hạng mục học liệu | Yêu cầu kỹ thuật gốc | Kết quả kiểm định thực tế | Điểm QA | Trạng thái |
+| :--- | :--- | :--- | :--- | :--- |
+| **1. Prompt Slide Gamma** | Outline chi tiết đúng 10 Slide tiếng Việt. | Đủ 10 slide với mạch từ mô hình lực đến xung lượng, ví dụ, giới hạn và vận dụng; trích đoạn dùng công thức và quy ước chiều phù hợp. | **9.2 / 10** | ✅ **PASS** |
+| **2. Prompt Phiếu Bài Tập** | 10 -&gt; 30 câu (TN, Đúng/Sai, Tự luận) + Đáp án. | Đủ 25 câu và có đáp án, nhưng Câu 1 có hai đáp án đúng về đơn vị lực (N và kg·m/s²), nên cần sửa để bảo đảm chỉ có một lựa chọn đúng. | **8.5 / 10** | ✅ **PASS** |
+| **3. Prompt Infographics** | Prompt tiếng Việt mô tả chi tiết 7 phân khu. | Đủ 7 phân khu và trình bày đúng chuỗi đo dữ liệu, tính độ biến thiên động lượng rồi ước lượng lực trung bình; ví dụ được ghi rõ là mô phỏng. | **9.1 / 10** | ✅ **PASS** |
+| **4. Prompt Video Google Flow** | Character + Voice + 20 Footages kèm Transcript. | Có đủ 20 footage trong 100 giây và lời thoại bám chủ đề, nhưng số transcript đo được là 21 nên cần đối chiếu để xác nhận khớp từng cảnh. | **8.8 / 10** | ✅ **PASS** |
+| **5. Đóng gói Site &amp; File ZIP** | Chia 6 thư mục, nén ZIP và dựng Portal HTML5. | Cả 4 tài liệu đều vượt ngưỡng 3.000 ký tự và có cấu trúc nội dung rõ; manifest nêu 6 thư mục/8 file nhưng chỉ liệt kê 4 đường dẫn, nên chưa đủ căn cứ xác nhận cấu trúc staging đầy đủ trước khi đóng gói. | **8.2 / 10** | ✅ **PASS** |
+
+## 2. Nhận Xét Chi Tiết Từ QA Reviewer
+### Điểm mạnh nổi bật
+- Bốn tài liệu cùng bám sát chủ đề phân tích lực, động lượng và xung lượng trong cú sút bóng đá.
+- Bài giảng, bài tập và infographic đều có mạch suy luận định lượng, chú ý chiều, dấu và giới hạn của lực trung bình.
+- Quy mô nội dung đạt các số lượng được yêu cầu: 10 slide, 25 câu, 7 phân khu và 20 footage.
+
+### Khuyến nghị rà soát thêm
+- Sửa Câu 1 của quiz để chỉ còn một phương án đúng, hoặc đổi phương án kg·m/s² thành một đơn vị không tương đương Newton.
+- Đối chiếu 21 transcript với 20 footage và bổ sung danh sách đủ 8 file cùng cấu trúc 6 thư mục vào manifest trước khi DevOps đóng gói.
+
+## 3. Kết Luận Kiểm Duyệt Cuối Cùng
+- **Điểm trung bình toàn bộ gói học liệu**: **8.8 / 10.0**
+- **Quyết định**: **APPROVED FOR RELEASE**
+</pre>
+            </div>
+            
+      </main>
+    </div>
+  </div>
+
+  <script>
+    function switchTab(targetId) {
+      document.querySelectorAll('.tab-panel').forEach(el => el.style.display = 'none');
+      document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active-tab'));
+      const panel = document.getElementById(targetId);
+      if (panel) panel.style.display = 'block';
+      const btn = document.querySelector(`.tab-btn[data-target="${targetId}"]`);
+      if (btn) btn.classList.add('active-tab');
+    }
+    async function copyPreContent(preId, btnEl) {
+      const text = document.getElementById(preId)?.innerText || '';
+      await navigator.clipboard.writeText(text);
+      const old = btnEl.innerText;
+      btnEl.innerText = '✅ Đã Copy!';
+      setTimeout(() => btnEl.innerText = old, 1800);
+    }
+  </script>
+</body>
+</html>

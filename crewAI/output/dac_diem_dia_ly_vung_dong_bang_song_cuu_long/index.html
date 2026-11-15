@@ -1,0 +1,974 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>E-Learning Prompt Portal — Đặc điểm địa lí vùng Đồng bằng sông Cửu Long</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+      background: #020617;
+      color: #F8FAFC;
+      line-height: 1.6;
+      padding: 24px;
+    }
+    .container { max-width: 1280px; margin: 0 auto; }
+    .hero {
+      background: linear-gradient(135deg, #0F172A 0%, #1E293B 100%);
+      border: 1px solid #38BDF8;
+      border-radius: 16px;
+      padding: 24px 28px;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
+      margin-bottom: 20px;
+      box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+    }
+    .hero-badge {
+      display: inline-block;
+      background: rgba(56, 189, 248, 0.15);
+      color: #38BDF8;
+      border: 1px solid rgba(56, 189, 248, 0.4);
+      padding: 4px 12px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+    .hero h1 { font-size: 24px; color: #F8FAFC; margin-bottom: 6px; }
+    .hero p { font-size: 13px; color: #94A3B8; max-width: 760px; }
+    .zip-cta {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      background: #22C55E;
+      color: #020617;
+      text-decoration: none;
+      font-weight: 800;
+      font-size: 14px;
+      padding: 14px 24px;
+      border-radius: 12px;
+      box-shadow: 0 10px 25px rgba(34, 197, 94, 0.35);
+      transition: all 0.2s;
+    }
+    .zip-cta:hover { background: #16A34A; transform: translateY(-2px); }
+    .grid-layout {
+      display: grid;
+      grid-template-columns: 320px 1fr;
+      gap: 20px;
+    }
+    @media (max-width: 960px) {
+      .grid-layout { grid-template-columns: 1fr; }
+    }
+    .sidebar {
+      background: #0F172A;
+      border: 1px solid #334155;
+      border-radius: 14px;
+      padding: 18px;
+      height: fit-content;
+    }
+    .sidebar h3 { font-size: 13px; color: #38BDF8; text-transform: uppercase; margin-bottom: 10px; }
+    .tree-box {
+      background: #020617;
+      border: 1px solid #1E293B;
+      border-radius: 10px;
+      padding: 12px;
+      font-family: Consolas, monospace;
+      font-size: 11.5px;
+      color: #4ADE80;
+      white-space: pre-wrap;
+      margin-bottom: 16px;
+    }
+    .meta-list { list-style: none; font-size: 12.5px; color: #CBD5E1; }
+    .meta-list li { padding: 6px 0; border-bottom: 1px solid #1E293B; }
+    .main-card {
+      background: #0F172A;
+      border: 1px solid #334155;
+      border-radius: 14px;
+      padding: 18px;
+    }
+    .tab-bar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 16px;
+      border-bottom: 1px solid #334155;
+      padding-bottom: 12px;
+    }
+    .tab-btn {
+      background: #1E293B;
+      color: #CBD5E1;
+      border: 1px solid #334155;
+      border-radius: 8px;
+      padding: 8px 14px;
+      font-size: 12.5px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .tab-btn:hover { color: #FFF; border-color: #64748B; }
+    .tab-btn.active-tab {
+      background: var(--tab-color, #38BDF8);
+      color: #020617;
+      border-color: var(--tab-color, #38BDF8);
+    }
+    .panel-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 10px;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+    .file-badge {
+      font-family: Consolas, monospace;
+      font-size: 12px;
+      color: #38BDF8;
+      background: #020617;
+      padding: 4px 10px;
+      border-radius: 6px;
+      border: 1px solid #334155;
+    }
+    .copy-btn {
+      background: #38BDF8;
+      color: #020617;
+      border: none;
+      border-radius: 8px;
+      padding: 7px 14px;
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+    .copy-btn:hover { background: #0EA5E9; }
+    .prompt-pre {
+      background: #020617;
+      border: 1px solid #334155;
+      border-radius: 10px;
+      padding: 18px;
+      font-family: Consolas, 'JetBrains Mono', monospace;
+      font-size: 12.5px;
+      color: #E2E8F0;
+      white-space: pre-wrap;
+      max-height: 640px;
+      overflow-y: auto;
+      line-height: 1.65;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="hero">
+      <div>
+        <span class="hero-badge">⚡ CREWAI FLOW: THIẾT KẾ BÀI GIẢNG ĐIỆN TỬ (9 AGENTS) &nbsp;|&nbsp; 🤖 LLM: gpt-6-luna (codex-cli)</span>
+        <h1>Bộ Siêu Prompt Học Liệu: Đặc điểm địa lí vùng Đồng bằng sông Cửu Long</h1>
+        <p>Đóng gói tự động bởi <strong>DevOps Site Manager (agent_devops_site_manager)</strong> sau khi vượt qua kiểm thử kịch bản 45 phút và kiểm định QA độc lập (8.8/10 — APPROVED FOR RELEASE). Toàn bộ các bản Prompt đã được phân chia vào 6 thư mục chuyên biệt trong gói <code>.ZIP</code>.</p>
+      </div>
+      <a class="zip-cta" href="BaiGiangDienTu_dac_diem_dia_ly_vung_dong_bang_song_cuu_long_Prompts.zip" download>
+        <span>📦 Tải Trọn Bộ File .ZIP (Đã Chia Thư Mục)</span>
+      </a>
+    </div>
+
+    <div class="grid-layout">
+      <aside class="sidebar">
+        <h3>📁 Cấu Trúc Thư Mục Trong File .ZIP</h3>
+        <div class="tree-box">📦 dac_diem_dia_ly_vung_dong_bang_song_cuu_long_prompts/
+ ├─ 📁 01_NghienCuu_Va_KichBan_SuPham/
+ │   ├─ 📄 01_ho_so_nghien_cuu_hoc_lieu.md
+ │   └─ 📄 02_ma_tran_kich_ban_su_pham.md
+ ├─ 📁 02_Prompt_Slide_Gamma_10Slides/
+ │   └─ 📄 prompt_gamma_10_slides.md
+ ├─ 📁 03_Prompt_Phieu_Bai_Tap_25Cau/
+ │   └─ 📄 prompt_phieu_bai_tap_25_cau.md
+ ├─ 📁 04_Prompt_Infographics/
+ │   └─ 📄 prompt_thiet_ke_infographics.md
+ ├─ 📁 05_Prompt_Video_Intro_GoogleFlow_20Footages/
+ │   └─ 📄 prompt_video_intro_20_footages_google_flow.md
+ └─ 📁 06_KichBan_ChayThu_Va_BaoCao_QA/
+     ├─ 📄 01_kich_ban_chay_thu_45_phut.md
+     └─ 📄 02_bien_ban_qa_va_phe_duyet.md</div>
+        <h3>📊 Thông Số Gói Học Liệu</h3>
+        <ul class="meta-list">
+          <li><strong>Chủ đề:</strong> Đặc điểm địa lí vùng Đồng bằng sông Cửu Long</li>
+          <li><strong>LLM Engine:</strong> <span style="color:#38BDF8;font-weight:700;">gpt-6-luna (codex-cli)</span> (35,488 tok)</li>
+          <li><strong>Slide Gamma:</strong> 10 / 10 Slide chi tiết</li>
+          <li><strong>Phiếu Bài Tập:</strong> 25 / 25 Câu (TN, Đúng/Sai, Tự luận)</li>
+          <li><strong>Infographics:</strong> 7 / 7 Phân khu + Mã màu Hex</li>
+          <li><strong>Video Google Flow:</strong> 20 / 20 Footages + Lời thoại</li>
+          <li><strong>Điểm QA:</strong> <span style="color:#4ADE80;font-weight:700;">8.8 / 10 (APPROVED FOR RELEASE)</span></li>
+        </ul>
+      </aside>
+
+      <main class="main-card">
+        <div class="tab-bar">
+          <button class="tab-btn active-tab" data-target="tab_gamma" style="--tab-color:#38BDF8" onclick="switchTab('tab_gamma')">📊 1. Prompt 10 Slide Gamma</button><button class="tab-btn " data-target="tab_quiz" style="--tab-color:#4ADE80" onclick="switchTab('tab_quiz')">📝 2. Prompt Phiếu Bài Tập (25 Câu)</button><button class="tab-btn " data-target="tab_info" style="--tab-color:#F59E0B" onclick="switchTab('tab_info')">🎨 3. Prompt Infographics (7 Phân Khu)</button><button class="tab-btn " data-target="tab_video" style="--tab-color:#C084FC" onclick="switchTab('tab_video')">🎬 4. Prompt Video Google Flow (20 Footages)</button><button class="tab-btn " data-target="tab_research" style="--tab-color:#2DD4BF" onclick="switchTab('tab_research')">🔬 5. Nghiên Cứu & Kịch Bản Sư Phạm</button><button class="tab-btn " data-target="tab_qa" style="--tab-color:#F43F5E" onclick="switchTab('tab_qa')">✅ 6. Chạy Thử 45p & Kiểm Duyệt QA</button>
+        </div>
+        
+            <div id="tab_gamma" class="tab-panel" style="">
+              <div class="panel-header">
+                <div>
+                  <span class="file-badge">📂 02_Prompt_Slide_Gamma_10Slides/prompt_gamma_10_slides.md</span>
+                </div>
+                <button class="copy-btn" onclick="copyPreContent('pre_tab_gamma', this)">📋 Copy Toàn Bộ Prompt Này</button>
+              </div>
+              <pre id="pre_tab_gamma" class="prompt-pre"># SIÊU PROMPT TIẾNG VIỆT TẠO BÀI GIẢNG 10 SLIDE TRÊN GAMMA.APP
+**Chủ đề**: **Đặc điểm địa lí vùng Đồng bằng sông Cửu Long**  
+**Tác nhân thiết kế**: `Gamma Slide Engineer (agent_gamma_slide_engineer)`  
+**Engine AI**: `gpt-6-luna (codex-cli)`  
+**Hướng dẫn sử dụng**: Copy toàn bộ khối prompt trong khung bên dưới và dán vào Gamma.app (**Create new AI -&gt; Paste in text / Prompt**) để sinh bộ bài giảng đúng 10 slide chuẩn sư phạm.
+
+```markdown
+# PROMPT TẠO BÀI GIẢNG GAMMA.APP
+
+## Thiết lập tổng thể
+
+- **Vai trò AI:** Kiến trúc sư thiết kế bài giảng điện tử và chuyên gia Địa lí Việt Nam. Tạo bài giảng chính xác, trực quan, phù hợp với học sinh lớp 12 theo Chương trình GDPT 2018.
+- **Chủ đề:** Đặc điểm địa lí vùng Đồng bằng sông Cửu Long.
+- **Môn học / Lĩnh vực:** Địa lí — Địa lí tự nhiên và kinh tế – xã hội Việt Nam.
+- **Đối tượng:** Học sinh THPT lớp 12.
+- **Đầu ra:** Đúng 10 slide, theo thứ tự dưới đây. Không thêm slide mở đầu, kết luận hoặc tài liệu tham khảo riêng; lồng nguồn dữ liệu ngắn gọn ngay trên slide có sử dụng số liệu.
+- **Tỉ lệ:** 16:9.
+- **Ngôn ngữ:** Tiếng Việt chuẩn, có dấu đầy đủ; dùng thuật ngữ địa lí chính xác, câu ngắn gọn, dễ đọc.
+- **Phong cách:** Hiện đại, gần gũi, giàu tính khám phá; kết hợp bản đồ, sơ đồ, dữ liệu và hình ảnh thực địa. Không dùng hình ảnh hoặc số liệu của vùng khác.
+- **Bảng màu:** Xanh Mekong `#167D8D`, xanh ngọc `#53C7B5`, xanh lam `#2F6F9F`, màu phù sa `#A66A45`, vàng lúa `#E5B94B`, nền sáng `#F5F8F6`, chữ than `#203238`.
+- **Layout &amp; Cards:** Dùng lưới 12 cột, khoảng trắng thoáng, thẻ nội dung bo góc nhẹ. Ưu tiên bản đồ lớn, sơ đồ dòng chảy, biểu đồ đơn giản và thẻ dữ kiện; mỗi slide có một thông điệp chính.
+- **Typography:** Tiêu đề sans-serif đậm, rõ; nội dung sans-serif dễ đọc, cỡ chữ đủ lớn khi trình chiếu. Làm nổi bật từ khóa, địa danh và đơn vị đo.
+- **Nhân vật dẫn chuyện:** Cô Ba Phù Sa — hướng dẫn viên địa lí mặc áo bà ba xanh lam, đội nón lá, cầm bản đồ vùng đồng bằng. Meky — trợ lí AI hình giọt nước màu xanh ngọc, hiển thị bản đồ, biểu đồ và lớp dữ liệu địa lí. Dùng nhất quán, vừa phải, không che thông tin.
+- **Quy tắc dữ liệu:** Ghi rõ năm, đơn vị và nguồn cho số liệu thống kê. Với diện tích khoảng **40,9 nghìn km²** và phạm vi **13 đơn vị cấp tỉnh** (thành phố Cần Thơ và 12 tỉnh), ghi chú đây là cách phân vùng thường dùng trong tài liệu Địa lí phổ thông; đối chiếu phạm vi và danh mục đơn vị hành chính tại thời điểm dạy học. Không tự tạo số liệu dân số, sản lượng, diện tích cây trồng, thủy sản hoặc xâm nhập mặn. Không gán một độ cao duy nhất cho toàn vùng hay một mùa mưa, mùa khô cố định cho mọi địa điểm.
+- **Câu hỏi dẫn nhập xuyên suốt:** Vì sao một vùng có mạng lưới sông ngòi, kênh rạch dày đặc và đất đai màu mỡ vẫn đang chịu sức ép lớn từ hạn hán, xâm nhập mặn và sụt lún?
+
+### SLIDE 1: Đồng bằng trù phú, vì sao vẫn dễ tổn thương?
+
+- **Bố cục (Layout &amp; Cards):** Tiêu đề lớn ở đầu slide; câu hỏi dẫn nhập ở trung tâm; ba thẻ từ khóa “Nguồn nước”, “Mùa khô”, “Sức ép môi trường” ở cuối. Cô Ba Phù Sa và Meky dẫn vào bài.
+- **Nội dung trọng tâm &amp; Số liệu/Công thức:** Nêu nghịch lí khởi động: đồng bằng có đất phù sa, sông ngòi và kênh rạch dày đặc, nhưng vẫn chịu tác động của hạn hán, xâm nhập mặn, sạt lở, sụt lún và biến đổi nguồn nước. Chưa kết luận nguyên nhân; đặt vấn đề để khám phá qua các đặc điểm địa lí.
+- **Tương tác / Câu hỏi lớp học:** Dự đoán hai yếu tố tự nhiên hoặc hoạt động của con người có thể khiến vùng trù phú vẫn thiếu nước ngọt.
+- **[Prompt ảnh minh họa / Sơ đồ]:** Ảnh minh họa toàn cảnh đồng bằng nhìn từ trên cao, có sông và ruộng; lớp phủ biểu tượng hạn, mặn và sụt lún ở mức khái quát, không gắn số liệu giả. Cô Ba chỉ vào bản đồ, Meky hiển thị câu hỏi trung tâm.
+
+### SLIDE 2: Vị trí địa lí và phạm vi vùng
+
+- **Bố cục (Layout &amp; Cards):** Bản đồ Việt Nam chiếm khoảng hai phần ba slide, tô nổi Đồng bằng sông Cửu Long; bên cạnh là các thẻ “Vị trí”, “Tiếp giáp”, “Phạm vi”.
+- **Nội dung trọng tâm &amp; Số liệu/Công thức:** Vùng nằm ở cực nam Việt Nam; tiếp giáp Campuchia, Biển Đông và vịnh Thái Lan. Diện tích khoảng **40,9 nghìn km²**. Theo cách phân vùng thường dùng trong tài liệu Địa lí phổ thông, vùng gồm thành phố Cần Thơ và 12 tỉnh. Ghi rõ phạm vi phân vùng và nguồn của số liệu diện tích; đối chiếu danh mục đơn vị hành chính tại thời điểm dạy học.
+- **Tương tác / Câu hỏi lớp học:** Dựa vào bản đồ, hãy xác định các hướng tiếp giáp và giải thích vị trí ven biển có thể tạo thuận lợi, đồng thời đặt ra thách thức nào.
+- **[Prompt ảnh minh họa / Sơ đồ]:** Bản đồ Việt Nam có ranh giới vùng rõ, nhãn Campuchia, Biển Đông, vịnh Thái Lan và vị trí Cần Thơ; không tự vẽ hoặc ghi tên tỉnh nếu lớp dữ liệu không bảo đảm chính xác.
+
+### SLIDE 3: Địa hình thấp và đồng bằng phù sa
+
+- **Bố cục (Layout &amp; Cards):** Sơ đồ mặt cắt từ nội đồng ra biển ở giữa; ba thẻ chú giải “Bề mặt đồng bằng”, “Vùng trũng”, “Ven biển”.
+- **Nội dung trọng tâm &amp; Số liệu/Công thức:** Địa hình nhìn chung thấp, tương đối bằng phẳng; đồng bằng hình thành chủ yếu từ phù sa sông Mekong và chịu tác động của biển. Có sự khác biệt giữa các khu vực, gồm vùng trũng và dải ven biển; không dùng một độ cao duy nhất để đại diện toàn vùng. Địa hình thấp ảnh hưởng đến tiêu thoát nước và mức độ nhạy cảm trước ngập, xâm nhập mặn.
+- **Tương tác / Câu hỏi lớp học:** Trên mặt cắt, vùng nào có thể dễ ngập hoặc chịu ảnh hưởng của biển hơn? Nêu căn cứ từ địa hình.
+- **[Prompt ảnh minh họa / Sơ đồ]:** Mặt cắt địa hình khái quát từ nội đồng qua vùng trũng đến ven biển, thể hiện phù sa và tác động biển; ghi rõ là sơ đồ không theo tỉ lệ, không gắn cao độ cụ thể.
+
+### SLIDE 4: Khí hậu mùa mưa, mùa khô và nguồn nước
+
+- **Bố cục (Layout &amp; Cards):** Hai cột so sánh “Mùa mưa” và “Mùa khô”; phía dưới là mũi tên liên hệ khí hậu → nguồn nước → sản xuất.
+- **Nội dung trọng tâm &amp; Số liệu/Công thức:** Khí hậu mang tính cận xích đạo gió mùa, phân hóa rõ mùa mưa và mùa khô. Lượng mưa, thời gian mùa và điều kiện nguồn nước thay đổi theo địa điểm và thời kỳ; chế độ dòng chảy biến đổi theo mùa. Chỉ đưa số liệu khí tượng khi có trạm, thời kỳ quan trắc, đơn vị và nguồn ghi rõ.
+- **Tương tác / Câu hỏi lớp học:** Vì sao mùa khô có thể làm tăng sức ép về nước ngọt và ảnh hưởng đến sản xuất?
+- **[Prompt ảnh minh họa / Sơ đồ]:** Sơ đồ mùa mưa – mùa khô bằng biểu tượng mưa và nắng, kèm đường biểu diễn dòng chảy khái quát theo mùa; không ghi trị số nếu không có dữ liệu trạm được dẫn nguồn.
+
+### SLIDE 5: Sông Mekong, sông Tiền, sông Hậu và kênh rạch
+
+- **Bố cục (Layout &amp; Cards):** Bản đồ hoặc sơ đồ dòng chảy lớn ở bên trái; chú giải và thẻ “Hai nhánh chính”, “Kênh rạch”, “Nước theo mùa” ở bên phải.
+- **Nội dung trọng tâm &amp; Số liệu/Công thức:** Khi vào Việt Nam, sông Mekong phân thành hai nhánh chính là sông Tiền và sông Hậu. Vùng có mạng lưới sông, kênh rạch tự nhiên và nhân tạo dày đặc. Dòng chảy và nguồn nước biến đổi theo mùa; không suy diễn một lưu lượng chung nếu không có số liệu đo, thời gian và vị trí cụ thể.
+- **Tương tác / Câu hỏi lớp học:** Hãy lần theo sơ đồ dòng chảy và giải thích mạng lưới kênh rạch hỗ trợ sinh hoạt, sản xuất như thế nào.
+- **[Prompt ảnh minh họa / Sơ đồ]:** Sơ đồ định hướng dòng Mekong vào Việt Nam rồi thể hiện sông Tiền, sông Hậu và mạng kênh rạch bằng ký hiệu phân biệt; dùng lớp bản đồ có nguồn, không tự tạo nhánh sông hoặc ranh giới.
+
+### SLIDE 6: Đất, sinh vật và hệ sinh thái
+
+- **Bố cục (Layout &amp; Cards):** Ba thẻ hình ảnh “Đất phù sa”, “Đất ngập nước”, “Rừng ngập mặn”; dải cuối slide nối giá trị sinh thái với sinh kế.
+- **Nội dung trọng tâm &amp; Số liệu/Công thức:** Phù sa góp phần hình thành các vùng đất có giá trị cho sản xuất; hệ sinh thái tiêu biểu gồm đất ngập nước và rừng ngập mặn, nhất là ở những khu vực phù hợp. Hệ sinh thái có giá trị sinh thái và gắn với sinh kế địa phương; điều kiện đất và nước khác nhau giữa các khu vực, không khái quát mọi nơi như nhau.
+- **Tương tác / Câu hỏi lớp học:** Chọn một hệ sinh thái trên slide và nêu một giá trị của hệ sinh thái đó đối với tự nhiên hoặc sinh kế.
+- **[Prompt ảnh minh họa / Sơ đồ]:** Bộ ảnh hoặc minh họa thực địa về đất phù sa, vùng đất ngập nước và rừng ngập mặn; đặt nhãn đúng hệ sinh thái, tránh dùng hình ảnh của vùng địa lí khác.
+
+### SLIDE 7: Dân cư, đô thị và văn hóa sông nước
+
+- **Bố cục (Layout &amp; Cards):** Bản đồ phân bố đô thị hoặc dân cư có nguồn ở trung tâm; hai thẻ phụ “Đô thị ven sông” và “Sinh hoạt sông nước”.
+- **Nội dung trọng tâm &amp; Số liệu/Công thức:** Dân cư, đô thị và nhiều hoạt động sinh hoạt, giao thông, dịch vụ gắn với mạng lưới sông nước. Cần dùng bản đồ phân bố phù hợp và có thời điểm, nguồn; không khẳng định mật độ hoặc thứ hạng địa phương nếu chưa có số liệu đáng tin cậy.
+- **Tương tác / Câu hỏi lớp học:** Mạng lưới sông ngòi có thể ảnh hưởng như thế nào đến vị trí đô thị, giao thông và đời sống cư dân?
+- **[Prompt ảnh minh họa / Sơ đồ]:** Bản đồ vùng thể hiện đô thị và tuyến sông với ký hiệu dễ phân biệt; kèm ảnh sinh hoạt sông nước có chú thích địa điểm nếu xác định được, không dùng ảnh minh họa như bằng chứng số liệu.
+
+### SLIDE 8: Các hoạt động kinh tế và điều kiện tự nhiên
+
+- **Bố cục (Layout &amp; Cards):** Bốn thẻ “Nông nghiệp”, “Thủy sản”, “Công nghiệp”, “Dịch vụ”; sơ đồ nối mỗi hoạt động với điều kiện địa lí liên quan.
+- **Nội dung trọng tâm &amp; Số liệu/Công thức:** Nông nghiệp, thủy sản, công nghiệp và dịch vụ đều có vai trò quan trọng. Điều kiện đất, nước, khí hậu, vị trí và mạng lưới sông nước tạo thuận lợi và giới hạn khác nhau cho từng hoạt động. Chỉ dùng số liệu sản lượng, diện tích hoặc quy mô khi ghi năm thống kê, đơn vị và nguồn; không suy rộng từ một năm.
+- **Tương tác / Câu hỏi lớp học:** Chọn một hoạt động kinh tế và giải thích hai điều kiện địa lí có liên quan đến hoạt động đó.
+- **[Prompt ảnh minh họa / Sơ đồ]:** Sơ đồ bốn nhánh nối hoạt động kinh tế với đất, nước, khí hậu hoặc vị trí; dùng ảnh đúng bối cảnh vùng và không chèn số liệu ước đoán.
+
+### SLIDE 9: Hạn hán, xâm nhập mặn, sạt lở và sụt lún
+
+- **Bố cục (Layout &amp; Cards):** Sơ đồ nguyên nhân → tác động → hệ quả ở trung tâm; bốn thẻ hiện tượng xung quanh: “Hạn”, “Mặn”, “Sạt lở”, “Sụt lún”.
+- **Nội dung trọng tâm &amp; Số liệu/Công thức:** Các sức ép gồm hạn hán, xâm nhập mặn, sạt lở, sụt lún và suy giảm nguồn nước. Phân tích quan hệ nguyên nhân – hệ quả thận trọng: sức ép có thể liên quan đến biến đổi khí hậu, dòng chảy theo mùa, tác động biển và hoạt động sử dụng nước, đất của con người. Mức độ và nguyên nhân cụ thể khác nhau theo địa điểm và thời gian; không quy mọi hiện tượng cho một nguyên nhân duy nhất. Số liệu xâm nhập mặn hoặc sụt lún phải ghi vị trí, thời kỳ, đơn vị và nguồn.
+- **Tương tác / Câu hỏi lớp học:** Chọn một sức ép và xây dựng chuỗi ba bước: điều kiện hoặc nguyên nhân → tác động trực tiếp → hệ quả đối với dân cư hay sản xuất.
+- **[Prompt ảnh minh họa / Sơ đồ]:** Sơ đồ quan hệ nguyên nhân – hệ quả có mũi tên và nhãn “có thể góp phần”, phân biệt yếu tố tự nhiên và hoạt động con người; bản đồ mặn hoặc sụt lún chỉ dùng khi có dữ liệu xác thực, kèm năm và nguồn.
+
+### SLIDE 10: Vận dụng — đề xuất giải pháp cho một địa phương
+
+- **Bố cục (Layout &amp; Cards):** Phiếu nhiệm vụ ba phần: “Chọn địa phương”, “Nêu vấn đề”, “Đề xuất và căn cứ”; ô cuối để nhóm trình bày ngắn.
+- **Nội dung trọng tâm &amp; Số liệu/Công thức:** Mỗi nhóm chọn một địa phương trong Đồng bằng sông Cửu Long, xác định một vấn đề liên quan đến nước, mặn, sạt lở, sụt lún hoặc hệ sinh thái; đề xuất giải pháp thích ứng và nêu căn cứ địa lí. Căn cứ cần liên hệ với vị trí, địa hình, khí hậu, mạng lưới nước, hệ sinh thái hoặc hoạt động kinh tế. Dữ liệu địa phương phải có năm, đơn vị và nguồn.
+- **Tương tác / Câu hỏi lớp học:** Nhóm em chọn giải pháp nào, giải quyết vấn đề gì, và căn cứ địa lí nào cho thấy giải pháp phù hợp với địa phương?
+- **[Prompt ảnh minh họa / Sơ đồ]:** Mẫu bảng nhóm ba cột “Vấn đề – Căn cứ địa lí – Giải pháp”, kèm bản đồ vùng để khoanh địa phương; không áp đặt một giải pháp chung cho mọi nơi.
+```
+</pre>
+            </div>
+            
+            <div id="tab_quiz" class="tab-panel" style="display:none;">
+              <div class="panel-header">
+                <div>
+                  <span class="file-badge">📂 03_Prompt_Phieu_Bai_Tap_25Cau/prompt_phieu_bai_tap_25_cau.md</span>
+                </div>
+                <button class="copy-btn" onclick="copyPreContent('pre_tab_quiz', this)">📋 Copy Toàn Bộ Prompt Này</button>
+              </div>
+              <pre id="pre_tab_quiz" class="prompt-pre"># SIÊU PROMPT TIẾNG VIỆT THIẾT KẾ PHIẾU BÀI TẬP ĐÁNH GIÁ NĂNG LỰC (25 CÂU HỎI)
+**Chủ đề**: **Đặc điểm địa lí vùng Đồng bằng sông Cửu Long**  
+**Tác nhân thiết kế**: `Quiz Assessment Maker (agent_quiz_assessment_maker)`  
+**Engine AI**: `gpt-6-luna (codex-cli)`  
+**Cấu trúc chuẩn**: Đề kiểm tra đánh giá năng lực 25 câu theo Chương trình GDPT 2018 (15 Trắc nghiệm 4 lựa chọn + 5 Đúng/Sai chùm 4 mệnh đề + 5 Tự luận trả lời ngắn/vận dụng) kèm Bảng Đáp án &amp; Giải thích.
+
+```markdown
+# ĐỀ KIỂM TRA ĐÁNH GIÁ NĂNG LỰC ĐỊA LÍ 12
+
+Vai trò: Chuyên gia Khảo thí và Đo lường Giáo dục Quốc gia, biên soạn theo định hướng GDPT 2018.  
+Mục tiêu: Đánh giá kiến thức địa lí, năng lực đọc dữ liệu, giải thích mối quan hệ tự nhiên – kinh tế và đề xuất giải pháp cho Đồng bằng sông Cửu Long.
+
+## PHẦN I. TRẮC NGHIỆM 4 LỰA CHỌN
+
+**Câu 1** *(Nhận biết).* Đồng bằng sông Cửu Long nằm ở đâu?
+
+A. Cực nam Việt Nam.  
+B. Cực bắc Việt Nam.  
+C. Ven biển Nam Trung Bộ.  
+D. Trung du Bắc Bộ.
+
+**Câu 2** *(Nhận biết).* Theo cách phân vùng thường dùng trong tài liệu Địa lí phổ thông, Đồng bằng sông Cửu Long gồm:
+
+A. Thành phố Cần Thơ và 12 tỉnh.  
+B. Thành phố Cần Thơ và 10 tỉnh.  
+C. 13 tỉnh, không gồm thành phố trực thuộc trung ương.  
+D. Thành phố Hồ Chí Minh và 12 tỉnh.
+
+**Câu 3** *(Nhận biết).* Hai nhánh chính của sông Mekong khi vào Việt Nam là:
+
+A. Sông Tiền và sông Hậu.  
+B. Sông Đồng Nai và sông Bé.  
+C. Sông Vàm Cỏ Đông và sông Vàm Cỏ Tây.  
+D. Sông Sài Gòn và sông Thị Vải.
+
+**Câu 4** *(Nhận biết).* Địa hình chung của Đồng bằng sông Cửu Long là:
+
+A. Cao, dốc và bị chia cắt mạnh.  
+B. Thấp, tương đối bằng phẳng.  
+C. Chủ yếu là núi đá vôi.  
+D. Có nhiều cao nguyên badan.
+
+**Câu 5** *(Nhận biết).* Khí hậu của vùng có đặc điểm:
+
+A. Cận xích đạo gió mùa, phân hóa mùa mưa và mùa khô.  
+B. Ôn đới lục địa, mùa đông kéo dài.  
+C. Nhiệt đới gió mùa có mùa đông lạnh rõ rệt.  
+D. Khô nóng quanh năm, hầu như không có mùa mưa.
+
+**Câu 6** *(Nhận biết).* Diện tích vùng thường được nêu trong tài liệu phổ thông vào khoảng:
+
+A. 20,9 nghìn km².  
+B. 30,9 nghìn km².  
+C. 40,9 nghìn km².  
+D. 60,9 nghìn km².
+
+**Câu 7** *(Thông hiểu).* Vì sao mạng lưới sông, kênh rạch dày đặc không đồng nghĩa với việc vùng luôn đủ nước ngọt?
+
+A. Nước và dòng chảy thay đổi theo mùa; mùa khô có thể thiếu nước và chịu xâm nhập mặn.  
+B. Các sông trong vùng chỉ có nước vào mùa đông.  
+C. Kênh rạch đều dẫn nước biển vào nội đồng quanh năm.  
+D. Địa hình cao khiến nước mưa không thể bổ cập cho sông.
+
+**Câu 8** *(Thông hiểu).* Phù sa sông Mekong và tác động của biển góp phần chủ yếu tạo nên:
+
+A. Bề mặt đồng bằng thấp, tương đối bằng phẳng, có những khu vực khác nhau về địa hình và đất.  
+B. Dải núi cao liên tục dọc ven biển.  
+C. Các cao nguyên rộng, bị chia cắt sâu.  
+D. Địa hình băng hà với nhiều hồ sâu.
+
+**Câu 9** *(Thông hiểu).* Nhận định nào giải thích đúng nhất sự phân hóa mùa của nguồn nước trong vùng?
+
+A. Mùa mưa và mùa khô làm lượng nước và chế độ dòng chảy biến đổi theo thời gian.  
+B. Nguồn nước chỉ phụ thuộc vào thủy triều, không liên quan đến mưa.  
+C. Lượng nước sông ổn định quanh năm vì có nhiều kênh rạch.  
+D. Mùa khô luôn có dòng chảy lớn hơn mùa mưa.
+
+**Câu 10** *(Thông hiểu).* Sông ngòi, kênh rạch dày đặc có thể hỗ trợ hoạt động kinh tế nào?
+
+A. Giao thông đường thủy, cấp nước và nuôi trồng thủy sản.  
+B. Khai thác than đá quy mô lớn.  
+C. Phát triển đường sắt xuyên núi là chủ yếu.  
+D. Trồng cây ôn đới trên núi cao.
+
+**Câu 11** *(Thông hiểu).* Vì sao không nên dùng một độ cao duy nhất để mô tả toàn bộ Đồng bằng sông Cửu Long?
+
+A. Địa hình có khác biệt giữa khu vực nội đồng, vùng trũng và ven biển.  
+B. Toàn vùng không có địa hình thấp.  
+C. Độ cao thay đổi hoàn toàn theo từng giờ.  
+D. Bản đồ địa hình không thể thể hiện độ cao ở đồng bằng.
+
+**Câu 12** *(Vận dụng).* Một địa phương ven biển ghi nhận nước mặn tiến sâu hơn vào kênh nội đồng trong mùa khô. Cách giải thích phù hợp nhất là:
+
+A. Lượng nước ngọt và dòng chảy giảm theo mùa, làm nước mặn có điều kiện lấn sâu.  
+B. Mưa lớn quanh năm làm nước biển tràn vào sông.  
+C. Địa hình vùng tăng cao đột ngột vào mùa khô.  
+D. Phù sa làm mọi kênh rạch mất hoàn toàn khả năng dẫn nước.
+
+**Câu 13** *(Vận dụng).* Khi so sánh sản lượng thủy sản của hai năm, thông tin nào cần có để kết luận đáng tin cậy?
+
+A. Năm thống kê, đơn vị đo và nguồn số liệu.  
+B. Tên tỉnh, không cần năm hoặc đơn vị.  
+C. Một con số ước lượng không rõ nguồn.  
+D. Màu sắc của biểu đồ và tên người lập.
+
+**Câu 14** *(Vận dụng).* Một khu vực có hệ sinh thái đất ngập nước và rừng ngập mặn. Phương án nào cân bằng tốt nhất giữa sinh kế và bảo tồn?
+
+A. Khai thác có kiểm soát, bảo vệ sinh cảnh và lựa chọn sinh kế phù hợp hệ sinh thái.  
+B. Chuyển toàn bộ khu vực thành đất xây dựng.  
+C. Chặt rừng ngập mặn để mở rộng nuôi trồng bằng mọi giá.  
+D. Cấm mọi hoạt động sinh kế của cư dân mà không có phương án thay thế.
+
+**Câu 15** *(Vận dụng).* Câu hỏi dẫn nhập nêu nghịch lí vùng trù phú vẫn chịu hạn, mặn và sụt lún. Nhận định nào tổng hợp phù hợp nhất?
+
+A. Điều kiện tự nhiên thuận lợi không loại bỏ rủi ro do biến đổi mùa, tác động biển và sức ép sử dụng tài nguyên.  
+B. Đất màu mỡ bảo đảm nguồn nước ngọt ổn định quanh năm.  
+C. Mạng lưới kênh rạch khiến vùng không thể bị xâm nhập mặn.  
+D. Sụt lún chỉ có thể xảy ra ở vùng núi.
+
+## PHẦN II. TRẮC NGHIỆM ĐÚNG / SAI CHÙM 4 MỆNH ĐỀ
+
+Với mỗi câu, xác định từng ý a), b), c), d) là **Đúng** hay **Sai**.
+
+**Câu 16.** Tư liệu khái quát vùng có diện tích khoảng 40,9 nghìn km² và gồm thành phố Cần Thơ cùng 12 tỉnh theo cách phân vùng thường dùng trong tài liệu phổ thông.
+
+a) Con số diện tích trên cần đi kèm phạm vi phân vùng và nguồn số liệu.  
+b) Theo cách phân vùng nêu trong tư liệu, vùng có 13 đơn vị cấp tỉnh.  
+c) Danh mục đơn vị hành chính có thể bỏ qua thời điểm dạy học vì không thay đổi.  
+d) Có thể dùng con số diện tích trên mà không cần xác định phạm vi thống kê.
+
+**Câu 17.** Một sơ đồ dòng chảy cho thấy sông Mekong vào Việt Nam rồi phân thành sông Tiền và sông Hậu; vùng có nhiều kênh rạch tự nhiên và nhân tạo.
+
+a) Sông Tiền và sông Hậu là hai nhánh chính của sông Mekong khi vào Việt Nam.  
+b) Toàn bộ kênh rạch trong vùng đều là kênh nhân tạo.  
+c) Mạng lưới kênh rạch có thể hỗ trợ giao thông đường thủy.  
+d) Có nhiều sông, kênh rạch nên mùa khô không thể xảy ra thiếu nước ngọt.
+
+**Câu 18.** Một biểu đồ khí tượng tại một trạm cho thấy lượng mưa tập trung nhiều hơn trong một phần năm, còn các tháng khác khô hơn. Tư liệu chỉ đại diện cho trạm và thời kỳ được ghi trên biểu đồ.
+
+a) Khí hậu vùng có sự phân hóa mùa mưa và mùa khô.  
+b) Có thể dùng số liệu của một trạm để khẳng định chính xác lượng mưa ở mọi nơi trong vùng.  
+c) Khi khai thác biểu đồ, cần ghi địa điểm và thời kỳ quan trắc.  
+d) Mùa khô có thể làm gia tăng sức ép lên nguồn nước phục vụ sản xuất.
+
+**Câu 19.** Vùng có địa hình thấp, tương đối bằng phẳng; một số khu vực ven biển và vùng trũng có điều kiện tự nhiên khác nhau. Vùng cũng có đất ngập nước và rừng ngập mặn.
+
+a) Địa hình vùng hoàn toàn đồng nhất, không có khác biệt khu vực.  
+b) Không nên dùng một độ cao duy nhất đại diện cho toàn vùng.  
+c) Rừng ngập mặn có giá trị sinh thái ở vùng ven biển.  
+d) Có thể xem xét đặc điểm địa hình và hệ sinh thái khi lập kế hoạch sử dụng đất.
+
+**Câu 20.** Một báo cáo địa phương đề cập đến hạn hán, xâm nhập mặn, sạt lở và sụt lún. Báo cáo cần phân biệt số liệu theo địa điểm, thời gian và nguồn.
+
+a) Hạn hán và xâm nhập mặn có thể gây sức ép lên sản xuất và sinh hoạt.  
+b) Chỉ cần có mạng lưới kênh rạch dày đặc là đủ kết luận vùng không bị hạn.  
+c) Sụt lún và sạt lở là những thách thức môi trường cần được đánh giá theo địa điểm và thời gian.  
+d) Có thể suy rộng số liệu của một năm thành xu thế dài hạn mà không cần thêm dữ liệu.
+
+## PHẦN III. TỰ LUẬN TRẢ LỜI NGẮN &amp; VẬN DỤNG THỰC TIỄN
+
+**Câu 21.** Tính mật độ dân số nếu một địa bàn có 1,2 triệu người trên diện tích 4.000 km²; làm tròn đến người/km².
+
+**Câu 22.** Một trạm đo ghi nhận lượng mưa mùa mưa là 1.500 mm, mùa khô là 300 mm. Tính chênh lệch lượng mưa giữa hai mùa.
+
+**Câu 23.** Nêu hai nguyên nhân địa lí có thể làm tăng nguy cơ thiếu nước ngọt hoặc xâm nhập mặn trong mùa khô ở vùng.
+
+**Câu 24.** Một xã ven biển dự kiến mở rộng nuôi trồng thủy sản gần rừng ngập mặn. Nêu một giải pháp giúp phát triển sinh kế đồng thời hạn chế suy giảm hệ sinh thái.
+
+**Câu 25.** Trả lời câu hỏi dẫn nhập bằng một đoạn ngắn: Vì sao vùng có sông ngòi dày đặc và đất đai màu mỡ vẫn chịu sức ép hạn hán, xâm nhập mặn và sụt lún?
+
+## PHẦN IV. BẢNG ĐÁP ÁN NHANH &amp; HƯỚNG DẪN GIẢI NGẮN GỌN
+
+| Câu | Đáp án | Hướng dẫn giải ngắn |
+|---|---|---|
+| 1 | A | Vùng nằm ở cực nam Việt Nam. |
+| 2 | A | Theo phân vùng phổ thông: Cần Thơ và 12 tỉnh; cần đối chiếu danh mục theo thời điểm dạy học. |
+| 3 | A | Hai nhánh chính là sông Tiền và sông Hậu. |
+| 4 | B | Địa hình nhìn chung thấp, tương đối bằng phẳng. |
+| 5 | A | Khí hậu cận xích đạo gió mùa có mùa mưa và mùa khô. |
+| 6 | C | Diện tích tham khảo khoảng 40,9 nghìn km²; cần ghi rõ phạm vi và nguồn. |
+| 7 | A | Nguồn nước biến đổi theo mùa; mùa khô có thể thiếu nước và tăng nguy cơ mặn. |
+| 8 | A | Phù sa sông và tác động biển tạo bề mặt đồng bằng, song địa hình và đất có phân hóa. |
+| 9 | A | Mùa mưa, mùa khô chi phối lượng nước và dòng chảy theo thời gian. |
+| 10 | A | Sông rạch hỗ trợ giao thông, cấp nước và các hoạt động thủy sản. |
+| 11 | A | Các khu vực trong đồng bằng khác nhau, không thể khái quát bằng một độ cao. |
+| 12 | A | Dòng nước ngọt giảm trong mùa khô có thể tạo điều kiện cho mặn lấn sâu. |
+| 13 | A | So sánh số liệu cần năm, đơn vị và nguồn. |
+| 14 | A | Khai thác phù hợp hệ sinh thái giúp hài hòa sinh kế và bảo tồn. |
+| 15 | A | Rủi ro vẫn tồn tại do tính mùa vụ, tác động biển và sức ép sử dụng tài nguyên. |
+| 16 | a Đ; b Đ; c S; d S | Số liệu cần phạm vi và nguồn; danh mục hành chính cần đối chiếu theo thời điểm. |
+| 17 | a Đ; b S; c Đ; d S | Kênh rạch gồm tự nhiên và nhân tạo; nhiều kênh không bảo đảm đủ nước mùa khô. |
+| 18 | a Đ; b S; c Đ; d Đ | Số liệu khí tượng đại diện cho trạm và thời kỳ ghi nhận, không tự động đại diện toàn vùng. |
+| 19 | a S; b Đ; c Đ; d Đ | Địa hình có khác biệt; hệ sinh thái và địa hình cần được cân nhắc khi quy hoạch. |
+| 20 | a Đ; b S; c Đ; d S | Cần đánh giá rủi ro theo địa điểm, thời gian; không suy rộng từ một năm. |
+| 21 | 300 người/km² | Mật độ = 1.200.000 ÷ 4.000 = 300 người/km². |
+| 22 | 1.200 mm | Chênh lệch = 1.500 − 300 = 1.200 mm. |
+| 23 | Nêu đúng 2 ý | Ví dụ: mùa khô làm dòng chảy nước ngọt giảm; nước biển có thể lấn sâu; nhu cầu nước sản xuất tăng. |
+| 24 | Giải pháp hợp lí, có căn cứ | Ví dụ: quy hoạch vùng nuôi phù hợp, giữ dải rừng ngập mặn và kiểm soát chất thải. |
+| 25 | Nêu được mối quan hệ | Sông rạch không bảo đảm nước quanh năm vì dòng chảy biến đổi theo mùa; mùa khô và tác động biển làm tăng hạn, mặn, còn sụt lún gắn với sức ép lên nền đất và tài nguyên nước. |
+```
+</pre>
+            </div>
+            
+            <div id="tab_info" class="tab-panel" style="display:none;">
+              <div class="panel-header">
+                <div>
+                  <span class="file-badge">📂 04_Prompt_Infographics/prompt_thiet_ke_infographics.md</span>
+                </div>
+                <button class="copy-btn" onclick="copyPreContent('pre_tab_info', this)">📋 Copy Toàn Bộ Prompt Này</button>
+              </div>
+              <pre id="pre_tab_info" class="prompt-pre"># SIÊU PROMPT TIẾNG VIỆT THIẾT KẾ INFOGRAPHIC TỔNG HỢP KIẾN THỨC (7 PHÂN KHU)
+**Chủ đề**: **Đặc điểm địa lí vùng Đồng bằng sông Cửu Long**  
+**Tác nhân thiết kế**: `Infographic Designer (agent_infographic_designer)`  
+**Engine AI**: `gpt-6-luna (codex-cli)`  
+**Mục đích sử dụng**: Dùng cho Canva Magic Design, Nano Banana Pro, Ideogram 2.0 hoặc AI UI Generator để dựng Poster Infographic chuẩn sư phạm.
+
+```markdown
+# SIÊU PROMPT THIẾT KẾ POSTER INFOGRAPHIC GIÁO DỤC 7 PHÂN KHU
+
+**Vai trò:** Bạn là Giám đốc Sáng tạo Đồ họa Thông tin chuyên thiết kế infographic giáo dục. Hãy tạo poster dọc giúp học sinh THPT lớp 12 hiểu, ghi nhớ và vận dụng kiến thức về **Đặc điểm địa lí vùng Đồng bằng sông Cửu Long**.
+
+## 1. THÔNG SỐ KỸ THUẬT &amp; BỐ CỤC
+
+- **Kích thước:** `1920 × 4800 px`, tỉ lệ `9:20`, poster dọc.
+- **Phong cách:** Infographic giáo dục hiện đại, chính xác, giàu tính trực quan; kết hợp bản đồ, sơ đồ dòng chảy, biểu đồ và minh họa sinh thái. Bố cục phân cấp rõ, dễ đọc khi xem trên màn hình lẫn khi in.
+- **Bảng màu 6 mã Hex:**
+  - Xanh Mekong đậm `#075B68` — tiêu đề, sông và nhấn mạnh.
+  - Xanh ngọc `#24B8A7` — dữ liệu, điểm nhấn của Meky.
+  - Xanh lam nhạt `#A9DDE5` — nước, nền sơ đồ.
+  - Vàng phù sa `#E8B95B` — đất, KPI và điểm cần nhớ.
+  - Xanh sinh thái `#557C59` — rừng ngập mặn, sinh cảnh.
+  - Trắng ngà `#F7F5EE` — nền chính, bảo đảm độ tương phản.
+- **Font chữ:** Be Vietnam Pro cho nội dung tiếng Việt; Montserrat cho tiêu đề, số liệu và nhãn ngắn. Dùng chữ có dấu chuẩn, nét rõ, không bóp méo font.
+- **Lưới bố cục:** Chia nội dung thành đúng **7 phân khu thị giác** theo thứ tự từ trên xuống. Tạo khoảng thở, giới hạn mỗi khối chữ, dùng mũi tên và nhãn để dẫn mắt. Không để chú thích, bản đồ hay số liệu chồng lấn.
+- **Đối tượng:** Học sinh lớp 12, Chương trình GDPT 2018. Dùng ngôn ngữ chính xác, dễ hiểu và khuyến khích tư duy nguyên nhân – hệ quả.
+- **Nhân vật dẫn chuyện:** Cô Ba Phù Sa, hướng dẫn viên địa lí mặc áo bà ba xanh lam, đội nón lá, cầm bản đồ vùng đồng bằng. Meky là trợ lí AI hình giọt nước màu xanh ngọc, hiển thị bản đồ, biểu đồ và các lớp dữ liệu địa lí. Giữ tạo hình nhất quán; nhân vật hỗ trợ bài học, không che dữ liệu.
+- **Câu hỏi dẫn nhập:** “Vì sao một vùng có mạng lưới sông ngòi, kênh rạch dày đặc và đất đai màu mỡ vẫn đang chịu sức ép lớn từ hạn hán, xâm nhập mặn và sụt lún?”
+- **Quy tắc dữ liệu:** Ghi rõ năm, đơn vị, phạm vi phân vùng và nguồn cho số liệu thống kê. Không tự tạo số liệu hoặc biến thông tin có điều kiện thành con số chắc chắn. Nếu chưa có nguồn kiểm chứng, dùng mô tả định tính và ghi chú cần đối chiếu tài liệu học tập hoặc nguồn thống kê chính thức tại thời điểm dạy học.
+
+## 2. MÔ TẢ CHI TIẾT 7 PHÂN KHU THỊ GIÁC
+
+#### 🔹 PHÂN KHU 1 (Top Header Banner &amp; 4 Hero KPI Badges)
+
+- **Visual:** Banner đầu poster có bản đồ cách điệu vùng Đồng bằng sông Cửu Long nhìn từ trên cao, các nhánh sông tỏa ra biển. Cô Ba Phù Sa đứng cạnh bản đồ; Meky hiển thị một lớp dữ liệu nhỏ. Dùng biểu tượng đơn giản cho địa hình, khí hậu, sông ngòi và sinh kế.
+- **Tiêu đề:** **ĐỒNG BẰNG SÔNG CỬU LONG**  
+  *Thiên nhiên trù phú — vùng đất trước nhiều sức ép*
+- **Nội dung chữ hiển thị:**  
+  “Vì sao một vùng có sông ngòi, kênh rạch dày đặc và đất đai màu mỡ vẫn chịu sức ép từ hạn hán, xâm nhập mặn và sụt lún?”
+- **4 Hero KPI Badges:**
+  1. **≈ 40,9 nghìn km²** — diện tích vùng; ghi chú: “Theo phạm vi phân vùng của nguồn được sử dụng”.
+  2. **13 đơn vị cấp tỉnh** — theo cách phân vùng thường dùng trong tài liệu Địa lí phổ thông: thành phố Cần Thơ và 12 tỉnh; cần đối chiếu danh mục hành chính tại thời điểm dạy học.
+  3. **2 nhánh chính** — sông Tiền và sông Hậu khi sông Mekong vào Việt Nam.
+  4. **2 mùa rõ rệt** — mùa mưa và mùa khô; thời gian, lượng mưa thay đổi theo địa điểm và thời kỳ thống kê.
+- **Ghi chú nhỏ:** “Các số liệu về diện tích và đơn vị cấp tỉnh cần ghi nguồn, phạm vi và thời điểm đối chiếu.”
+
+#### 🔹 PHÂN KHU 2 (Mô hình / Sơ đồ Trung tâm của bài học)
+
+- **Visual:** Sơ đồ trung tâm dạng lát cắt địa lí: phía tây bắc là biên giới Campuchia; dòng Mekong phân nhánh thành sông Tiền, sông Hậu và mạng kênh rạch; phía đông và nam hướng ra Biển Đông, phía tây nam giáp vịnh Thái Lan. Phối hợp lát cắt địa hình thấp, vùng trũng, vùng ven biển và lớp phủ đất ngập nước. Dùng mũi tên để thể hiện nước, phù sa và tác động biển; không vẽ sai hướng sông hoặc ranh giới.
+- **Tiêu đề:** **Một đồng bằng được định hình bởi sông và biển**
+- **Nội dung chữ hiển thị:**  
+  “Vùng cực nam Việt Nam, tiếp giáp Campuchia, Biển Đông và vịnh Thái Lan.”  
+  “Đồng bằng thấp, tương đối bằng phẳng; hình thành chủ yếu từ phù sa sông Mekong và chịu tác động của biển.”  
+  “Nước, phù sa, địa hình và mùa khí hậu cùng chi phối hệ sinh thái, sản xuất và sinh kế.”
+- **Nhãn trên sơ đồ:** “Campuchia”, “Biển Đông”, “Vịnh Thái Lan”, “Mekong”, “Sông Tiền”, “Sông Hậu”, “Vùng trũng”, “Ven biển”.
+- **Chú thích:** “Độ cao và điều kiện tự nhiên thay đổi giữa các khu vực; không dùng một độ cao duy nhất đại diện cho toàn vùng.”
+
+#### 🔹 PHÂN KHU 3 (Công thức / Định luật / Trụ cột kiến thức cốt lõi)
+
+- **Visual:** Năm thẻ kiến thức nối với nhau bằng dòng chảy, từ tự nhiên đến kinh tế – xã hội. Meky bật từng lớp dữ liệu; Cô Ba Phù Sa chỉ vào quan hệ giữa mùa nước và hoạt động sản xuất.
+- **Tiêu đề:** **5 trụ cột để đọc vùng đồng bằng**
+- **Nội dung chữ hiển thị:**
+  1. **Vị trí và phạm vi:** Vùng cực nam Việt Nam; tiếp giáp Campuchia, Biển Đông và vịnh Thái Lan. Phạm vi đơn vị hành chính cần ghi theo tài liệu học tập được chọn.
+  2. **Địa hình và nguồn gốc:** Thấp, tương đối bằng phẳng; bề mặt đồng bằng hình thành chủ yếu bởi phù sa sông Mekong, đồng thời chịu tác động của biển.
+  3. **Khí hậu và nguồn nước:** Khí hậu cận xích đạo gió mùa, phân hóa mùa mưa – mùa khô; nguồn nước và chế độ dòng chảy biến đổi theo mùa.
+  4. **Sông ngòi và sinh thái:** Sông, kênh rạch dày đặc; có hệ sinh thái đất ngập nước, rừng ngập mặn và vùng ven biển giàu giá trị sinh thái.
+  5. **Dân cư và kinh tế:** Dân cư, đô thị và sinh kế gắn với sông nước; nông nghiệp, thủy sản, công nghiệp và dịch vụ đều quan trọng, đồng thời chịu sức ép môi trường và biến đổi khí hậu.
+- **Công thức ghi nhớ:**  
+  **Vị trí + địa hình + khí hậu + nước + con người → đặc điểm và sinh kế của vùng**
+- **Chú thích:** “Đây là sơ đồ khái quát mối liên hệ địa lí, không phải công thức tính toán.”
+
+#### 🔹 PHÂN KHU 4 (Biểu đồ so sánh / Trực quan hóa dữ liệu hoặc Phân loại)
+
+- **Visual:** Infographic phân loại mùa mưa – mùa khô bằng hai nửa màu: mùa mưa có biểu tượng mưa và dòng chảy; mùa khô có biểu tượng nắng, nhu cầu nước và nguy cơ mặn tăng ở một số nơi. Kèm sơ đồ dòng chảy Mekong → sông Tiền, sông Hậu → mạng lưới kênh rạch. Không gán con số lượng mưa, độ mặn hay thời gian mùa nếu chưa có nguồn, địa điểm và thời kỳ.
+- **Tiêu đề:** **Nước thay đổi theo mùa — tác động lan tới sản xuất**
+- **Nội dung chữ hiển thị:**
+  - **Mùa mưa:** Mưa bổ sung nước; dòng chảy và chế độ ngập thay đổi theo địa điểm.
+  - **Mùa khô:** Nguồn nước biến đổi; một số khu vực có thể chịu hạn và xâm nhập mặn.
+  - **Quanh năm:** Sông Tiền, sông Hậu cùng mạng lưới kênh rạch tự nhiên và nhân tạo kết nối nhiều khu vực.
+- **Quan hệ cần đọc:**  
+  **Mùa khí hậu → nguồn nước và dòng chảy → điều kiện sản xuất, sinh hoạt và hệ sinh thái**
+- **Nhãn dữ liệu:** “Muốn so sánh lượng mưa hoặc độ mặn: ghi địa điểm/trạm, thời kỳ, đơn vị và nguồn.”
+
+#### 🔹 PHÂN KHU 5 (Ứng dụng thực tiễn &amp; Liên hệ đời sống / Công nghệ)
+
+- **Visual:** Tình huống học tập trên bản đồ nhỏ: một địa phương ven biển hoặc nội đồng đang chọn phương án thích ứng. Meky bật các lớp “nguồn nước”, “đất”, “sinh kế”; Cô Ba Phù Sa hướng dẫn học sinh đối chiếu bản đồ và số liệu. Không khẳng định giải pháp nào phù hợp cho mọi địa phương.
+- **Tiêu đề:** **Dùng kiến thức địa lí để chọn cách thích ứng**
+- **Nội dung chữ hiển thị:**
+  - “Xác định địa phương và đặc điểm tự nhiên liên quan.”
+  - “Đọc dữ liệu nước, mặn, đất và sinh kế có ghi thời gian, đơn vị, nguồn.”
+  - “So sánh các phương án theo điều kiện tại chỗ và tác động tới người dân, hệ sinh thái.”
+- **Thẻ gợi ý giải pháp để đánh giá:**  
+  “Quản lí và sử dụng nước phù hợp” · “Điều chỉnh mùa vụ hoặc sinh kế theo điều kiện địa phương” · “Bảo vệ hệ sinh thái ven biển và đất ngập nước” · “Theo dõi, cập nhật thông tin hạn và mặn”.
+- **Câu hỏi trên poster:** “Giải pháp nào phù hợp với địa phương em? Dữ liệu nào làm căn cứ?”
+- **Ghi chú:** “Đây là gợi ý thảo luận; cần đánh giá tính phù hợp theo địa điểm và dữ liệu thực tế.”
+
+#### 🔹 PHÂN KHU 6 (Lưu ý sư phạm — Bẫy sai lầm thường gặp của học sinh)
+
+- **Visual:** Bốn thẻ “Dễ nhầm” có biểu tượng cảnh báo nhẹ; Meky dùng kính lúp để kiểm tra nguồn và đơn vị. Thiết kế mang tính hướng dẫn, không tạo cảm giác phê phán.
+- **Tiêu đề:** **4 điều cần kiểm tra trước khi kết luận**
+- **Nội dung chữ hiển thị:**
+  1. **Không xem toàn vùng có cùng một độ cao.** Địa hình khác nhau giữa vùng trũng, nội đồng và ven biển.
+  2. **Không đồng nhất mùa khô với hạn ở mọi nơi.** Điều kiện nước và mức độ ảnh hưởng thay đổi theo địa điểm, thời gian và nguồn cung nước.
+  3. **Không khẳng định một nguyên nhân duy nhất gây xâm nhập mặn hoặc sụt lún.** Hãy phân tích nhiều yếu tố và dựa vào tài liệu, dữ liệu có nguồn.
+  4. **Không dùng số liệu thiếu năm, đơn vị hoặc phạm vi.** Dân số, sản lượng, cây trồng, thủy sản và xâm nhập mặn phải ghi năm thống kê và nguồn.
+- **Dòng nhắc học sinh:** “Phân biệt điều quan sát được, số liệu thống kê và nhận định nguyên nhân.”
+
+#### 🔹 PHÂN KHU 7 (Footer &amp; Thông điệp khắc sâu kiến thức)
+
+- **Visual:** Footer là dải sông chảy qua ruộng, kênh rạch, vùng đất ngập nước và rừng ngập mặn hướng ra biển. Cô Ba Phù Sa và Meky đứng cạnh một câu hỏi vận dụng; chừa khoảng trống dễ đọc cho phần nguồn.
+- **Tiêu đề:** **Hiểu dòng chảy — hiểu cách vùng đất thích ứng**
+- **Nội dung chữ hiển thị:**  
+  “Đồng bằng sông Cửu Long vừa là không gian sông nước trù phú, vừa có điều kiện tự nhiên biến đổi theo mùa và khác nhau giữa các địa phương. Đọc đúng vị trí, địa hình, khí hậu, nguồn nước và số liệu là bước đầu để giải thích thách thức và đề xuất giải pháp thích ứng.”
+- **Thông điệp khắc sâu:**  
+  **“Đặc điểm vùng được tạo nên từ mối liên hệ giữa tự nhiên, sinh kế và cách con người sử dụng tài nguyên.”**
+- **Nhiệm vụ vận dụng:** “Chọn một địa phương ở Đồng bằng sông Cửu Long. Nêu một thách thức tự nhiên, đề xuất một giải pháp thích ứng và chỉ ra căn cứ địa lí, dữ liệu dùng để bảo vệ lựa chọn.”
+- **Nguồn và chú thích cuối poster:** “Bổ sung tên tài liệu Địa lí, nguồn thống kê/bản đồ, năm xuất bản hoặc năm số liệu, phạm vi phân vùng và đơn vị đo trước khi phát hành poster.”
+```
+</pre>
+            </div>
+            
+            <div id="tab_video" class="tab-panel" style="display:none;">
+              <div class="panel-header">
+                <div>
+                  <span class="file-badge">📂 05_Prompt_Video_Intro_GoogleFlow_20Footages/prompt_video_intro_20_footages_google_flow.md</span>
+                </div>
+                <button class="copy-btn" onclick="copyPreContent('pre_tab_video', this)">📋 Copy Toàn Bộ Prompt Này</button>
+              </div>
+              <pre id="pre_tab_video" class="prompt-pre"># SIÊU PROMPT TIẾNG VIỆT XÂY DỰNG VIDEO INTRO BÀI HỌC (GOOGLE FLOW — 20 FOOTAGES + LỜI THOẠI)
+**Chủ đề**: **Đặc điểm địa lí vùng Đồng bằng sông Cửu Long**  
+**Tác nhân thiết kế**: `Video Flow Director (agent_video_flow_director)`  
+**Engine AI**: `gpt-6-luna (codex-cli)`  
+**Công cụ mục tiêu**: **Google Flow (Veo 2 / Imagen Video)** — Tổng thời lượng **100 giây** (20 Footages x 5 giây + Transcript tiếng Việt từng cảnh).
+
+```markdown
+# PHẦN 1. HỒ SƠ NHÂN VẬT, GIỌNG ĐỌC &amp; VĂN PHONG (CONSISTENCY BIBLE)
+
+## Nhân vật chính — Cô Ba Phù Sa
+
+Nữ hướng dẫn viên địa lí người Việt Nam, điềm đạm, gần gũi và giàu năng lượng. Cô mặc áo bà ba xanh lam trơn, đội nón lá truyền thống, cầm bản đồ vùng Đồng bằng sông Cửu Long. Giữ thống nhất khuôn mặt, độ tuổi, trang phục, phụ kiện và vóc dáng trong cả 20 footage; không đổi màu áo, kiểu nón hoặc hình dạng bản đồ.
+
+**[Character Anchor Token]** `Co Ba Phu Sa, a warm Vietnamese female geography guide with a consistent friendly face, wearing a plain blue ao ba ba and a traditional conical hat, holding a regional map of the Mekong Delta`
+
+## Trợ lí AI — Meky
+
+Meky là trợ lí AI hình giọt nước nhỏ màu xanh ngọc, thân trong mờ, gương mặt biểu cảm thân thiện. Meky hiển thị bản đồ, biểu đồ và lớp dữ liệu địa lí bằng đồ họa rõ ràng, tiết chế; không tự tạo chữ, nhãn hoặc số liệu khó đọc trên hình.
+
+**[Character Anchor Token]** `Meky, a small translucent turquoise water-drop AI assistant with a friendly expressive face, displaying clean map overlays, charts, and geographic data layers`
+
+## Hồ sơ giọng đọc và văn phong
+
+- **Giọng đọc:** Tiếng Việt phổ thông, phát âm rõ, ấm và tự nhiên; nhịp vừa phải, phù hợp lời dẫn mở đầu bài giảng cho học sinh lớp 12.
+- **Cô Ba:** Giọng nữ trưởng thành, thân thiện, có sắc thái kể chuyện; nhấn nhẹ vào câu hỏi dẫn nhập và các thuật ngữ địa lí.
+- **Meky:** Giọng trung tính, sáng và gọn; chỉ dùng khi cần giới thiệu lớp dữ liệu hoặc gợi ý quan sát.
+- **Văn phong:** Chính xác, khơi gợi khám phá, nối điều kiện tự nhiên với dân cư, kinh tế và thách thức môi trường. Không khẳng định số liệu thiếu năm hoặc nguồn; tránh quy một độ cao cho toàn vùng.
+- **Quy chuẩn hình ảnh:** Cinematic educational, hình ảnh chân thực, màu sắc tự nhiên, chuyển cảnh liền mạch. Không để AI tự sinh chữ trong khung hình; bản đồ và đồ thị dùng lớp đồ họa sạch, nhãn có thể bổ sung khi dựng.
+- **Quay và xuất hình:** 4K, 24 fps, ánh sáng điện ảnh tự nhiên, chuyển động máy ổn định, bố cục dễ đọc. Mỗi footage dài 5 giây; tổng thời lượng 100 giây. Giữ đồng nhất hai nhân vật theo anchor token trong mọi cảnh có nhân vật.
+
+# PHẦN 2. CHUỖI 20 PROMPT TẠO FOOTAGES GOOGLE FLOW KÈM TRANSCRIPT LỜI THOẠI (00:00 – 01:40)
+
+### 🎬 FOOTAGE #01 (00:00 – 00:05)
+
+- **Prompt tạo Video trên Google Flow:** Cinematic 4K, 24fps aerial shot over a lush Mekong Delta canal at dawn, then gently reveal dry fields and a distant coastline. `Co Ba Phu Sa, a warm Vietnamese female geography guide with a consistent friendly face, wearing a plain blue ao ba ba and a traditional conical hat, holding a regional map of the Mekong Delta`, looks toward the landscape.
+- **🎙️ Transcript Lời Thoại (Voice-over):** Vì sao một vùng sông ngòi dày đặc, đất đai màu mỡ vẫn chịu sức ép từ hạn hán, xâm nhập mặn và sụt lún?
+- **🔊 Hiệu ứng âm thanh (SFX):** Gió sớm, tiếng nước vỗ nhẹ; nhạc nền mở đầu trầm ấm, gợi tò mò.
+
+### 🎬 FOOTAGE #02 (00:05 – 00:10)
+
+- **Prompt tạo Video trên Google Flow:** Medium shot of `Co Ba Phu Sa, a warm Vietnamese female geography guide with a consistent friendly face, wearing a plain blue ao ba ba and a traditional conical hat, holding a regional map of the Mekong Delta` on a riverside landing in the Mekong Delta. `Meky, a small translucent turquoise water-drop AI assistant with a friendly expressive face, displaying clean map overlays, charts, and geographic data layers`, appears beside the map as a subtle glowing guide.
+- **🎙️ Transcript Lời Thoại (Voice-over):** Cùng Cô Ba Phù Sa và Meky khám phá những đặc điểm địa lí đã tạo nên sự trù phú và cả những thách thức của vùng.
+- **🔊 Hiệu ứng âm thanh (SFX):** Tiếng mái chèo khua nước, âm báo điện tử nhẹ khi Meky xuất hiện.
+
+### 🎬 FOOTAGE #03 (00:10 – 00:15)
+
+- **Prompt tạo Video trên Google Flow:** Top-down cinematic view of a clean physical map of Vietnam, camera slowly pushes toward the southern tip as Meky highlights the Mekong Delta with a turquoise outline. `Meky, a small translucent turquoise water-drop AI assistant with a friendly expressive face, displaying clean map overlays, charts, and geographic data layers`.
+- **🎙️ Transcript Lời Thoại (Voice-over):** Đồng bằng sông Cửu Long nằm ở cực nam Việt Nam, tiếp giáp Campuchia, Biển Đông và vịnh Thái Lan.
+- **🔊 Hiệu ứng âm thanh (SFX):** Âm thanh lật bản đồ, tiếng “ping” dịu khi vùng được khoanh sáng.
+
+### 🎬 FOOTAGE #04 (00:15 – 00:20)
+
+- **Prompt tạo Video trên Google Flow:** Aerial coastline montage transitioning from the eastern shore to the Gulf of Thailand, with a restrained map overlay showing the delta’s position and neighboring waters. `Co Ba Phu Sa, a warm Vietnamese female geography guide with a consistent friendly face, wearing a plain blue ao ba ba and a traditional conical hat, holding a regional map of the Mekong Delta`, gestures across the coast.
+- **🎙️ Transcript Lời Thoại (Voice-over):** Vùng có thành phố Cần Thơ và các tỉnh thuộc phân vùng dùng trong tài liệu học tập; danh mục cần đối chiếu theo thời điểm dạy.
+- **🔊 Hiệu ứng âm thanh (SFX):** Sóng biển nhẹ hòa với âm thanh sông nước; nhạc nền tiếp tục nhịp khám phá.
+
+### 🎬 FOOTAGE #05 (00:20 – 00:25)
+
+- **Prompt tạo Video trên Google Flow:** Wide low-angle shot across flat delta fields after rain, the horizon broad and uninterrupted; use a subtle animated landform layer without numerical elevation labels. `Co Ba Phu Sa, a warm Vietnamese female geography guide with a consistent friendly face, wearing a plain blue ao ba ba and a traditional conical hat, holding a regional map of the Mekong Delta`, surveys the landscape.
+- **🎙️ Transcript Lời Thoại (Voice-over):** Địa hình nhìn chung thấp và tương đối bằng phẳng, nhưng khác nhau giữa vùng trũng, nội đồng và dải ven biển.
+- **🔊 Hiệu ứng âm thanh (SFX):** Gió lướt qua đồng, chim đồng xa; nhạc nền thoáng rộng.
+
+### 🎬 FOOTAGE #06 (00:25 – 00:30)
+
+- **Prompt tạo Video trên Google Flow:** Cinematic macro-to-wide transition: sediment swirling in river water, then settling beside a green riverbank and expanding into a delta landscape. `Meky, a small translucent turquoise water-drop AI assistant with a friendly expressive face, displaying clean map overlays, charts, and geographic data layers`, traces the sediment flow with a simple visual layer.
+- **🎙️ Transcript Lời Thoại (Voice-over):** Phù sa sông Mekong góp phần hình thành bề mặt đồng bằng, trong khi biển tiếp tục tác động lên vùng cửa sông và ven bờ.
+- **🔊 Hiệu ứng âm thanh (SFX):** Nước chảy gần, tiếng trầm chuyển cảnh mềm; nhạc nền có sắc thái khám phá tự nhiên.
+
+### 🎬 FOOTAGE #07 (00:30 – 00:35)
+
+- **Prompt tạo Video trên Google Flow:** Time-lapse over a Mekong Delta field shifting from rainy-season clouds and wet rice paddies to a bright dry-season sky. `Meky, a small translucent turquoise water-drop AI assistant with a friendly expressive face, displaying clean map overlays, charts, and geographic data layers`, displays a clean seasonal rainfall graphic with no numbers.
+- **🎙️ Transcript Lời Thoại (Voice-over):** Khí hậu cận xích đạo gió mùa phân hóa rõ mùa mưa và mùa khô; lượng mưa thay đổi theo địa điểm và thời kỳ.
+- **🔊 Hiệu ứng âm thanh (SFX):** Mưa rào ngắn chuyển dần sang tiếng ve và gió khô; nhạc nền giữ nhịp đều.
+
+### 🎬 FOOTAGE #08 (00:35 – 00:40)
+
+- **Prompt tạo Video trên Google Flow:** River-level time-lapse from abundant flow to a visibly lower dry-season waterline, filmed from a stable riverside viewpoint without exaggerating the change. `Co Ba Phu Sa, a warm Vietnamese female geography guide with a consistent friendly face, wearing a plain blue ao ba ba and a traditional conical hat, holding a regional map of the Mekong Delta`, points out the changing waterline.
+- **🎙️ Transcript Lời Thoại (Voice-over):** Nguồn nước và chế độ dòng chảy biến đổi theo mùa, ảnh hưởng đến sản xuất và sinh hoạt ở nhiều nơi.
+- **🔊 Hiệu ứng âm thanh (SFX):** Tiếng nước rút nhẹ, chim ven sông; nhạc nền trầm xuống vừa phải.
+
+### 🎬 FOOTAGE #09 (00:40 – 00:45)
+
+- **Prompt tạo Video trên Google Flow:** Smooth drone shot following a natural river bend into a branching canal network, with the camera staying low and revealing boats and settlements along the banks. `Co Ba Phu Sa, a warm Vietnamese female geography guide with a consistent friendly face, wearing a plain blue ao ba ba and a traditional conical hat, holding a regional map of the Mekong Delta`, is visible on a small riverside boat.
+- **🎙️ Transcript Lời Thoại (Voice-over):** Sông Tiền và sông Hậu là hai nhánh chính của sông Mekong khi vào Việt Nam.
+- **🔊 Hiệu ứng âm thanh (SFX):** Máy ghe xa, tiếng nước lướt mạn thuyền; nhạc nền nhịp nhàng.
+
+### 🎬 FOOTAGE #10 (00:45 – 00:50)
+
+- **Prompt tạo Video trên Google Flow:** Overhead shot of interwoven natural waterways and man-made canals, transitioning into a clean animated network map over real aerial footage. `Meky, a small translucent turquoise water-drop AI assistant with a friendly expressive face, displaying clean map overlays, charts, and geographic data layers`, traces selected channels.
+- **🎙️ Transcript Lời Thoại (Voice-over):** Cùng với sông tự nhiên, mạng lưới kênh rạch dày đặc kết nối nhiều khu dân cư và vùng sản xuất.
+- **🔊 Hiệu ứng âm thanh (SFX):** Tiếng nước và âm thanh chợ ven kênh xa; các nốt điện tử nhẹ theo đường sáng.
+
+### 🎬 FOOTAGE #11 (00:50 – 00:55)
+
+- **Prompt tạo Video trên Google Flow:** Wide cinematic shot of a wetland at sunrise, reeds moving in the breeze and shallow water reflecting the sky; natural colors, documentary realism. `Co Ba Phu Sa, a warm Vietnamese female geography guide with a consistent friendly face, wearing a plain blue ao ba ba and a traditional conical hat, holding a regional map of the Mekong Delta`, walks along a safe raised path.
+- **🎙️ Transcript Lời Thoại (Voice-over):** Hệ sinh thái đất ngập nước là một phần quan trọng của cảnh quan và đời sống sinh vật trong vùng.
+- **🔊 Hiệu ứng âm thanh (SFX):** Tiếng chim nước, côn trùng và gió nhẹ; nhạc nền trong trẻo.
+
+### 🎬 FOOTAGE #12 (00:55 – 01:00)
+
+- **Prompt tạo Video trên Google Flow:** Slow tracking shot through a coastal mangrove forest, sunlight filtering between roots, then reveal a nearby fishing boat at the forest edge. `Meky, a small translucent turquoise water-drop AI assistant with a friendly expressive face, displaying clean map overlays, charts, and geographic data layers`, marks the coastal ecosystem on a minimal map layer.
+- **🎙️ Transcript Lời Thoại (Voice-over):** Rừng ngập mặn và các vùng ven biển có giá trị sinh thái, đồng thời gắn với sinh kế của cộng đồng địa phương.
+- **🔊 Hiệu ứng âm thanh (SFX):** Sóng nhỏ vỗ rễ cây, chim biển; nhạc nền êm và sâu.
+
+### 🎬 FOOTAGE #13 (01:00 – 01:05)
+
+- **Prompt tạo Video trên Google Flow:** Documentary-style morning shot of a riverside neighborhood waking up, boats moving past homes and a local market opening along the water. `Co Ba Phu Sa, a warm Vietnamese female geography guide with a consistent friendly face, wearing a plain blue ao ba ba and a traditional conical hat, holding a regional map of the Mekong Delta`, greets residents.
+- **🎙️ Transcript Lời Thoại (Voice-over):** Dân cư và đô thị hình thành trong mối liên hệ lâu đời với sông nước, giao thông thủy và các hoạt động ven sông.
+- **🔊 Hiệu ứng âm thanh (SFX):** Tiếng chợ sáng vừa phải, tiếng ghe máy nhỏ; nhạc nền thân tình.
+
+### 🎬 FOOTAGE #14 (01:05 – 01:10)
+
+- **Prompt tạo Video trên Google Flow:** Aerial transition from rice cultivation to aquaculture ponds and a compact urban center, presented as a balanced educational montage. `Meky, a small translucent turquoise water-drop AI assistant with a friendly expressive face, displaying clean map overlays, charts, and geographic data layers`, places simple unlabeled icons over each scene.
+- **🎙️ Transcript Lời Thoại (Voice-over):** Nông nghiệp, thủy sản, công nghiệp và dịch vụ đều góp phần tạo nên cơ cấu kinh tế đa dạng của vùng.
+- **🔊 Hiệu ứng âm thanh (SFX):** Âm thanh đồng ruộng chuyển sang tiếng máy chế biến xa; nhạc nền tăng nhịp nhẹ.
+
+### 🎬 FOOTAGE #15 (01:10 – 01:15)
+
+- **Prompt tạo Video trên Google Flow:** Close documentary shot of farmers tending a rice field and fishers working at an aquaculture pond, then a smooth pullback to show the wider landscape. `Co Ba Phu Sa, a warm Vietnamese female geography guide with a consistent friendly face, wearing a plain blue ao ba ba and a traditional conical hat, holding a regional map of the Mekong Delta`, connects the scenes with a measured gesture.
+- **🎙️ Transcript Lời Thoại (Voice-over):** Điều kiện tự nhiên tạo nhiều lợi thế, nhưng sản xuất cũng phụ thuộc vào nguồn nước, mùa vụ và biến động môi trường.
+- **🔊 Hiệu ứng âm thanh (SFX):** Tiếng lao động ngoài đồng, nước trong ao; nhạc nền cân bằng, không quá dồn dập.
+
+### 🎬 FOOTAGE #16 (01:15 – 01:20)
+
+- **Prompt tạo Video trên Google Flow:** Realistic dry-season field with cracked soil in the foreground and a canal in the distance, shown without disaster exaggeration. `Meky, a small translucent turquoise water-drop AI assistant with a friendly expressive face, displaying clean map overlays, charts, and geographic data layers`, overlays a restrained water-stress pattern.
+- **🎙️ Transcript Lời Thoại (Voice-over):** Khi mùa khô kéo dài hoặc nguồn nước suy giảm, hạn hán có thể gây sức ép lên sinh hoạt và sản xuất.
+- **🔊 Hiệu ứng âm thanh (SFX):** Gió khô, tiếng đất vụn rất nhẹ; nhạc nền hạ thấp để lời thoại rõ.
+
+### 🎬 FOOTAGE #17 (01:20 – 01:25)
+
+- **Prompt tạo Video trên Google Flow:** Aerial view of a coastal river meeting the sea, with a subtle animated saline-front line moving inland as a conceptual map overlay. `Co Ba Phu Sa, a warm Vietnamese female geography guide with a consistent friendly face, wearing a plain blue ao ba ba and a traditional conical hat, holding a regional map of the Mekong Delta`, studies the shoreline.
+- **🎙️ Transcript Lời Thoại (Voice-over):** Xâm nhập mặn là thách thức cần theo dõi theo địa điểm và thời điểm; mức độ không giống nhau trên toàn vùng.
+- **🔊 Hiệu ứng âm thanh (SFX):** Sóng cửa sông, gió biển; âm báo bản đồ rất nhẹ.
+
+### 🎬 FOOTAGE #18 (01:25 – 01:30)
+
+- **Prompt tạo Video trên Google Flow:** Stable documentary shot of a riverbank with a visible eroded edge, transitioning to a city street and a simple ground-settlement cross-section graphic. `Meky, a small translucent turquoise water-drop AI assistant with a friendly expressive face, displaying clean map overlays, charts, and geographic data layers`, presents the cross-section without numerical claims.
+- **🎙️ Transcript Lời Thoại (Voice-over):** Sạt lở ven sông, sạt lở bờ biển và sụt lún đất có nguyên nhân phức tạp, cần xem xét bằng dữ liệu cụ thể.
+- **🔊 Hiệu ứng âm thanh (SFX):** Nước chảy sát bờ, âm trầm chuyển cảnh; nhạc nền nghiêm túc nhưng tiết chế.
+
+### 🎬 FOOTAGE #19 (01:30 – 01:35)
+
+- **Prompt tạo Video trên Google Flow:** Medium two-shot of `Co Ba Phu Sa, a warm Vietnamese female geography guide with a consistent friendly face, wearing a plain blue ao ba ba and a traditional conical hat, holding a regional map of the Mekong Delta` and `Meky, a small translucent turquoise water-drop AI assistant with a friendly expressive face, displaying clean map overlays, charts, and geographic data layers`, reviewing map, climate, and water layers beside a river.
+- **🎙️ Transcript Lời Thoại (Voice-over):** Muốn hiểu sức ép ấy, ta cần kết nối vị trí, địa hình, mùa khí hậu, dòng chảy và cách con người khai thác tài nguyên.
+- **🔊 Hiệu ứng âm thanh (SFX):** Tiếng bút chạm bản đồ, âm điện tử êm; nhạc nền nâng dần hướng tới lời mời học tập.
+
+### 🎬 FOOTAGE #20 (01:35 – 01:40)
+
+- **Prompt tạo Video trên Google Flow:** Hero wide shot of `Co Ba Phu Sa, a warm Vietnamese female geography guide with a consistent friendly face, wearing a plain blue ao ba ba and a traditional conical hat, holding a regional map of the Mekong Delta`, standing by the river as `Meky, a small translucent turquoise water-drop AI assistant with a friendly expressive face, displaying clean map overlays, charts, and geographic data layers`, opens a clean regional map graphic. Camera slowly pulls back in warm morning light.
+- **🎙️ Transcript Lời Thoại (Voice-over):** Bắt đầu bài học, chúng ta sẽ lần lượt đọc bản đồ, phân tích số liệu và đề xuất cách thích ứng cho từng địa phương.
+- **🔊 Hiệu ứng âm thanh (SFX):** Nhạc chủ đề mở rộng rồi kết gọn; tiếng sông nước dịu dần.
+```
+</pre>
+            </div>
+            
+            <div id="tab_research" class="tab-panel" style="display:none;">
+              <div class="panel-header">
+                <div>
+                  <span class="file-badge">📂 01_NghienCuu_Va_KichBan_SuPham/01_ho_so_nghien_cuu_hoc_lieu.md</span>
+                </div>
+                <button class="copy-btn" onclick="copyPreContent('pre_tab_research', this)">📋 Copy Toàn Bộ Prompt Này</button>
+              </div>
+              <pre id="pre_tab_research" class="prompt-pre"># HỒ SƠ NGHIÊN CỨU HỌC LIỆU &amp; PHÂN TÍCH NỘI DUNG KHOA HỌC
+**Chủ đề bài giảng**: **Đặc điểm địa lí vùng Đồng bằng sông Cửu Long**  
+**Lĩnh vực / Môn học**: Địa lí — Địa lí tự nhiên và kinh tế – xã hội Việt Nam  
+**Đối tượng học sinh**: Học sinh THPT lớp 12 — Chương trình GDPT 2018  
+**Tác nhân thực hiện**: `Research Specialist (agent_research_specialist)`  
+**Engine AI sử dụng**: `gpt-6-luna (codex-cli)`
+
+---
+
+## 1. Hệ Thống Kiến Thức Cốt Lõi Cần Truyền Tải
+- **Trụ cột 1**: Vị trí địa lí và phạm vi: vùng cực nam Việt Nam, tiếp giáp Campuchia, Biển Đông và vịnh Thái Lan; gồm thành phố Cần Thơ và các tỉnh thuộc vùng theo phân vùng được sử dụng trong tài liệu học tập.
+- **Trụ cột 2**: Địa hình thấp, tương đối bằng phẳng; bề mặt đồng bằng được hình thành chủ yếu bởi phù sa sông Mekong và chịu tác động của biển.
+- **Trụ cột 3**: Khí hậu cận xích đạo gió mùa, phân hóa rõ mùa mưa và mùa khô; nguồn nước và chế độ dòng chảy biến đổi theo mùa.
+- **Trụ cột 4**: Mạng lưới sông, kênh rạch dày đặc; có hệ sinh thái đất ngập nước, rừng ngập mặn và vùng ven biển có giá trị sinh thái.
+- **Trụ cột 5**: Dân cư, đô thị và hoạt động kinh tế gắn với sông nước; nông nghiệp, thủy sản, công nghiệp và dịch vụ có vai trò quan trọng, đồng thời đối mặt với sức ép môi trường và biến đổi khí hậu.
+
+## 2. Công Thức, Định Luật &amp; Dữ Liệu Chuẩn Hóa (Fact-Checked Metrics)
+- `Diện tích vùng khoảng 40,9 nghìn km²; khi sử dụng cần ghi rõ phạm vi phân vùng và nguồn số liệu.`
+- `Vùng gồm 13 đơn vị cấp tỉnh theo cách phân vùng thường dùng trong tài liệu Địa lí phổ thông: thành phố Cần Thơ và 12 tỉnh; cần đối chiếu danh mục đơn vị hành chính tại thời điểm dạy học.`
+- `Địa hình nhìn chung thấp và bằng phẳng; không dùng một độ cao duy nhất để đại diện cho toàn vùng vì có khác biệt giữa các khu vực.`
+- `Khí hậu có mùa mưa và mùa khô; thời gian và lượng mưa cụ thể thay đổi theo địa điểm, cần khai thác số liệu trạm khí tượng có ghi thời kỳ.`
+- `Sông Tiền và sông Hậu là hai nhánh chính của sông Mekong khi vào Việt Nam; vùng còn có mạng lưới kênh rạch nhân tạo và tự nhiên dày đặc.`
+- `Số liệu về dân số, sản lượng, diện tích cây trồng, thủy sản và xâm nhập mặn phải ghi năm thống kê, đơn vị đo và nguồn; không suy rộng từ số liệu của một năm.`
+
+## 3. Định Hướng Sư Phạm &amp; Trực Quan Cho 4 Luồng Siêu Prompt
+1. **Câu hỏi / Tình huống dẫn nhập**: Vì sao một vùng có mạng lưới sông ngòi, kênh rạch dày đặc và đất đai màu mỡ vẫn đang chịu sức ép lớn từ hạn hán, xâm nhập mặn và sụt lún?
+2. **Nhân vật &amp; Bối cảnh minh họa**: Cô Ba Phù Sa, hướng dẫn viên địa lí mặc áo bà ba xanh lam, đội nón lá, cầm bản đồ vùng đồng bằng. đồng hành cùng Meky, trợ lí AI hình giọt nước màu xanh ngọc, hiển thị bản đồ, biểu đồ và lớp dữ liệu địa lí..
+3. **Phân bổ cho 4 Luồng Prompt**:
+   - **Luồng Slide Gamma (10 Slides)**:
+   - Slide 1: Câu hỏi khởi động — vì sao đồng bằng trù phú vẫn dễ tổn thương trước hạn và mặn?
+   - Slide 2: Xác định vị trí và phạm vi vùng trên bản đồ Việt Nam; nêu các vùng tiếp giáp.
+   - Slide 3: Địa hình và quá trình hình thành đồng bằng phù sa; nhận diện khu vực thấp, ven biển và vùng trũng.
+   - Slide 4: Khí hậu mùa mưa, mùa khô và tác động đến nguồn nước, sản xuất.
+   - Slide 5: Sông Mekong, sông Tiền, sông Hậu và mạng lưới kênh rạch; đọc sơ đồ dòng chảy.
+   - Slide 6: Đất, sinh vật và các hệ sinh thái tiêu biểu; liên hệ giá trị sinh thái với sinh kế.
+   - Slide 7: Dân cư, đô thị và văn hóa sông nước; khai thác bản đồ phân bố phù hợp.
+   - Slide 8: Các hoạt động kinh tế chính và mối liên hệ với điều kiện tự nhiên; dùng số liệu có năm và nguồn.
+   - Slide 9: Thách thức về hạn, xâm nhập mặn, sạt lở, sụt lún và suy giảm nguồn nước; phân tích quan hệ nguyên nhân – hệ quả.
+   - Slide 10: Nhiệm vụ vận dụng — đề xuất giải pháp thích ứng cho một địa phương và nêu căn cứ địa lí.
+   - **Luồng Phiếu Bài Tập (25 Câu)**: Kiểm tra đủ 3 cấp độ Nhận biết — Thông hiểu — Vận dụng qua 15 TN 4 lựa chọn, 5 Đúng/Sai chùm và 5 Tự luận.
+   - **Luồng Infographic (7 Phân Khu)**: Hệ thống hóa công thức, sơ đồ cốt lõi và bẫy sai lầm thường gặp trên 1 mặt phẳng trực quan.
+   - **Luồng Video Intro Google Flow (20 Footages — 100s)**: Trực quan hóa tình huống mở đầu khơi gợi tò mò khoa học kèm Transcript lời thoại tiếng Việt.
+
+
+---
+
+# MA TRẬN MỤC TIÊU &amp; KỊCH BẢN SƯ PHẠM TỔNG THỂ (GDPT 2018)
+**Bài học**: **Đặc điểm địa lí vùng Đồng bằng sông Cửu Long**  
+**Lĩnh vực**: Địa lí — Địa lí tự nhiên và kinh tế – xã hội Việt Nam — Học sinh THPT lớp 12 — Chương trình GDPT 2018  
+**Tác nhân thực hiện**: `Pedagogy Architect (agent_pedagogy_architect)`
+
+---
+
+## 1. Mục Tiêu Bài Học Theo Tiếp Cận Năng Lực
+- **Năng lực nhận thức khoa học**: Trình bày được vị trí, phạm vi lãnh thổ và các đặc điểm nổi bật về tự nhiên, dân cư và hoạt động kinh tế của vùng Đồng bằng sông Cửu Long; giải thích được mối liên hệ giữa điều kiện tự nhiên với sản xuất và đời sống.
+- **Năng lực tìm hiểu &amp; xử lý thông tin**: Đọc bản đồ, lược đồ và biểu đồ phù hợp để xác định vị trí, địa hình, mạng lưới sông ngòi và phân bố một số hoạt động kinh tế; so sánh, nhận xét số liệu có ghi rõ thời điểm và nguồn.
+- **Năng lực vận dụng kiến thức, kỹ năng**: Vận dụng kiến thức để đề xuất một số giải pháp thích ứng với hạn hán, xâm nhập mặn, sạt lở hoặc suy giảm nguồn nước tại địa phương, có cân nhắc điều kiện và lợi ích của người dân.
+
+## 2. Cấu Trúc Đồng Bộ Hóa 4 Học Liệu Số Trong Tiết Học 45 Phút
+| Thời lượng | Hoạt động dạy học | Học liệu số sử dụng | Mục tiêu sư phạm trọng tâm |
+| :--- | :--- | :--- | :--- |
+| **00:00 – 05:00** | Chiếu video mở đầu về cảnh quan sông nước và một tình huống hạn, mặn; nêu câu hỏi định hướng. | 05_Prompt_Video_Intro_GoogleFlow_20Footages | Đánh giá thử video 100 giây về độ chính xác địa danh, tính phù hợp hình ảnh và khả năng khơi gợi câu hỏi. |
+| **05:00 – 25:00** | Dẫn dắt 10 slide bằng bản đồ và dữ liệu có nguồn; giao câu hỏi đọc bản đồ, giải thích mối liên hệ tự nhiên – kinh tế. | 02_Prompt_Slide_Gamma_10Slides | Đánh giá lượng thông tin và nhịp trình bày của 10 slide; kiểm tra chú giải, năm thống kê và nguồn dữ liệu. |
+| **25:00 – 33:00** | Hướng dẫn đọc infographic 7 phần về vị trí, địa hình, khí hậu, sông ngòi, hệ sinh thái, kinh tế và thách thức. | 04_Prompt_Infographics | Đánh giá tính dễ đọc, chính xác bản đồ và biểu đồ; phân biệt rõ dữ liệu thống kê với hình minh họa. |
+| **33:00 – 45:00** | Phát phiếu 25 câu hỏi gồm nhận biết, đọc bản đồ và vận dụng; chọn một số câu để chữa và phản hồi. | 03_Prompt_Phieu_Bai_Tap_25Cau | Đánh giá độ bao phủ mục tiêu, độ rõ của câu hỏi và đáp án; bảo đảm số liệu trong câu hỏi có năm, đơn vị và nguồn. |
+</pre>
+            </div>
+            
+            <div id="tab_qa" class="tab-panel" style="display:none;">
+              <div class="panel-header">
+                <div>
+                  <span class="file-badge">📂 06_KichBan_ChayThu_Va_BaoCao_QA/02_bien_ban_qa_va_phe_duyet.md</span>
+                </div>
+                <button class="copy-btn" onclick="copyPreContent('pre_tab_qa', this)">📋 Copy Toàn Bộ Prompt Này</button>
+              </div>
+              <pre id="pre_tab_qa" class="prompt-pre"># KỊCH BẢN CHẠY THỬ TIẾT HỌC 45 PHÚT (DRY-RUN CLASSROOM SIMULATION)
+**Bài học**: **Đặc điểm địa lí vùng Đồng bằng sông Cửu Long**  
+**Tác nhân thực hiện**: `DryRun Scenario Tester (agent_dryrun_scenario_tester)`
+
+---
+
+## 1. Bảng Điều Phối Thời Gian &amp; Khớp Nối Học Liệu (45 Phút)
+| Phút thứ | Hoạt động của Giáo viên | Hoạt động của Học sinh | Học liệu số kích hoạt | Kết quả kiểm tra chạy thử |
+| :--- | :--- | :--- | :--- | :--- |
+| **00:00 – 05:00** | Chiếu video mở đầu về cảnh quan sông nước và một tình huống hạn, mặn; nêu câu hỏi định hướng. | Quan sát, dự đoán nguyên nhân và chia sẻ hiểu biết ban đầu về mối liên hệ giữa sông nước với đời sống. | 05_Prompt_Video_Intro_GoogleFlow_20Footages | Đánh giá thử video 100 giây về độ chính xác địa danh, tính phù hợp hình ảnh và khả năng khơi gợi câu hỏi. |
+| **05:00 – 25:00** | Dẫn dắt 10 slide bằng bản đồ và dữ liệu có nguồn; giao câu hỏi đọc bản đồ, giải thích mối liên hệ tự nhiên – kinh tế. | Xác định vị trí, nhận xét đặc điểm địa hình, khí hậu, sông ngòi; trao đổi nhóm và nêu căn cứ từ bản đồ hoặc số liệu. | 02_Prompt_Slide_Gamma_10Slides | Đánh giá lượng thông tin và nhịp trình bày của 10 slide; kiểm tra chú giải, năm thống kê và nguồn dữ liệu. |
+| **25:00 – 33:00** | Hướng dẫn đọc infographic 7 phần về vị trí, địa hình, khí hậu, sông ngòi, hệ sinh thái, kinh tế và thách thức. | Đọc chú giải, nối đặc điểm địa lí với hoạt động sản xuất và chỉ ra một thách thức cần thích ứng. | 04_Prompt_Infographics | Đánh giá tính dễ đọc, chính xác bản đồ và biểu đồ; phân biệt rõ dữ liệu thống kê với hình minh họa. |
+| **33:00 – 45:00** | Phát phiếu 25 câu hỏi gồm nhận biết, đọc bản đồ và vận dụng; chọn một số câu để chữa và phản hồi. | Làm cá nhân hoặc theo cặp, giải thích câu trả lời bằng bản đồ, kiến thức và dữ liệu đã học; hoàn thành câu vận dụng. | 03_Prompt_Phieu_Bai_Tap_25Cau | Đánh giá độ bao phủ mục tiêu, độ rõ của câu hỏi và đáp án; bảo đảm số liệu trong câu hỏi có năm, đơn vị và nguồn. |
+
+## 2. Kết Quả Quét Cấu Trúc Thực Tế Trước Kiểm Duyệt
+- **Slide Gamma phát hiện**: `10 / 10` slide (11,855 ký tự)
+- **Câu hỏi Phiếu bài tập**: `25 / 25` câu | Đáp án &amp; Hướng dẫn giải: `Có`
+- **Phân khu Infographic**: `7 / 7` phân khu (10,569 ký tự)
+- **Video Google Flow**: `20 / 20` footages | Transcript lời thoại: `21` mục
+
+
+---
+
+# BIÊN BẢN KIỂM ĐỊNH CHẤT LƯỢNG (QA) &amp; QUYẾT ĐỊNH PHÊ DUYỆT XUẤT BẢN
+**Bài học**: **Đặc điểm địa lí vùng Đồng bằng sông Cửu Long**  
+**Tác nhân Kiểm thử QA**: `QA Quality Reviewer (agent_qa_quality_reviewer)`  
+**Engine Kiểm định**: `gpt-6-luna (codex-cli)`  
+**Tác nhân Đóng gói**: `DevOps Site Manager (agent_devops_site_manager)`
+
+---
+
+## 1. Bảng Kiểm Tra Đối Chiếu Tiêu Chí Kỹ Thuật (QA Checklist)
+| Hạng mục học liệu | Yêu cầu kỹ thuật gốc | Kết quả kiểm định thực tế | Điểm QA | Trạng thái |
+| :--- | :--- | :--- | :--- | :--- |
+| **1. Prompt Slide Gamma** | Outline chi tiết đúng 10 Slide tiếng Việt. | Đủ 10 slide, trình tự đi từ vị trí và điều kiện tự nhiên đến kinh tế, thách thức và vận dụng khá sát chủ đề; cần kiểm tra nội dung chi tiết và bổ sung nguồn có năm cho số liệu trước khi xuất bản. | **8.8 / 10** | ✅ **PASS** |
+| **2. Prompt Phiếu Bài Tập** | 10 -&gt; 30 câu (TN, Đúng/Sai, Tự luận) + Đáp án. | Đủ 25 câu, có đáp án và phân bố từ nhận biết đến vận dụng; một số dữ kiện như diện tích và phạm vi 12 tỉnh cùng Cần Thơ cần ghi rõ mốc và cách phân vùng để tránh nhầm với đơn vị hành chính hiện hành. | **8.6 / 10** | ✅ **PASS** |
+| **3. Prompt Infographics** | Prompt tiếng Việt mô tả chi tiết 7 phân khu. | Bố cục 7 phân khu bao quát kiến thức, ứng dụng và lỗi thường gặp; yêu cầu tự bổ sung nguồn ở cuối poster cho thấy tài liệu chưa đủ căn cứ dữ liệu để phát hành ngay. | **8.7 / 10** | ✅ **PASS** |
+| **4. Prompt Video Google Flow** | Character + Voice + 20 Footages kèm Transcript. | Đủ 20 cảnh, tổng thời lượng 100 giây và có lời thoại; số transcript được đếm là 21 nên cần đối chiếu để xác định phần dư là lời dẫn riêng hay một cảnh bị lệch. | **8.6 / 10** | ✅ **PASS** |
+| **5. Đóng gói Site &amp; File ZIP** | Chia 6 thư mục, nén ZIP và dựng Portal HTML5. | Theo manifest, cả 4 tài liệu đều vượt 3.000 ký tự và trạng thái staging khai báo đủ 6 thư mục, 8 tệp, nên đạt điều kiện đóng gói ZIP và Portal; cần đối chiếu 21 transcript với 20 footage trước khi phát hành. | **9.5 / 10** | ✅ **PASS** |
+
+## 2. Nhận Xét Chi Tiết Từ QA Reviewer
+### Điểm mạnh nổi bật
+- Cả bốn tài liệu đều bám sát chủ đề Đồng bằng sông Cửu Long và phù hợp với bài học Địa lí 12.
+- Cấu trúc có đủ bài giảng, đánh giá, infographic và video dẫn nhập; quiz có đáp án và giải thích.
+- Nội dung kết nối điều kiện tự nhiên với sinh kế, thách thức và nhiệm vụ vận dụng theo địa phương.
+
+### Khuyến nghị rà soát thêm
+- Ghi nguồn, năm và phạm vi phân vùng cho các số liệu; rà soát cách nêu diện tích và đơn vị hành chính theo thời điểm sử dụng.
+- Đối chiếu danh sách transcript với 20 footage và hoàn thiện thông tin nguồn trước khi tạo bản xuất bản.
+
+## 3. Kết Luận Kiểm Duyệt Cuối Cùng
+- **Điểm trung bình toàn bộ gói học liệu**: **8.8 / 10.0**
+- **Quyết định**: **APPROVED FOR RELEASE**
+</pre>
+            </div>
+            
+      </main>
+    </div>
+  </div>
+
+  <script>
+    function switchTab(targetId) {
+      document.querySelectorAll('.tab-panel').forEach(el => el.style.display = 'none');
+      document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active-tab'));
+      const panel = document.getElementById(targetId);
+      if (panel) panel.style.display = 'block';
+      const btn = document.querySelector(`.tab-btn[data-target="${targetId}"]`);
+      if (btn) btn.classList.add('active-tab');
+    }
+    async function copyPreContent(preId, btnEl) {
+      const text = document.getElementById(preId)?.innerText || '';
+      await navigator.clipboard.writeText(text);
+      const old = btnEl.innerText;
+      btnEl.innerText = '✅ Đã Copy!';
+      setTimeout(() => btnEl.innerText = old, 1800);
+    }
+  </script>
+</body>
+</html>

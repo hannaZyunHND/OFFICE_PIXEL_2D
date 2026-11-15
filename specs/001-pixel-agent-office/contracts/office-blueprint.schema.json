@@ -1,0 +1,116 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://pixel-agent-office.local/schemas/office-blueprint.schema.json",
+  "title": "OfficeBlueprint",
+  "description": "Canonical spatial topology, furniture layout, agent roster, and workflow DAG for Pixel Agent Office.",
+  "type": "object",
+  "required": ["meta", "zones", "furniture", "agents", "edges"],
+  "additionalProperties": false,
+  "properties": {
+    "meta": {
+      "type": "object",
+      "required": ["project_name", "grid_cols", "grid_rows", "tile_size"],
+      "additionalProperties": false,
+      "properties": {
+        "project_name": { "type": "string", "minLength": 1, "maxLength": 120 },
+        "grid_cols": { "type": "integer", "minimum": 12, "maximum": 64, "default": 24 },
+        "grid_rows": { "type": "integer", "minimum": 10, "maximum": 64, "default": 16 },
+        "tile_size": { "type": "integer", "const": 32 }
+      }
+    },
+    "zones": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": ["id", "name", "type", "rect"],
+        "additionalProperties": false,
+        "properties": {
+          "id": { "type": "string", "pattern": "^[a-zA-Z0-9_-]+$" },
+          "name": { "type": "string", "minLength": 1, "maxLength": 80 },
+          "type": { "type": "string", "enum": ["WORK", "APPROVAL", "IDLE"] },
+          "rect": {
+            "type": "array",
+            "prefixItems": [
+              { "type": "integer", "minimum": 0 },
+              { "type": "integer", "minimum": 0 },
+              { "type": "integer", "minimum": 3 },
+              { "type": "integer", "minimum": 3 }
+            ],
+            "minItems": 4,
+            "maxItems": 4
+          }
+        }
+      }
+    },
+    "furniture": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": ["id", "type", "x", "y", "footprint", "interaction_point", "facing"],
+        "additionalProperties": false,
+        "properties": {
+          "id": { "type": "string", "pattern": "^[a-zA-Z0-9_-]+$" },
+          "type": {
+            "type": "string",
+            "enum": ["DESK_PC", "COFFEE_MACHINE", "SOFA", "PLANT", "AQUARIUM", "WHITEBOARD", "BOOKSHELF"]
+          },
+          "x": { "type": "integer", "minimum": 0 },
+          "y": { "type": "integer", "minimum": 0 },
+          "footprint": {
+            "type": "array",
+            "prefixItems": [
+              { "type": "integer", "minimum": 1, "maximum": 6 },
+              { "type": "integer", "minimum": 1, "maximum": 6 }
+            ],
+            "minItems": 2,
+            "maxItems": 2
+          },
+          "interaction_point": {
+            "type": "array",
+            "prefixItems": [
+              { "type": "integer", "minimum": 0 },
+              { "type": "integer", "minimum": 0 }
+            ],
+            "minItems": 2,
+            "maxItems": 2
+          },
+          "facing": { "type": "string", "enum": ["UP", "DOWN", "LEFT", "RIGHT"] },
+          "agent_id": { "type": "string" },
+          "custom_asset_id": { "type": "string" }
+        }
+      }
+    },
+    "agents": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": ["id", "name", "role", "color", "avatar_sprite", "desk_id"],
+        "additionalProperties": false,
+        "properties": {
+          "id": { "type": "string", "pattern": "^[a-zA-Z0-9_-]+$" },
+          "name": { "type": "string", "minLength": 1, "maxLength": 80 },
+          "role": { "type": "string", "minLength": 1, "maxLength": 160 },
+          "color": { "type": "string", "pattern": "^#[0-9a-fA-F]{6}$" },
+          "avatar_sprite": { "type": "string", "minLength": 1 },
+          "desk_id": { "type": "string", "minLength": 1 }
+        }
+      }
+    },
+    "edges": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["from", "to"],
+        "additionalProperties": false,
+        "properties": {
+          "from": { "type": "string", "minLength": 1 },
+          "to": { "type": "string", "minLength": 1 },
+          "label": { "type": "string", "maxLength": 80 }
+        }
+      }
+    }
+  }
+}

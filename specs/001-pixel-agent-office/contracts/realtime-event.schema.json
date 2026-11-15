@@ -1,0 +1,54 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://pixel-agent-office.local/schemas/realtime-event.schema.json",
+  "title": "AgentEvent",
+  "description": "Real-time event packet received over WebSocket, window.postMessage, BroadcastChannel, or Mock Simulator.",
+  "type": "object",
+  "required": ["event_id", "timestamp", "event_type", "agent_id", "metadata"],
+  "additionalProperties": false,
+  "properties": {
+    "event_id": { "type": "string", "minLength": 1, "maxLength": 128 },
+    "timestamp": { "type": "number", "minimum": 0 },
+    "event_type": {
+      "type": "string",
+      "enum": [
+        "AGENT_START",
+        "AGENT_TOOL_CALL",
+        "AGENT_HANDOFF",
+        "AGENT_COMPLETE",
+        "AGENT_ERROR"
+      ]
+    },
+    "agent_id": { "type": "string", "minLength": 1 },
+    "target_agent_id": { "type": "string", "minLength": 1 },
+    "metadata": {
+      "type": "object",
+      "additionalProperties": true,
+      "properties": {
+        "status_text": { "type": "string", "maxLength": 500 },
+        "icon": {
+          "type": "string",
+          "enum": ["search", "code", "db", "error", "message", "check"]
+        },
+        "input_payload": {
+          "oneOf": [{ "type": "object" }, { "type": "string" }, { "type": "array" }]
+        },
+        "output_payload": {
+          "oneOf": [{ "type": "object" }, { "type": "string" }, { "type": "array" }]
+        },
+        "tokens_used": { "type": "integer", "minimum": 0 },
+        "duration_ms": { "type": "integer", "minimum": 0 }
+      }
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": { "event_type": { "const": "AGENT_HANDOFF" } }
+      },
+      "then": {
+        "required": ["target_agent_id"]
+      }
+    }
+  ]
+}
