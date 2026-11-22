@@ -1,4 +1,4 @@
-import { defineConfig, type Plugin } from 'vite';
+import { defineConfig, loadEnv, type Plugin } from 'vite';
 import vue from '@vitejs/plugin-vue';
 import { fileURLToPath, URL } from 'node:url';
 import fs from 'node:fs';
@@ -7,7 +7,7 @@ import path from 'node:path';
 import { DatabaseSync } from 'node:sqlite';
 import { sqliteRunHistoryPlugin } from './server/sqliteRunHistoryPlugin';
 
-function sqliteWorkflowApiPlugin(): Plugin {
+function sqliteWorkflowApiPlugin(defaultCrewWsUrl: string): Plugin {
   let db: any = null;
 
   function getDb() {
@@ -25,7 +25,7 @@ function sqliteWorkflowApiPlugin(): Plugin {
         id TEXT PRIMARY KEY,
         name TEXT NOT NULL,
         description TEXT NOT NULL,
-        crew_endpoint_url TEXT NOT NULL DEFAULT 'ws://localhost:8765',
+        crew_endpoint_url TEXT NOT NULL DEFAULT '${defaultCrewWsUrl}',
         raw_requirement TEXT NOT NULL,
         blueprint_json TEXT NOT NULL,
         steps_json TEXT NOT NULL,
@@ -36,7 +36,7 @@ function sqliteWorkflowApiPlugin(): Plugin {
     // Safe migration for existing databases created before crew_endpoint_url column
     try {
       db.exec(
-        `ALTER TABLE workflows ADD COLUMN crew_endpoint_url TEXT NOT NULL DEFAULT 'ws://localhost:8765';`,
+        `ALTER TABLE workflows ADD COLUMN crew_endpoint_url TEXT NOT NULL DEFAULT '${defaultCrewWsUrl}';`,
       );
     } catch {
       // Column already exists
@@ -59,7 +59,7 @@ function sqliteWorkflowApiPlugin(): Plugin {
             id: r.id,
             name: r.name,
             description: r.description,
-            crew_endpoint_url: r.crew_endpoint_url || 'ws://localhost:8765',
+            crew_endpoint_url: r.crew_endpoint_url || defaultCrewWsUrl,
             raw_requirement: r.raw_requirement,
             blueprint: JSON.parse(r.blueprint_json),
             steps: JSON.parse(r.steps_json),
@@ -96,7 +96,7 @@ function sqliteWorkflowApiPlugin(): Plugin {
                   String(item.id),
                   String(item.name || 'Custom Workflow'),
                   String(item.description || ''),
-                  String(item.crew_endpoint_url || 'ws://localhost:8765'),
+                  String(item.crew_endpoint_url || defaultCrewWsUrl),
                   String(item.raw_requirement || ''),
                   JSON.stringify(item.blueprint || {}),
                   JSON.stringify(item.steps || []),
@@ -133,15 +133,22 @@ function sqliteWorkflowApiPlugin(): Plugin {
   };
 }
 
-export default defineConfig({
-  plugins: [vue(), sqliteWorkflowApiPlugin(), sqliteRunHistoryPlugin()],
-  resolve: {
-    alias: {
-      '@': fileURLToPath(new URL('./src', import.meta.url)),
+export default defineConfig(({ mode }) => {
+  const env = loadEnv(mode, process.cwd(), '');
+  const fePort = Number(env.VITE_PORT || 34213) || 34213;
+  const crewPort = Number(env.VITE_CREWAI_PORT || 34214) || 34214;
+  const defaultCrewWsUrl = (env.VITE_CREWAI_WS_URL || `ws://localhost:${crewPort}`).trim();
+
+  return {
+    plugins: [vue(), sqliteWorkflowApiPlugin(defaultCrewWsUrl), sqliteRunHistoryPlugin()],
+    resolve: {
+      alias: {
+        '@': fileURLToPath(new URL('./src', import.meta.url)),
+      },
     },
-  },
-  server: {
-    port: 5173,
-    host: true,
-  },
+    server: {
+      port: fePort,
+      host: true,
+    },
+  };
 });

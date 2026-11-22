@@ -30,6 +30,7 @@ import time
 from typing import Any, Dict, List, Optional
 import zipfile
 
+from env_loader import get_crew_portal_base_url
 from pixel_office_sdk import PixelOfficeBridge
 from flows.elearning_codex_agents import (
     codex_generate_gamma_10_slides,
@@ -1563,14 +1564,17 @@ async def run_elearning_lesson_flow(
     portal_file.write_text(portal_html, encoding="utf-8")
     (package_dir / "index.html").write_text(portal_html, encoding="utf-8")
 
+    portal_base = get_crew_portal_base_url()
+    elearning_portal_url = f"{portal_base}/elearning_portal.html"
+
     await bridge.emit_event(
         event_type="AGENT_TOOL_CALL",
         agent_id=ops_id,
-        status_text=f"Đã tạo gói '{zip_filename}' (6 thư mục) & Portal http://localhost:8766/elearning_portal.html | Engine: {llm_engine}",
+        status_text=f"Đã tạo gói '{zip_filename}' (6 thư mục) & Portal {elearning_portal_url} | Engine: {llm_engine}",
         icon="db",
         output_payload={
             "zip_file": str(zip_path),
-            "portal_url": "http://localhost:8766/elearning_portal.html",
+            "portal_url": elearning_portal_url,
             "folders_created": 6,
             "files_created": len(files_map),
             "llm_engine": llm_engine,
@@ -1589,8 +1593,8 @@ async def run_elearning_lesson_flow(
         tokens_used=150,
     )
 
-    history_portal_url = f"http://localhost:8766/{slug}/index.html"
-    history_zip_url = f"http://localhost:8766/{slug}/{zip_filename}"
+    history_portal_url = f"{portal_base}/{slug}/index.html"
+    history_zip_url = f"{portal_base}/{slug}/{zip_filename}"
 
     elapsed = round(time.time() - t0, 2)
     return {
@@ -1608,7 +1612,7 @@ async def run_elearning_lesson_flow(
         "zip_path": str(zip_path),
         "zip_url": history_zip_url,
         "zip_filename": zip_filename,
-        "portal_url": "http://localhost:8766/elearning_portal.html",
+        "portal_url": elearning_portal_url,
         "result_url": history_portal_url,
         "files_count": len(files_map),
     }

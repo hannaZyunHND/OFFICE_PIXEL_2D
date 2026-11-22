@@ -392,6 +392,54 @@ export function drawProceduralFurniture(
       break;
     }
 
+    case 'LARGE_AQUARIUM': {
+      // 4x2 (128x64px) Executive Floor-Standing Panoramic Aquascape Tank
+      // Rich Walnut Cabinet Stand
+      g.rect(4, 44, widthPx - 8, 16).fill({ color: 0x451a03 });
+      g.rect(6, 46, widthPx - 12, 12).fill({ color: 0x78350f });
+      g.rect(4, 43, widthPx - 8, 2).fill({ color: 0xd97706 });
+      g.rect(10, 48, 24, 9).fill({ color: 0x5c2b0e });
+      g.rect(38, 48, 24, 9).fill({ color: 0x5c2b0e });
+      g.rect(66, 48, 24, 9).fill({ color: 0x5c2b0e });
+      g.rect(94, 48, 24, 9).fill({ color: 0x5c2b0e });
+
+      // Glass Tank Outer Frame & Overhead Aquascape LED Light
+      g.rect(5, 4, widthPx - 10, 40).fill({ color: 0x0f172a });
+      g.rect(14, 2, widthPx - 28, 3).fill({ color: 0xbae6fd });
+      g.rect(8, 7, widthPx - 16, 34).fill({ color: 0x0369a1 });
+      g.rect(10, 9, widthPx - 20, 26).fill({ color: 0x0284c7 });
+      g.rect(12, 11, widthPx - 24, 15).fill({ color: 0x0ea5e9, alpha: 0.72 });
+
+      // Sandy Substrate, River Rocks & Lush Aquascape Greens
+      g.rect(8, 36, widthPx - 16, 5).fill({ color: 0xd97706 });
+      g.rect(12, 35, widthPx - 24, 3).fill({ color: 0xfde68a, alpha: 0.75 });
+      g.rect(20, 31, 14, 6).fill({ color: 0x475569 });
+      g.rect(74, 32, 16, 5).fill({ color: 0x64748b });
+      g.rect(14, 17, 6, 19).fill({ color: 0x10b981 });
+      g.rect(22, 21, 5, 15).fill({ color: 0x22c55e });
+      g.rect(54, 22, 6, 14).fill({ color: 0x15803d });
+      g.rect(96, 15, 7, 21).fill({ color: 0x10b981 });
+      g.rect(106, 20, 6, 16).fill({ color: 0x22c55e });
+      // Vibrant Coral Accents
+      g.rect(36, 29, 7, 7).fill({ color: 0xf43f5e });
+      g.rect(86, 28, 6, 8).fill({ color: 0xa855f7 });
+
+      // 4 Animated Swimming Fish + Rising Air Bubbles
+      const swimA = Math.floor(Math.sin(animPhase * 1.5) * 26);
+      const swimB = Math.floor(Math.cos(animPhase * 1.2) * 22);
+      const bobY = Math.floor(Math.sin(animPhase * 2.4) * 2);
+      g.rect(48 + swimA, 15 + bobY, 9, 4).fill({ color: 0xf97316 });
+      g.rect(45 + swimA, 16 + bobY, 3, 2).fill({ color: 0xfef08a });
+      g.rect(72 - swimA, 22 - bobY, 8, 4).fill({ color: 0xfacc15 });
+      g.rect(60 + swimB, 28 + bobY, 7, 3).fill({ color: 0xf472b6 });
+      g.rect(38 - swimB, 13, 6, 3).fill({ color: 0x7dd3fc });
+
+      const bubbleStep = Math.floor(animPhase * 8) % 20;
+      g.rect(30, 33 - bubbleStep, 2, 2).fill({ color: 0xe0f2fe, alpha: 0.78 });
+      g.rect(98, 30 - ((bubbleStep + 9) % 18), 2, 2).fill({ color: 0xe0f2fe, alpha: 0.75 });
+      break;
+    }
+
     case 'SLEEPING_POD': {
       g.rect(3, 5, widthPx - 6, 22).fill({ color: 0xe2e8f0 });
       g.rect(6, 8, 26, 16).fill({ color: 0x0284c7 });

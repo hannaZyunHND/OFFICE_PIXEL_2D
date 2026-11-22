@@ -102,6 +102,24 @@ export const COMPACT_5_AGENT_MARKDOWN = `# Hệ Thống Multi-Agent Phát Triể
 - Oracle -> Seraph: Security Audit Report
 `;
 
+export const PRODUCT_HUNTER_MARKDOWN = `# Product Hunter — Săn Sản Phẩm 3 Sàn TMĐT (8 Agents · HITL + External Tools)
+
+## Các Phòng Ban (Zones)
+- **Khu Nghiên Cứu & Thu Thập Đa Sàn (WORK)**: Mở rộng từ khóa, gọi API Sàn Cam / Sàn Xanh / Sàn Đen song song và phân tích giá - review.
+- **Phòng Kiểm Toán Số Liệu & Báo Cáo (APPROVAL)**: Lọc nhiễu, bước sang Phòng Giám Đốc trình duyệt HITL và đóng gói Dashboard chiến lược.
+- **Phòng Chơi & Pantry (IDLE)**: Khu giải lao tinh gọn gồm Quầy Pantry, máy PS5 PES và bàn Bi Lắc.
+
+## Danh Sách Nhân Sự (Agents)
+1. **Market Strategist** — Mở rộng từ khóa & quét tín hiệu Google Serper
+2. **Shopee Hunter [Sàn Cam]** — Gọi AddLiveTag Market & Batch API
+3. **Lazada Hunter [Sàn Xanh]** — Cào LazMall & giá khuyến mãi qua Apify
+4. **TikTok Shop Hunter [Sàn Đen]** — Quét xu hướng GMV video/live & KOC qua Apify
+5. **Pricing & Margin Analyst** — Phân tầng phân khúc giá & điểm ngọt thị trường
+6. **VOC & Pain-Point Miner** — Khai thác nỗi đau đánh giá 1★–3★ → USP
+7. **Market Auditor [HITL]** — Kiểm toán chéo & trình Giám đốc chốt ngách + nhập giá vốn
+8. **Executive Report Architect** — Tính Unit Economics & xuất Dashboard HTML/ZIP
+`;
+
 const SYSTEM_INSTRUCTION = `You are Stage 1 of the Pixel Agent Office Markdown-to-Office Compiler.
 Extract the organizational topology from the user's Markdown description or ASCII architecture diagram into the strict JSON schema.
 CRITICAL RULE: DO NOT output any (x, y) coordinates. Output only semantic zones, agents, props, and directed workflow edges.
@@ -277,6 +295,14 @@ export function parseMarkdownDeterministically(
     )
   ) {
     return buildGameFactoryTopology(markdownText);
+  }
+
+  if (
+    /Product Hunter|Shopee Hunter|Lazada Hunter|TikTok Shop Hunter/i.test(
+      markdownText,
+    )
+  ) {
+    return buildProductHunterTopology(markdownText);
   }
 
   const lines = markdownText
@@ -653,6 +679,116 @@ function slugifyAgentId(raw: string): string {
     .replace(/[^a-z0-9]+/g, '_')
     .replace(/^_+|_+$/g, '');
   return base.startsWith('agent_') ? base : `agent_${base || 'unit'}`;
+}
+
+function buildProductHunterTopology(_markdownText: string): Stage1SemanticTopology {
+  const used: string[] = [];
+  const nextAvatar = (): string => {
+    const id = pickRandomAgentAvatarId({ excludeIds: used });
+    used.push(id);
+    return id;
+  };
+
+  return {
+    project_name: 'Product Hunter — Săn Sản Phẩm 3 Sàn (8 Agents)',
+    zones: [
+      {
+        id: 'zone_work',
+        name: 'Săn Hàng Đa Sàn & Phân Tích Dữ Liệu',
+        type: 'WORK',
+        props: ['WHITEBOARD', 'BOOKSHELF', 'PLANT'],
+      },
+      {
+        id: 'zone_approval',
+        name: 'Kiểm Toán Số Liệu, HITL & Báo Cáo',
+        type: 'APPROVAL',
+        props: ['PLANT'],
+      },
+      {
+        id: 'zone_pantry',
+        name: 'Pantry & Lounge Thư Giãn',
+        type: 'IDLE',
+        props: ['COFFEE_MACHINE', 'SOFA', 'AQUARIUM'],
+      },
+    ],
+    agents: [
+      {
+        id: 'agent_market_strategist',
+        name: 'Market Strategist',
+        role: 'Pha 0: Mở rộng từ khóa & quét tín hiệu Serper VN [HITL Gate #1]',
+        zone_id: 'zone_work',
+        color: '#38bdf8',
+        avatar_sprite: nextAvatar(),
+      },
+      {
+        id: 'agent_shopee_hunter',
+        name: 'Shopee Hunter [Sàn Cam]',
+        role: 'Pha 1: Quét Sàn Cam qua AddLiveTag Market & Batch API',
+        zone_id: 'zone_work',
+        color: '#f97316',
+        avatar_sprite: nextAvatar(),
+      },
+      {
+        id: 'agent_lazada_hunter',
+        name: 'Lazada Hunter [Sàn Xanh]',
+        role: 'Pha 1: Quét Sàn Xanh (LazMall & khuyến mãi) qua Apify Actor',
+        zone_id: 'zone_work',
+        color: '#2563eb',
+        avatar_sprite: nextAvatar(),
+      },
+      {
+        id: 'agent_tiktok_hunter',
+        name: 'TikTok Shop Hunter [Sàn Đen]',
+        role: 'Pha 1: Quét TikTok Shop VN (GMV video/live & KOC) qua Apify',
+        zone_id: 'zone_work',
+        color: '#ec4899',
+        avatar_sprite: nextAvatar(),
+      },
+      {
+        id: 'agent_pricing_analyst',
+        name: 'Pricing & Margin Analyst',
+        role: 'Pha 2: Phân tầng giá 3 phân khúc & tìm vùng giá ngọt',
+        zone_id: 'zone_work',
+        color: '#f59e0b',
+        avatar_sprite: nextAvatar(),
+      },
+      {
+        id: 'agent_voc_miner',
+        name: 'VOC & Pain-Point Miner',
+        role: 'Pha 2: Đào nỗi đau đánh giá 1–3★ & hook chuyển đổi',
+        zone_id: 'zone_work',
+        color: '#10b981',
+        avatar_sprite: nextAvatar(),
+      },
+      {
+        id: 'agent_market_auditor',
+        name: 'Market Auditor [HITL]',
+        role: 'Pha 3: Kiểm toán chéo & trình Giám đốc chốt ngách + giá vốn [Gate #2]',
+        zone_id: 'zone_approval',
+        color: '#a855f7',
+        avatar_sprite: nextAvatar(),
+      },
+      {
+        id: 'agent_report_architect',
+        name: 'Executive Report Architect',
+        role: 'Pha 4: Tính lãi ròng thực tế & đóng gói Dashboard HTML + ZIP',
+        zone_id: 'zone_approval',
+        color: '#22d3ee',
+        avatar_sprite: nextAvatar(),
+      },
+    ],
+    edges: [
+      { from: 'agent_market_strategist', to: 'agent_shopee_hunter', label: 'Keyword Matrix (Cam)' },
+      { from: 'agent_market_strategist', to: 'agent_lazada_hunter', label: 'Keyword Matrix (Xanh)' },
+      { from: 'agent_market_strategist', to: 'agent_tiktok_hunter', label: 'Keyword Matrix (Đen)' },
+      { from: 'agent_shopee_hunter', to: 'agent_pricing_analyst', label: 'Shopee SKUs' },
+      { from: 'agent_lazada_hunter', to: 'agent_pricing_analyst', label: 'Lazada SKUs' },
+      { from: 'agent_tiktok_hunter', to: 'agent_voc_miner', label: 'TikTok KOC & Reviews' },
+      { from: 'agent_pricing_analyst', to: 'agent_market_auditor', label: '3 Price Tiers' },
+      { from: 'agent_voc_miner', to: 'agent_market_auditor', label: 'Pain Points & USPs' },
+      { from: 'agent_market_auditor', to: 'agent_report_architect', label: 'HITL Approved Focus' },
+    ],
+  };
 }
 
 function normalizeStage1Topology(

@@ -70,7 +70,7 @@ Khi hệ thống CrewAI của Developer chạy ở Backend, nó sẽ mở WebSoc
 | **\`AGENT_COMPLETE\`** | Nhân vật hoàn thành nhiệm vụ, bật hiệu ứng dấu tích xanh (\`check\`) và ghi nhận tổng Token tiêu thụ. | \`agent_id\`, \`metadata.status_text\` |
 | **\`AGENT_ERROR\`** | Nhân vật nhấp nháy cảnh báo đỏ (\`ERROR\`), hiển thị chi tiết lỗi trong ngăn kéo Inspector để gỡ lỗi ngay lập tức. | \`agent_id\`, \`metadata.status_text\` |`;
 
-export const CREWAI_MASTER_PROMPT_FOR_DEVS = `Bạn là Kiến trúc sư Hệ thống Multi-Agent (CrewAI). Tôi đang sử dụng hệ thống hiển thị trực quan 2D "PIXEL AGENT OFFICE" (chạy tại http://localhost:5173).
+export const CREWAI_MASTER_PROMPT_FOR_DEVS = `Bạn là Kiến trúc sư Hệ thống Multi-Agent (CrewAI). Tôi đang sử dụng hệ thống hiển thị trực quan 2D "PIXEL AGENT OFFICE" (chạy tại http://localhost:34213).
 
 Hãy thiết kế và viết code hoàn chỉnh cho một hệ thống CrewAI giải quyết bài toán sau:
 👉 [NHẬP YÊU CẦU NGHIỆP VỤ CỦA BẠN TẠI ĐÂY - VD: Hệ thống Phân tích & Đầu tư Chứng khoán / Hệ thống Sáng tạo Nội dung Marketing / Hệ thống Kiểm thử Phần mềm Tự động...]

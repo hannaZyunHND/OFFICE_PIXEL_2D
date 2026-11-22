@@ -7,6 +7,7 @@ from __future__ import annotations
 import asyncio
 from pathlib import Path
 from typing import Any, Dict
+from env_loader import get_crew_portal_base_url
 from pixel_office_sdk import (
     AgentSpec,
     EdgeSpec,
@@ -125,7 +126,7 @@ async def run_custom_crew_flow(
         "flow_name": "CUSTOM CREWAI WORKFLOW",
         "prompt": prompt,
         "elapsed_seconds": 3.4,
-        "portal_url": "http://localhost:8766/portal.html",
+        "portal_url": f"{get_crew_portal_base_url()}/portal.html",
         "streams": [],
         "master_blueprint": {"prompt": prompt, "status": "APPROVED"},
         "qr_svg": "",

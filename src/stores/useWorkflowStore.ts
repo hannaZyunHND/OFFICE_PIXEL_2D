@@ -9,7 +9,12 @@ import {
   decorateBlueprintWithRichFurniture,
   ensureDirectorRoomAndFurniture,
   findBestSlotForFurniture,
+  generateProductHunterMinimalBlueprint,
 } from '@/services/compiler/deterministicLayoutEngine';
+import {
+  PRODUCT_HUNTER_MARKDOWN,
+  parseMarkdownDeterministically,
+} from '@/services/compiler/llmTopologyExtractor';
 import {
   getCanonicalFootprint,
   type OfficeBlueprint,
@@ -17,6 +22,7 @@ import {
 import { useBlueprintStore } from './useBlueprintStore';
 import { useSettingsStore } from './useSettingsStore';
 import { pickRandomAgentAvatarId } from '@/data/agentAvatarCatalog';
+import { normalizeLegacyCrewWsUrl } from '@/config/runtimeEndpoints';
 
 const LOCAL_MIRROR_KEY = 'pixel_office_sqlite_workflows_mirror_v1';
 
@@ -57,7 +63,52 @@ export const useWorkflowStore = defineStore('workflow', () => {
           // OR whose Eco-Zone items still use legacy small footprints (< 4x3 for ECO_BIOME_DOME)
           let upgradedAny = false;
           const enrichedDbList = dbList.map((w) => {
+            const normalizedEndpoint = normalizeLegacyCrewWsUrl(
+              w.crew_endpoint_url,
+            );
+            const needsEndpointMigration =
+              normalizedEndpoint !== w.crew_endpoint_url;
+            if (needsEndpointMigration) {
+              upgradedAny = true;
+            }
+            const nextDoc = needsEndpointMigration
+              ? generateCrewAiIntegrationDoc(
+                  w.blueprint,
+                  w.id,
+                  w.raw_requirement,
+                  normalizedEndpoint,
+                )
+              : w.integration_doc_md;
+
             const furnList = w.blueprint?.furniture || [];
+            if (w.id === 'product_hunter_crewai') {
+              const needsMinimalUpgrade =
+                w.blueprint?.meta?.layout_profile !== 'product_hunter_minimal_v1';
+              if (needsMinimalUpgrade || needsEndpointMigration) {
+                upgradedAny = true;
+                const minimalBp = needsMinimalUpgrade
+                  ? generateProductHunterMinimalBlueprint(
+                      parseMarkdownDeterministically(
+                        w.raw_requirement || PRODUCT_HUNTER_MARKDOWN,
+                      ),
+                    )
+                  : w.blueprint;
+                return {
+                  ...w,
+                  crew_endpoint_url: normalizedEndpoint,
+                  integration_doc_md: generateCrewAiIntegrationDoc(
+                    minimalBp,
+                    w.id,
+                    w.raw_requirement,
+                    normalizedEndpoint,
+                  ),
+                  avatar_catalog_v2: true,
+                  minimal_layout_v1: true,
+                  blueprint: minimalBp,
+                };
+              }
+              return w;
+            }
             const ecoDome = furnList.find((f) => f.type === 'ECO_BIOME_DOME');
             const needsEcoUpgrade = !ecoDome || ecoDome.footprint[0] < 4;
             const hasLegacyUnswappedQuarterTurn = furnList.some((f) => {
@@ -117,6 +168,8 @@ export const useWorkflowStore = defineStore('workflow', () => {
               }
               return {
                 ...w,
+                crew_endpoint_url: normalizedEndpoint,
+                integration_doc_md: nextDoc,
                 avatar_catalog_v2: true,
                 blueprint: enrichedBp,
               };
@@ -146,8 +199,17 @@ export const useWorkflowStore = defineStore('workflow', () => {
               }
               return {
                 ...w,
+                crew_endpoint_url: normalizedEndpoint,
+                integration_doc_md: nextDoc,
                 avatar_catalog_v2: true,
                 blueprint: nextBp,
+              };
+            }
+            if (needsEndpointMigration) {
+              return {
+                ...w,
+                crew_endpoint_url: normalizedEndpoint,
+                integration_doc_md: nextDoc,
               };
             }
             return w;
@@ -301,7 +363,10 @@ export const useWorkflowStore = defineStore('workflow', () => {
       if (raw) {
         const parsed = JSON.parse(raw) as StoredWorkflowRecord[];
         if (Array.isArray(parsed) && parsed.length > 0) {
-          workflows.value = parsed;
+          workflows.value = parsed.map((w) => ({
+            ...w,
+            crew_endpoint_url: normalizeLegacyCrewWsUrl(w.crew_endpoint_url),
+          }));
           return;
         }
       }

@@ -20,6 +20,7 @@ import zipfile
 from pathlib import Path
 from typing import Any, Dict, List
 from codex_cli_llm import find_codex_executable, run_codex_json
+from env_loader import get_crew_portal_base_url
 from pixel_office_sdk.contracts import (
     AgentSpec,
     EdgeSpec,
@@ -939,7 +940,8 @@ async def run_game_factory_flow(
     )
     await asyncio.sleep(step_delay * 0.7)
 
-    portal_url = f"http://localhost:8766/portal.html?v={cache_bust}"
+    portal_base = get_crew_portal_base_url()
+    portal_url = f"{portal_base}/portal.html?v={cache_bust}"
     qr_svg = _generate_qr_svg(portal_url)
     (output_dir / "classroom_qr.svg").write_text(qr_svg, encoding="utf-8")
 
@@ -959,7 +961,7 @@ async def run_game_factory_flow(
             if fpath.is_file():
                 zf.write(fpath, arcname=fname)
 
-    zip_url = f"http://localhost:8766/{zip_filename}?v={cache_bust}"
+    zip_url = f"{portal_base}/{zip_filename}?v={cache_bust}"
 
     # Preserve immutable per-run snapshot for History inspection
     slug_base = re.sub(r"[^a-z0-9]+", "_", prompt.lower()).strip("_")[:36] or "game_run"
@@ -979,8 +981,8 @@ async def run_game_factory_flow(
         if src_file.is_file():
             (history_dir / fname).write_bytes(src_file.read_bytes())
 
-    history_portal_url = f"http://localhost:8766/history/{history_tag}/portal.html"
-    history_zip_url = f"http://localhost:8766/history/{history_tag}/{zip_filename}"
+    history_portal_url = f"{portal_base}/history/{history_tag}/portal.html"
+    history_zip_url = f"{portal_base}/history/{history_tag}/{zip_filename}"
 
     await bridge.emit_event(
         "AGENT_TOOL_CALL",
@@ -1007,7 +1009,7 @@ async def run_game_factory_flow(
         "streams": [
             {
                 **s,
-                "url": f"http://localhost:8766/history/{history_tag}/{s['file']}",
+                "url": f"{portal_base}/history/{history_tag}/{s['file']}",
             }
             for s in stream_results
         ],

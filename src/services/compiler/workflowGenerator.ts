@@ -4,15 +4,18 @@ import type { Stage1SemanticTopology } from '@/types/assets';
 import {
   GAME_FACTORY_WORKFLOW_MARKDOWN,
   COMPACT_5_AGENT_MARKDOWN,
+  PRODUCT_HUNTER_MARKDOWN,
   parseMarkdownDeterministically,
 } from './llmTopologyExtractor';
 import {
   findBestSlotForFurniture,
   generateDeterministicBlueprint,
+  generateProductHunterMinimalBlueprint,
 } from './deterministicLayoutEngine';
 import defaultBlueprintData from '@/data/defaultBlueprint.json';
 import { MOCK_SCENARIOS } from '@/data/mockScenarios';
 import { pickRandomAgentAvatarId } from '@/data/agentAvatarCatalog';
+import { DEFAULT_CREWAI_WS_ORIGIN } from '@/config/runtimeEndpoints';
 
 export interface WorkflowSimulationStep {
   delayMs: number;
@@ -30,6 +33,7 @@ export interface StoredWorkflowRecord {
   integration_doc_md: string;
   created_at: number;
   avatar_catalog_v2?: boolean;
+  minimal_layout_v1?: boolean;
 }
 
 /**
@@ -66,7 +70,7 @@ export function generateCrewAiIntegrationDoc(
   blueprint: OfficeBlueprint,
   workflowId: string,
   rawRequirement: string = '',
-  crewEndpointUrl: string = 'ws://localhost:8765',
+  crewEndpointUrl: string = DEFAULT_CREWAI_WS_ORIGIN,
 ): string {
   const agentRows = blueprint.agents
     .map(
@@ -474,7 +478,7 @@ export function parseChatOrMarkdownRequirement(
  */
 export function buildDefaultSeedWorkflows(): StoredWorkflowRecord[] {
   // 1. Multi-Agent Game Factory (11 Agents, 28x23 Tiles)
-  const gameFactoryUrl = 'ws://localhost:8765/game-factory';
+  const gameFactoryUrl = `${DEFAULT_CREWAI_WS_ORIGIN}/game-factory`;
   const gameFactoryTopology = parseMarkdownDeterministically(
     GAME_FACTORY_WORKFLOW_MARKDOWN,
   );
@@ -485,7 +489,7 @@ export function buildDefaultSeedWorkflows(): StoredWorkflowRecord[] {
   const gameFactoryRaw = `URL kết nối: ${gameFactoryUrl}\n${GAME_FACTORY_WORKFLOW_MARKDOWN}`;
 
   // 2. Autonomous Research Crew (4 Agents, 24x16 Tiles)
-  const researchUrl = 'ws://localhost:8766/research-crew';
+  const researchUrl = `${DEFAULT_CREWAI_WS_ORIGIN}/research-crew`;
   const researchBlueprint = JSON.parse(
     JSON.stringify(defaultBlueprintData),
   ) as OfficeBlueprint;
@@ -519,11 +523,18 @@ export function buildDefaultSeedWorkflows(): StoredWorkflowRecord[] {
 `;
 
   // 3. CyberSec & Full-Stack Product Squad (5 Agents)
-  const cyberUrl = 'ws://localhost:8767/cybersec-crew';
+  const cyberUrl = `${DEFAULT_CREWAI_WS_ORIGIN}/cybersec-crew`;
   const cyberTopology = parseMarkdownDeterministically(COMPACT_5_AGENT_MARKDOWN);
   const cyberBlueprint = generateDeterministicBlueprint(cyberTopology);
   const cyberSteps = synthesizeSimulationStepsForBlueprint(cyberBlueprint);
   const cyberRaw = `URL kết nối: ${cyberUrl}\n${COMPACT_5_AGENT_MARKDOWN}`;
+
+  // 4. Product Hunter — 3 Sàn TMĐT (Shopee / Lazada / TikTok Shop — 8 Agents)
+  const hunterUrl = `${DEFAULT_CREWAI_WS_ORIGIN}/product-hunter`;
+  const hunterTopology = parseMarkdownDeterministically(PRODUCT_HUNTER_MARKDOWN);
+  const hunterBlueprint = generateProductHunterMinimalBlueprint(hunterTopology);
+  const hunterSteps = synthesizeSimulationStepsForBlueprint(hunterBlueprint);
+  const hunterRaw = `URL kết nối: ${hunterUrl}\n${PRODUCT_HUNTER_MARKDOWN}`;
 
   return [
     {
@@ -576,6 +587,25 @@ export function buildDefaultSeedWorkflows(): StoredWorkflowRecord[] {
         cyberUrl,
       ),
       created_at: Date.now() - 10000,
+    },
+    {
+      id: 'product_hunter_crewai',
+      name: 'Product Hunter — Săn Sản Phẩm 3 Sàn (Shopee / Lazada / TikTok — 8 Agents)',
+      description:
+        'CrewAI phân tích thị trường đa sàn hoàn toàn tự động (AddLiveTag Sàn Cam, Apify Sàn Xanh & Đen, Serper): Điểm Đại dương xanh /100, HHI, Tỷ lệ có bán, Hoa hồng TB, Top Shop CR5; hỗ trợ bật HITL tùy chọn.',
+      crew_endpoint_url: hunterUrl,
+      raw_requirement: hunterRaw,
+      blueprint: hunterBlueprint,
+      steps: hunterSteps,
+      integration_doc_md: generateCrewAiIntegrationDoc(
+        hunterBlueprint,
+        'product_hunter_crewai',
+        hunterRaw,
+        hunterUrl,
+      ),
+      created_at: Date.now() - 5000,
+      avatar_catalog_v2: true,
+      minimal_layout_v1: true,
     },
   ];
 }

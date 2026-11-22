@@ -369,6 +369,117 @@ export class OfficeRenderer {
     agent.enqueueEvent(event);
   }
 
+  private resolveDirectorMeetingSpot(): {
+    anchorX: number;
+    anchorY: number;
+    meetingSpot: { x: number; y: number; facing: Direction };
+    workerFaceDir: Direction;
+  } | null {
+    if (!this.currentBlueprint || !this.directorEntity) return null;
+    const director = this.directorEntity;
+    const directorDesk = this.currentBlueprint.furniture.find(
+      (f) => f.type === 'DIRECTOR_DESK',
+    );
+    const directorZone = this.currentBlueprint.zones.find(
+      (z) => z.type === 'DIRECTOR',
+    );
+
+    const anchorX = directorDesk
+      ? directorDesk.interaction_point[0]
+      : directorZone
+        ? directorZone.rect[0] + Math.floor(directorZone.rect[2] / 2)
+        : director.gridX;
+    const anchorY = directorDesk
+      ? directorDesk.interaction_point[1]
+      : directorZone
+        ? directorZone.rect[1] + Math.floor(directorZone.rect[3] / 2)
+        : director.gridY;
+
+    const avoidSelf = new Set<string>([`${anchorX},${anchorY}`]);
+    const meetingNeighbors = this.pathfinder.getWalkableNeighbors(
+      anchorX,
+      anchorY,
+      avoidSelf,
+    );
+    const meetingSpot = meetingNeighbors[0] ?? {
+      x: anchorX,
+      y: anchorY,
+      facing: 'DOWN' as Direction,
+    };
+
+    const workerFaceDir: Direction =
+      anchorX > meetingSpot.x
+        ? 'RIGHT'
+        : anchorX < meetingSpot.x
+          ? 'LEFT'
+          : anchorY < meetingSpot.y
+            ? 'UP'
+            : 'DOWN';
+
+    return { anchorX, anchorY, meetingSpot, workerFaceDir };
+  }
+
+  /**
+   * Walks the specified Agent (plus Giám Đốc NPC) to DIRECTOR_DESK and holds position
+   * while Human-in-the-Loop approval is awaiting user input in the UI.
+   */
+  public async requestAgentHumanApproval(
+    agentId: string,
+    stepTitle: string,
+  ): Promise<void> {
+    const spot = this.resolveDirectorMeetingSpot();
+    const director = this.directorEntity;
+    if (!spot || !director) return;
+
+    const agent =
+      this.agentEntities.get(agentId) ?? this.agentEntities.values().next().value;
+    if (!agent) return;
+
+    this.clearSocialBanterTimers();
+    director.enterBriefingMode();
+    director.showBubble('⚖️ Xin ý kiến Giám đốc!', '#f59e0b', 6000);
+
+    const shortStep =
+      stepTitle.length > 26 ? `${stepTitle.slice(0, 25)}…` : stepTitle;
+
+    await Promise.all([
+      director.walkToTile(this.pathfinder, spot.anchorX, spot.anchorY, 'DOWN', 1.6),
+      agent.walkToDirectorBriefing(
+        spot.meetingSpot.x,
+        spot.meetingSpot.y,
+        spot.meetingSpot.facing,
+        `🙋 Sếp duyệt: ${shortStep}`,
+      ),
+    ]);
+
+    director.faceTowards(spot.meetingSpot.x, spot.meetingSpot.y);
+    agent.showBriefingBubble(`⏸️ Chờ duyệt: ${shortStep}`, '#fbbf24', spot.workerFaceDir);
+  }
+
+  public resolveAgentHumanApproval(
+    agentId: string,
+    decision: 'approve' | 'edit' | 'reject',
+  ): void {
+    const director = this.directorEntity;
+    const agent =
+      this.agentEntities.get(agentId) ?? this.agentEntities.values().next().value;
+
+    if (director) {
+      if (decision === 'reject') {
+        director.showBubble('⛔ Dừng bước này!', '#ef4444', 2800);
+      } else if (decision === 'edit') {
+        director.showBubble('✏️ Đã chỉnh hướng! Làm tiếp!', '#38bdf8', 2800);
+      } else {
+        director.showBubble('✅ Đã duyệt! Triển khai!', '#22c55e', 2800);
+      }
+      director.exitBriefingMode();
+    }
+
+    if (agent) {
+      agent.endDirectorBriefing();
+    }
+  }
+
   /**
    * Choreographs the physical briefing between Giám Đốc (Tôi) and the first Crew agent:
    * First agent walks to Director in Phòng Giám Đốc, exchanges speech bubbles for the prompt,
@@ -410,6 +521,9 @@ export class OfficeRenderer {
       : undefined;
     if (!firstAgent || !firstAgentSpec) return;
 
+    const spot = this.resolveDirectorMeetingSpot();
+    if (!spot) return;
+
     const nonce = ++this.briefingSessionNonce;
     this.isBriefingActive = true;
     this.briefingBufferedEvents = [];
@@ -417,35 +531,7 @@ export class OfficeRenderer {
     const director = this.directorEntity;
     director.enterBriefingMode();
 
-    const directorDesk = this.currentBlueprint.furniture.find(
-      (f) => f.type === 'DIRECTOR_DESK',
-    );
-    const directorZone = this.currentBlueprint.zones.find(
-      (z) => z.type === 'DIRECTOR',
-    );
-
-    const anchorX = directorDesk
-      ? directorDesk.interaction_point[0]
-      : directorZone
-        ? directorZone.rect[0] + Math.floor(directorZone.rect[2] / 2)
-        : director.gridX;
-    const anchorY = directorDesk
-      ? directorDesk.interaction_point[1]
-      : directorZone
-        ? directorZone.rect[1] + Math.floor(directorZone.rect[3] / 2)
-        : director.gridY;
-
-    const avoidSelf = new Set<string>([`${anchorX},${anchorY}`]);
-    const meetingNeighbors = this.pathfinder.getWalkableNeighbors(
-      anchorX,
-      anchorY,
-      avoidSelf,
-    );
-    const meetingSpot = meetingNeighbors[0] ?? {
-      x: anchorX,
-      y: anchorY,
-      facing: 'DOWN' as Direction,
-    };
+    const { anchorX, anchorY, meetingSpot, workerFaceDir } = spot;
 
     const shortFirstName = firstAgentSpec.name.split(/\s*[—–([|]\s*/)[0].trim();
     director.showBubble(`📣 Gọi ${shortFirstName} nhận việc!`, '#fbbf24', 5200);
@@ -468,14 +554,6 @@ export class OfficeRenderer {
     if (nonce !== this.briefingSessionNonce) return;
 
     director.faceTowards(meetingSpot.x, meetingSpot.y);
-    const workerFaceDir: Direction =
-      anchorX > meetingSpot.x
-        ? 'RIGHT'
-        : anchorX < meetingSpot.x
-          ? 'LEFT'
-          : anchorY < meetingSpot.y
-            ? 'UP'
-            : 'DOWN';
 
     const clippedPrompt =
       prompt.length > 22 ? `${prompt.slice(0, 21)}…` : prompt;

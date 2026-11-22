@@ -12,6 +12,8 @@ import MapEditorToolbar from '@/components/editor/MapEditorToolbar.vue';
 import MarkdownCompilerModal from '@/components/modals/MarkdownCompilerModal.vue';
 import CustomAssetLoaderModal from '@/components/modals/CustomAssetLoaderModal.vue';
 import RunHistoryModal from '@/components/modals/RunHistoryModal.vue';
+import HumanApprovalModal from '@/components/modals/HumanApprovalModal.vue';
+import ProviderExtrasModal from '@/components/modals/ProviderExtrasModal.vue';
 
 import { useBlueprintStore } from '@/stores/useBlueprintStore';
 import { useWorkflowStore } from '@/stores/useWorkflowStore';
@@ -20,8 +22,9 @@ import { useUiStore } from '@/stores/useUiStore';
 import { useSettingsStore } from '@/stores/useSettingsStore';
 import { useRunHistoryStore } from '@/stores/useRunHistoryStore';
 import { EventBusManager } from '@/services/transport/EventBusManager';
-import type { AgentEvent } from '@/types/events';
+import type { AgentEvent, HitlApprovalResponse } from '@/types/events';
 import type { TransportMode } from '@/services/storage/localConfig';
+import { DEFAULT_CREWAI_WS_ORIGIN } from '@/config/runtimeEndpoints';
 
 const canvasRef = ref<InstanceType<typeof PixelOfficeCanvas> | null>(null);
 const isSimRunning = ref<boolean>(false);
@@ -75,7 +78,7 @@ onMounted(async () => {
         uiStore.crewAiFlowRunning = true;
         uiStore.isGodView = true;
         uiStore.showToast(
-          `🚀 CrewAI (${workflowStore.activeWorkflow?.crew_endpoint_url || 'ws://localhost:8765'}) đang thực thi: "${prompt}"`,
+          `🚀 CrewAI (${workflowStore.activeWorkflow?.crew_endpoint_url || DEFAULT_CREWAI_WS_ORIGIN}) đang thực thi: "${prompt}"`,
           'info',
           3400,
         );
@@ -92,8 +95,44 @@ onMounted(async () => {
       },
       onFlowError: (err) => {
         uiStore.crewAiFlowRunning = false;
+        uiStore.setPendingHitlApproval(null);
         runHistoryStore.failRunSession(err);
         uiStore.showToast(`Lỗi thực thi CrewAI Bridge: ${err}`, 'error', 4000);
+      },
+      onHumanApprovalRequired: (approval) => {
+        uiStore.setPendingHitlApproval(approval);
+        void canvasRef.value?.requestAgentHumanApproval(
+          approval.agent_id,
+          approval.step_title,
+        );
+        const hitlEvt: AgentEvent = {
+          event_id: `hitl_req_${approval.approval_id}`,
+          timestamp: Date.now(),
+          event_type: 'HUMAN_APPROVAL',
+          agent_id: approval.agent_id,
+          metadata: {
+            status_text: `⏸️ Chờ Giám đốc duyệt HITL: ${approval.step_title}`,
+            icon: 'message',
+            input_payload: {
+              approval_id: approval.approval_id,
+              stage: approval.stage || 'APPROVAL',
+              estimated_cost_usd: approval.estimated_cost_usd || 0,
+            },
+          },
+        };
+        telemetryStore.recordEvent(hitlEvt);
+        const agName =
+          blueprintStore.blueprint.agents.find((a) => a.id === approval.agent_id)
+            ?.name ?? approval.agent_id;
+        runHistoryStore.recordRunEvent(hitlEvt, agName);
+        uiStore.showToast(
+          `⚖️ HITL: "${approval.step_title}" đang chờ Giám đốc duyệt!`,
+          'warning',
+          4000,
+        );
+      },
+      onToolRegistrySync: (tools) => {
+        uiStore.setRegisteredExternalTools(tools);
       },
     },
   );
@@ -145,7 +184,7 @@ function handleDispatchCrewFlow(payload: CrewFlowDispatchPayload): void {
   eventBus.simulator.stop();
 
   const activeWf = workflowStore.activeWorkflow;
-  const endpointUrl = activeWf?.crew_endpoint_url || 'ws://localhost:8765';
+  const endpointUrl = activeWf?.crew_endpoint_url || DEFAULT_CREWAI_WS_ORIGIN;
 
   uiStore.isGodView = true;
   uiStore.crewAiPrompt = payload.prompt;
@@ -179,6 +218,7 @@ function handleDispatchCrewFlow(payload: CrewFlowDispatchPayload): void {
     attached_file_content: payload.attachedFileContent,
     blueprint: blueprintStore.blueprint,
     step_delay: settingsStore.settings.simulationSpeed === 2 ? 0.45 : 0.75,
+    extras: { ...settingsStore.settings.extras },
   });
 
   uiStore.showToast(
@@ -186,6 +226,32 @@ function handleDispatchCrewFlow(payload: CrewFlowDispatchPayload): void {
     'info',
     3200,
   );
+}
+
+function handleSubmitHitlDecision(response: HitlApprovalResponse): void {
+  const pending = uiStore.pendingHitlApproval;
+  eventBus?.wsClient.sendHumanApprovalResponse(response);
+
+  if (pending) {
+    canvasRef.value?.resolveAgentHumanApproval(pending.agent_id, response.decision);
+    const resolvedEvt: AgentEvent = {
+      event_id: `hitl_res_${pending.approval_id}_${Date.now()}`,
+      timestamp: Date.now(),
+      event_type: 'HUMAN_APPROVAL',
+      agent_id: pending.agent_id,
+      metadata: {
+        status_text: `✅ Giám đốc [${response.decision.toUpperCase()}]: ${pending.step_title}`,
+        icon: response.decision === 'reject' ? 'error' : 'check',
+        output_payload: response as unknown as Record<string, unknown>,
+      },
+    };
+    telemetryStore.recordEvent(resolvedEvt);
+    const agName =
+      blueprintStore.blueprint.agents.find((a) => a.id === pending.agent_id)
+        ?.name ?? pending.agent_id;
+    runHistoryStore.recordRunEvent(resolvedEvt, agName);
+    uiStore.recordHitlResolution(pending, response);
+  }
 }
 
 function handleRerunPromptFromHistory(payload: {
@@ -231,7 +297,7 @@ function handleSwitchTransport(mode: TransportMode, wsUrl?: string): void {
     uiStore.connectionState = 'POSTMESSAGE_LISTENING';
   } else if (mode === 'websocket') {
     uiStore.showToast(
-      `Đang kết nối WebSocket (${wsUrl || 'ws://localhost:8765'}) để nhận sự kiện thực từ CrewAI...`,
+      `Đang kết nối WebSocket (${wsUrl || DEFAULT_CREWAI_WS_ORIGIN}) để nhận sự kiện thực từ CrewAI...`,
       'info',
       3000,
     );
@@ -299,6 +365,10 @@ function handleGlobalKeydown(e: KeyboardEvent): void {
     />
 
     <RunHistoryModal @rerun-prompt="handleRerunPromptFromHistory" />
+
+    <HumanApprovalModal @submit-decision="handleSubmitHitlDecision" />
+
+    <ProviderExtrasModal />
 
     <!-- Floating Toast Notification -->
     <transition name="toast-fade">

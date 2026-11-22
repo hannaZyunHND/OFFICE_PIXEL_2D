@@ -728,3 +728,234 @@ export function generateDeterministicBlueprint(
   // 4. Richly decorate with ~45 items (pool table, ping-pong, mini bar, microwave, eco-biome, koi pond, cats, roombas, etc.)
   return decorateBlueprintWithRichFurniture(baseBlueprint, 45);
 }
+
+/**
+ * Generates the streamlined, minimalist Studio Layout specifically requested for Product Hunter:
+ * - WORK zone: 6 Agent desks + ONLY 1 Office Cat (OFFICE_CAT) & 1 Robot Vacuum (ROBOT_VACUUM).
+ * - APPROVAL zone: 2 Auditor/Architect desks.
+ * - IDLE zone ("Phòng Chơi & Pantry"): ONLY Pantry (COFFEE_MACHINE + MINI_BAR_COUNTER) + PS5_PES_STATION + FOOSBALL_TABLE.
+ * - DIRECTOR zone ("Phòng Giám Đốc (Tôi)"): DIRECTOR_DESK + LARGE_AQUARIUM (4x2) + BOOKSHELF (2x1) + visitor SOFA.
+ */
+export function generateProductHunterMinimalBlueprint(
+  topology: Stage1SemanticTopology,
+): OfficeBlueprint {
+  const workAgents = topology.agents.filter((a) => {
+    const z = topology.zones.find((zn) => zn.id === a.zone_id);
+    return !z || z.type === 'WORK';
+  });
+  const approvalAgents = topology.agents.filter((a) => {
+    const z = topology.zones.find((zn) => zn.id === a.zone_id);
+    return z?.type === 'APPROVAL';
+  });
+
+  const workRows = Math.max(3, Math.ceil(workAgents.length / 2));
+  const gridCols = 37;
+  const gridRows = Math.max(19, 4 + workRows * 4 + 3);
+  const approvalHeight = Math.max(8, approvalAgents.length * 3 + 2);
+  const idleY = approvalHeight + 2;
+  const idleHeight = gridRows - idleY - 1;
+
+  const zones: ZoneDefinition[] = [
+    {
+      id: topology.zones.find((z) => z.type === 'WORK')?.id || 'zone_work',
+      name: 'Khu Làm Việc — Săn Đa Sàn',
+      type: 'WORK',
+      rect: [1, 1, 14, gridRows - 2],
+    },
+    {
+      id: topology.zones.find((z) => z.type === 'APPROVAL')?.id || 'zone_approval',
+      name: 'Phòng Kiểm Toán & Báo Cáo',
+      type: 'APPROVAL',
+      rect: [16, 1, 9, approvalHeight],
+    },
+    {
+      id: topology.zones.find((z) => z.type === 'IDLE')?.id || 'zone_pantry',
+      name: 'Phòng Chơi & Pantry',
+      type: 'IDLE',
+      rect: [16, idleY, 9, idleHeight],
+    },
+    {
+      id: 'zone_director',
+      name: 'Phòng Giám Đốc (Tôi)',
+      type: 'DIRECTOR',
+      rect: [26, 1, 10, gridRows - 2],
+    },
+  ];
+
+  const furniture: FurnitureItem[] = [];
+  const agents: AgentBlueprint[] = [];
+
+  // 1. WORK desks (2 cols x 3 rows)
+  workAgents.forEach((agentSpec, index) => {
+    const colIdx = index % 2;
+    const rowIdx = Math.floor(index / 2);
+    const deskX = 3 + colIdx * 6;
+    const deskY = 4 + rowIdx * 4;
+    const deskId = `furn_desk_${agentSpec.id}`;
+    furniture.push({
+      id: deskId,
+      type: 'DESK_PC',
+      x: deskX,
+      y: deskY,
+      footprint: [2, 1],
+      interaction_point: [deskX, deskY + 1],
+      facing: 'UP',
+      agent_id: agentSpec.id,
+    });
+    agents.push({
+      id: agentSpec.id,
+      name: agentSpec.name,
+      role: agentSpec.role,
+      color: agentSpec.color,
+      avatar_sprite: agentSpec.avatar_sprite,
+      desk_id: deskId,
+    });
+  });
+
+  // WORK companions: ONLY 1 Office Cat + 1 Robot Vacuum
+  furniture.push(
+    {
+      id: 'furn_ph_work_cat',
+      type: 'OFFICE_CAT',
+      x: 6,
+      y: 6,
+      footprint: [1, 1],
+      interaction_point: [6, 7],
+      facing: 'DOWN',
+    },
+    {
+      id: 'furn_ph_work_vacuum',
+      type: 'ROBOT_VACUUM',
+      x: 7,
+      y: 11,
+      footprint: [1, 1],
+      interaction_point: [7, 12],
+      facing: 'DOWN',
+    },
+  );
+
+  // 2. APPROVAL desks
+  approvalAgents.forEach((agentSpec, index) => {
+    const deskX = 19;
+    const deskY = 3 + index * 3;
+    const deskId = `furn_desk_${agentSpec.id}`;
+    furniture.push({
+      id: deskId,
+      type: 'DESK_PC',
+      x: deskX,
+      y: deskY,
+      footprint: [2, 1],
+      interaction_point: [deskX, deskY + 1],
+      facing: 'UP',
+      agent_id: agentSpec.id,
+    });
+    agents.push({
+      id: agentSpec.id,
+      name: agentSpec.name,
+      role: agentSpec.role,
+      color: agentSpec.color,
+      avatar_sprite: agentSpec.avatar_sprite,
+      desk_id: deskId,
+    });
+  });
+
+  // 3. IDLE zone ("Phòng Chơi & Pantry"): ONLY Pantry + PS5 + Foosball
+  const pantryRowY = idleY + 2;
+  const gameRowY = idleY + 5;
+  furniture.push(
+    {
+      id: 'furn_ph_pantry_coffee',
+      type: 'COFFEE_MACHINE',
+      x: 17,
+      y: pantryRowY,
+      footprint: [1, 1],
+      interaction_point: [17, pantryRowY + 1],
+      facing: 'UP',
+    },
+    {
+      id: 'furn_ph_pantry_bar',
+      type: 'MINI_BAR_COUNTER',
+      x: 20,
+      y: pantryRowY,
+      footprint: [2, 1],
+      interaction_point: [20, pantryRowY + 1],
+      facing: 'UP',
+    },
+    {
+      id: 'furn_ph_ps5',
+      type: 'PS5_PES_STATION',
+      x: 17,
+      y: gameRowY,
+      footprint: [2, 1],
+      interaction_point: [17, gameRowY + 1],
+      facing: 'UP',
+    },
+    {
+      id: 'furn_ph_foosball',
+      type: 'FOOSBALL_TABLE',
+      x: 21,
+      y: gameRowY,
+      footprint: [2, 1],
+      interaction_point: [21, gameRowY + 1],
+      facing: 'UP',
+    },
+  );
+
+  // 4. DIRECTOR Suite: Bookshelf (2x1) + Large Aquarium (4x2) + Executive Desk (3x1) + Visitor Sofa (2x1)
+  furniture.push(
+    {
+      id: 'furn_ph_director_bookshelf',
+      type: 'BOOKSHELF',
+      x: 27,
+      y: 3,
+      footprint: [2, 1],
+      interaction_point: [27, 4],
+      facing: 'UP',
+    },
+    {
+      id: 'furn_ph_director_aquarium',
+      type: 'LARGE_AQUARIUM',
+      x: 30,
+      y: 3,
+      footprint: [4, 2],
+      interaction_point: [31, 5],
+      facing: 'UP',
+    },
+    {
+      id: 'furn_director_desk',
+      type: 'DIRECTOR_DESK',
+      x: 29,
+      y: 9,
+      footprint: [3, 1],
+      interaction_point: [30, 10],
+      facing: 'UP',
+    },
+    {
+      id: 'furn_ph_director_sofa',
+      type: 'SOFA',
+      x: 29,
+      y: 14,
+      footprint: [2, 1],
+      interaction_point: [29, 13],
+      facing: 'DOWN',
+    },
+  );
+
+  return {
+    meta: {
+      project_name: topology.project_name,
+      grid_cols: gridCols,
+      grid_rows: gridRows,
+      tile_size: 32,
+      layout_profile: 'product_hunter_minimal_v1',
+    },
+    zones,
+    furniture,
+    agents,
+    edges: topology.edges.map((e) => ({
+      from: e.from,
+      to: e.to,
+      label: e.label,
+    })),
+  };
+}

@@ -16,3 +16,6 @@ __pycache__/
 *.py[cod]
 data/*.sqlite*
 tsconfig.tsbuildinfo
+logs/
+crewAI/output/ProductHunter_*.zip
+crewAI/output/product_hunter/

@@ -50,6 +50,7 @@ const FURNITURE_BUBBLES: Partial<Record<FurnitureType, string[]>> = {
   OFFICE_CAT: ['🐱 Boss Mèo hôm nay ngoan ghê!', '🐾 Vuốt ve mèo lấy hên!'],
   CORGI_DOG: ['🐶 Corgi vẫy đuôi đáng yêu quá!'],
   AQUARIUM: ['🐠 Bể cá thủy sinh lung linh thật!'],
+  LARGE_AQUARIUM: ['🐠 Ngắm bể cá rồng thủy sinh thư giãn chốt deal nào!'],
   WHITEBOARD: ['📋 Xem lại sơ đồ kiến trúc hệ thống...'],
   BOOKSHELF: ['📚 Đọc tham khảo tài liệu chiến lược...'],
   HOLOGRAM_GLOBE: ['🌐 Theo dõi bản đồ vận hành toàn cầu!'],

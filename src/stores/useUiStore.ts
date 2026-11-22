@@ -1,5 +1,10 @@
 import { defineStore } from 'pinia';
 import { ref } from 'vue';
+import type {
+  ExternalToolMetadata,
+  HitlApprovalRequest,
+  HitlApprovalResponse,
+} from '@/types/events';
 
 export type ConnectionState =
   | 'SIMULATOR_READY'
@@ -15,7 +20,8 @@ export type ActiveModalType =
   | 'ASSETS'
   | 'WS_CONFIG'
   | 'CREWAI_MISSION'
-  | 'RUN_HISTORY';
+  | 'RUN_HISTORY'
+  | 'PROVIDER_EXTRAS';
 
 export interface CrewAiStreamSummary {
   stream_id: string;
@@ -66,6 +72,36 @@ export const useUiStore = defineStore('ui', () => {
   const crewAiPrompt = ref<string>('');
   const crewAiFlowRunning = ref<boolean>(false);
   const crewAiResult = ref<CrewAiFlowResult | null>(null);
+
+  // Human-in-the-Loop (HITL) & External Tool Registry State
+  const pendingHitlApproval = ref<HitlApprovalRequest | null>(null);
+  const hitlDecisionHistory = ref<
+    Array<{ request: HitlApprovalRequest; response: HitlApprovalResponse; resolvedAt: number }>
+  >([]);
+  const registeredExternalTools = ref<ExternalToolMetadata[]>([]);
+
+  function setPendingHitlApproval(req: HitlApprovalRequest | null): void {
+    pendingHitlApproval.value = req;
+  }
+
+  function recordHitlResolution(
+    request: HitlApprovalRequest,
+    response: HitlApprovalResponse,
+  ): void {
+    hitlDecisionHistory.value.unshift({
+      request,
+      response,
+      resolvedAt: Date.now(),
+    });
+    if (hitlDecisionHistory.value.length > 50) {
+      hitlDecisionHistory.value.pop();
+    }
+    pendingHitlApproval.value = null;
+  }
+
+  function setRegisteredExternalTools(tools: ExternalToolMetadata[]): void {
+    registeredExternalTools.value = tools;
+  }
 
   let toastTimer: ReturnType<typeof setTimeout> | null = null;
 
@@ -121,6 +157,9 @@ export const useUiStore = defineStore('ui', () => {
     crewAiPrompt,
     crewAiFlowRunning,
     crewAiResult,
+    pendingHitlApproval,
+    hitlDecisionHistory,
+    registeredExternalTools,
     toggleGodView,
     toggleEditMode,
     selectAgent,
@@ -128,5 +167,8 @@ export const useUiStore = defineStore('ui', () => {
     openModal,
     closeModal,
     showToast,
+    setPendingHitlApproval,
+    recordHitlResolution,
+    setRegisteredExternalTools,
   };
 });

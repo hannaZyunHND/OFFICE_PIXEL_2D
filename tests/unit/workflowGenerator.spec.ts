@@ -7,6 +7,7 @@ import {
   extractEndpointUrlFromPrompt,
   stripEndpointUrlFromPrompt,
 } from '@/services/compiler/workflowGenerator';
+import { DEFAULT_CREWAI_WS_ORIGIN } from '@/config/runtimeEndpoints';
 
 describe('Workflow Generator & CrewAI Technical Documentation', () => {
   it('extracts mandatory CrewAI Endpoint URL from prompt and generates department + technical doc', () => {
@@ -27,8 +28,9 @@ describe('Workflow Generator & CrewAI Technical Documentation', () => {
     expect(topology.zones.length).toBe(3);
 
     const seeds = buildDefaultSeedWorkflows();
-    expect(seeds.length).toBe(3);
-    expect(seeds[0].crew_endpoint_url).toBe('ws://localhost:8765/game-factory');
+    expect(seeds.length).toBe(4);
+    expect(seeds[0].crew_endpoint_url).toBe(`${DEFAULT_CREWAI_WS_ORIGIN}/game-factory`);
+    expect(seeds.some((s) => s.id === 'product_hunter_crewai')).toBe(true);
 
     const firstSeed = seeds[0];
     expect(firstSeed.blueprint.agents.length).toBe(11);
@@ -36,7 +38,7 @@ describe('Workflow Generator & CrewAI Technical Documentation', () => {
       'TÀI LIỆU KỸ THUẬT KẾT NỐI CREWAI',
     );
     expect(firstSeed.integration_doc_md).toContain(
-      'ws://localhost:8765/game-factory',
+      `${DEFAULT_CREWAI_WS_ORIGIN}/game-factory`,
     );
 
     const steps = synthesizeSimulationStepsForBlueprint(firstSeed.blueprint);

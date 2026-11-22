@@ -1,46 +1,27 @@
 """
-CrewAI Multi-Agent Live WebSocket Bridge & Portal Server.
-- WebSocket Endpoint: ws://localhost:8765  (connects directly to Pixel Agent Office Frontend & routes all Crew endpoints)
-- Output Portal HTTP: http://localhost:8766/ (serves elearning_portal.html, .ZIP archives, and HTML5 games)
+CrewAI Multi-Agent Live WebSocket Bridge & Unified Portal Server.
+- WebSocket Endpoint: ws://localhost:34214 (override via CREWAI_PORT in .env)
+- Output Portal HTTP: http://localhost:34214/ (served on the same port via PixelOfficeBridge)
 """
 
 from __future__ import annotations
 import asyncio
-from functools import partial
-from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
-import threading
 import time
 from typing import Any, Dict, List
 
+from env_loader import get_crew_host, get_crew_port, get_crew_portal_base_url, load_project_dotenv
 from pixel_office_sdk import PixelOfficeBridge
+from tool_registry import DEFAULT_TOOL_REGISTRY
+import providers.ecommerce_providers  # noqa: F401
 from flows.game_factory_flow import (
     get_game_factory_blueprint,
     run_game_factory_flow,
 )
 from flows.elearning_lesson_flow import run_elearning_lesson_flow
+from flows.product_hunter_flow import run_product_hunter_flow
 
 OUTPUT_DIR = Path(__file__).resolve().parent / "output"
-
-
-class CORSStaticHandler(SimpleHTTPRequestHandler):
-    def end_headers(self) -> None:
-        self.send_header("Access-Control-Allow-Origin", "*")
-        self.send_header("Cache-Control", "no-store")
-        super().end_headers()
-
-    def log_message(self, format: str, *args: Any) -> None:
-        pass
-
-
-def start_portal_http_server(port: int = 8766) -> ThreadingHTTPServer:
-    OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
-    handler = partial(CORSStaticHandler, directory=str(OUTPUT_DIR))
-    httpd = ThreadingHTTPServer(("localhost", port), handler)
-    thread = threading.Thread(target=httpd.serve_forever, daemon=True)
-    thread.start()
-    print(f"[CrewAI Portal Server] Serving generated portals & ZIPs at http://localhost:{port}/")
-    return httpd
 
 
 async def run_dynamic_blueprint_flow(
@@ -137,8 +118,14 @@ async def run_dynamic_blueprint_flow(
 
 
 async def main() -> None:
+    env_file = load_project_dotenv()
+    host = get_crew_host()
+    crew_port = get_crew_port()
+    portal_base = get_crew_portal_base_url()
+
     OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
-    start_portal_http_server(8766)
+    if env_file:
+        print(f"[CrewAI Env] Loaded keys & config from {env_file}")
 
     blueprint = get_game_factory_blueprint()
     (OUTPUT_DIR / "OfficeBlueprint.json").write_text(
@@ -147,10 +134,12 @@ async def main() -> None:
     )
 
     bridge = PixelOfficeBridge(
-        host="localhost",
-        ws_port=8765,
+        host=host,
+        ws_port=crew_port,
         initial_blueprint=None,
+        static_output_dir=OUTPUT_DIR,
     )
+    bridge.set_tool_metadata(DEFAULT_TOOL_REGISTRY.list_tools_metadata())
 
     async def handle_task(prompt: str, options: Dict[str, Any]) -> Dict[str, Any]:
         endpoint_url = str(options.get("endpoint_url") or "").lower()
@@ -162,6 +151,26 @@ async def main() -> None:
         print(
             f'[CrewAI Flow] Dispatching prompt="{prompt}" | workflow="{workflow_name}" | endpoint="{endpoint_url}"'
         )
+
+        # 0. Product Hunter Multi-Marketplace Crew (8 Agents · Shopee / Lazada / TikTok Shop)
+        if (
+            "product-hunter" in endpoint_url
+            or "product_hunter" in workflow_id
+            or "product hunter" in workflow_name
+            or "agent_shopee_hunter" in bp_agents
+        ):
+            step_delay = float(options.get("step_delay") or 0.75)
+            result = await run_product_hunter_flow(
+                keyword_prompt=prompt,
+                bridge=bridge,
+                output_root=OUTPUT_DIR,
+                step_delay=step_delay,
+                options=options,
+            )
+            print(
+                f'[CrewAI Product Hunter] Completed in {result["elapsed_seconds"]}s -> {result["portal_url"]}'
+            )
+            return result
 
         # 1. E-Learning Lesson Design Crew (9 Agents)
         if (
@@ -213,7 +222,7 @@ async def main() -> None:
     bridge.on_task_dispatch(handle_task)
 
     ws_server = await bridge.start_ws_server()
-    print("[CrewAI Server] Ready! Waiting for Pixel Agent Office Frontend at ws://localhost:8765 ...")
+    print(f"[CrewAI Server] Ready! WS=ws://{host}:{crew_port} | Portal={portal_base}/")
     await ws_server.wait_closed()
 
 

@@ -13,6 +13,7 @@ import {
   Loader2,
   FileText,
   Sparkles,
+  SlidersHorizontal,
 } from 'lucide-vue-next';
 import { useSettingsStore } from '@/stores/useSettingsStore';
 import { useTelemetryStore } from '@/stores/useTelemetryStore';
@@ -195,6 +196,17 @@ function handleInputKeydown(e: KeyboardEvent): void {
         >
           <FileCode2 class="w-3.5 h-3.5" />
           <span class="hidden sm:inline">Tài Liệu Kết Nối &amp; Quy Trình</span>
+        </button>
+
+        <button
+          type="button"
+          data-testid="open-extras-modal-btn"
+          class="hud-btn !py-1 !px-2.5 text-xs border-[#10B981]/50 text-[#34D399]"
+          title="Cấu hình API Keys (AddLiveTag / Apify / Serper) & Chính sách Human-in-the-Loop (HITL)"
+          @click="uiStore.openModal('PROVIDER_EXTRAS')"
+        >
+          <SlidersHorizontal class="w-3.5 h-3.5" />
+          <span class="hidden sm:inline">Keys &amp; HITL</span>
         </button>
 
         <button

@@ -45,6 +45,7 @@ export type FurnitureType =
   | 'HAMMOCK_STAND'
   | 'WATERFALL_ROCK_WALL'
   | 'AQUARIUM'
+  | 'LARGE_AQUARIUM'
   | 'SOFA'
   | 'SLEEPING_POD'
   | 'PLANT'
@@ -140,6 +141,13 @@ export const FURNITURE_CATALOG: FurnitureCatalogEntry[] = [
     emoji: '🐠',
     category: 'ECO_LOUNGE',
     footprint: [3, 1],
+  },
+  {
+    type: 'LARGE_AQUARIUM',
+    label: 'Bể Cá Thủy Sinh Lớn Phòng Sếp (4x2)',
+    emoji: '🐠',
+    category: 'ECO_LOUNGE',
+    footprint: [4, 2],
   },
   {
     type: 'SOFA',
@@ -486,6 +494,7 @@ export interface BlueprintMeta {
   grid_cols: number;
   grid_rows: number;
   tile_size: 32;
+  layout_profile?: string;
 }
 
 export interface ZoneDefinition {

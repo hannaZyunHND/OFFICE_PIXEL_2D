@@ -163,6 +163,20 @@ async function startDirectorBriefing(prompt: string): Promise<void> {
   await rendererRef.value?.startDirectorBriefing(prompt);
 }
 
+async function requestAgentHumanApproval(
+  agentId: string,
+  stepTitle: string,
+): Promise<void> {
+  await rendererRef.value?.requestAgentHumanApproval(agentId, stepTitle);
+}
+
+function resolveAgentHumanApproval(
+  agentId: string,
+  decision: 'approve' | 'edit' | 'reject',
+): void {
+  rendererRef.value?.resolveAgentHumanApproval(agentId, decision);
+}
+
 function resetCamera(): void {
   rendererRef.value?.resetCamera();
 }
@@ -175,6 +189,8 @@ async function reloadCustomAssets(): Promise<void> {
 defineExpose({
   dispatchEvent,
   startDirectorBriefing,
+  requestAgentHumanApproval,
+  resolveAgentHumanApproval,
   resetCamera,
   reloadCustomAssets,
 });

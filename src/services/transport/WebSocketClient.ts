@@ -1,15 +1,23 @@
-import type { AgentEvent } from '@/types/events';
+import type {
+  AgentEvent,
+  ExternalToolMetadata,
+  HitlApprovalRequest,
+  HitlApprovalResponse,
+} from '@/types/events';
 import type { OfficeBlueprint } from '@/types/blueprint';
 import type { CrewAiFlowResult } from '@/stores/useUiStore';
+import { DEFAULT_CREWAI_WS_ORIGIN } from '@/config/runtimeEndpoints';
 
 export interface WebSocketControlCallbacks {
   onBlueprintSync?: (blueprint: OfficeBlueprint) => void;
   onFlowStarted?: (prompt: string) => void;
   onFlowResult?: (result: CrewAiFlowResult) => void;
   onFlowError?: (error: string) => void;
+  onHumanApprovalRequired?: (approval: HitlApprovalRequest) => void;
+  onToolRegistrySync?: (tools: ExternalToolMetadata[]) => void;
 }
 
-const DEFAULT_HUB_WS = 'ws://localhost:8765';
+const DEFAULT_HUB_WS = DEFAULT_CREWAI_WS_ORIGIN;
 
 export class WebSocketClient {
   private ws: WebSocket | null = null;
@@ -72,6 +80,25 @@ export class WebSocketClient {
       options,
     });
 
+    if (this.ws && this.ws.readyState === WebSocket.OPEN) {
+      this.ws.send(payload);
+    } else {
+      this.pendingMessages.push(payload);
+      if (
+        !this.ws ||
+        this.ws.readyState === WebSocket.CLOSED ||
+        this.ws.readyState === WebSocket.CLOSING
+      ) {
+        this.connect(this.endpoint || DEFAULT_HUB_WS);
+      }
+    }
+  }
+
+  public sendHumanApprovalResponse(response: HitlApprovalResponse): void {
+    const payload = JSON.stringify({
+      type: 'HUMAN_APPROVAL_RESPONSE',
+      response,
+    });
     if (this.ws && this.ws.readyState === WebSocket.OPEN) {
       this.ws.send(payload);
     } else {
@@ -156,6 +183,18 @@ export class WebSocketClient {
           );
           return;
         }
+        if (parsed.type === 'HUMAN_APPROVAL_REQUIRED' && parsed.approval) {
+          this.controlCallbacks?.onHumanApprovalRequired?.(
+            parsed.approval as HitlApprovalRequest,
+          );
+          return;
+        }
+        if (parsed.type === 'TOOL_REGISTRY_SYNC' && Array.isArray(parsed.tools)) {
+          this.controlCallbacks?.onToolRegistrySync?.(
+            parsed.tools as ExternalToolMetadata[],
+          );
+          return;
+        }
 
         // 2. Standard Real-Time AgentEvent
         if (parsed.event_type && parsed.agent_id) {
@@ -171,7 +210,7 @@ export class WebSocketClient {
     };
 
     this.ws.onclose = () => {
-      // If a custom port failed on initial connect, fall back to the central CrewAI Bridge Hub (ws://localhost:8765)
+      // If a custom port failed on initial connect, fall back to the central CrewAI Bridge Hub (DEFAULT_HUB_WS)
       if (
         !this.hasOpenedCurrentEndpoint &&
         !this.endpoint.startsWith(DEFAULT_HUB_WS)

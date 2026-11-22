@@ -3,7 +3,56 @@ export type AgentEventType =
   | 'AGENT_TOOL_CALL'
   | 'AGENT_HANDOFF'
   | 'AGENT_COMPLETE'
-  | 'AGENT_ERROR';
+  | 'AGENT_ERROR'
+  | 'HUMAN_APPROVAL';
+
+export interface HitlChoiceOption {
+  id: string;
+  label: string;
+  description?: string;
+  default_selected?: boolean;
+}
+
+export interface HitlFormField {
+  key: string;
+  label: string;
+  type: 'number' | 'text' | 'textarea' | 'select';
+  default_value?: string | number;
+  placeholder?: string;
+  options?: Array<{ value: string; label: string }>;
+}
+
+export interface HitlApprovalRequest {
+  approval_id: string;
+  agent_id: string;
+  step_title: string;
+  stage?: string;
+  summary_md: string;
+  choices?: HitlChoiceOption[];
+  multi_select?: boolean;
+  form_fields?: HitlFormField[];
+  context_payload?: Record<string, unknown>;
+  estimated_cost_usd?: number;
+}
+
+export interface HitlApprovalResponse {
+  approval_id: string;
+  decision: 'approve' | 'edit' | 'reject';
+  selected_choices: string[];
+  inputs: Record<string, string | number>;
+  note?: string;
+}
+
+export interface ExternalToolMetadata {
+  name: string;
+  provider: string;
+  description: string;
+  cost_tier: 'free' | 'credit' | 'paid';
+  estimated_cost_usd: number;
+  requires_hitl: boolean;
+  parameters_schema?: Record<string, unknown>;
+  tags?: string[];
+}
 
 export type ToolIconType = 'search' | 'code' | 'db' | 'error' | 'message' | 'check';
 
