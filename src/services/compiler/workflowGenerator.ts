@@ -477,9 +477,9 @@ export function buildDefaultSeedWorkflows(): StoredWorkflowRecord[] {
   return [
     {
       id: 'product_hunter_crewai',
-      name: 'Product Hunter — Săn Sản Phẩm 3 Sàn (Shopee / Lazada / TikTok — 11 Agents)',
+      name: 'Product Hunter — Săn Sản Phẩm 3 Sàn (Shopee / Lazada / TikTok — 15 Agents)',
       description:
-        'Chủ tịch nhắn tên sản phẩm trong group Telegram. Crew săn 3 sàn, đăng GitHub Pages, gửi link lại group và chụp toàn cảnh văn phòng mỗi 10 giây.',
+        'Chủ tịch nhắn tên sản phẩm, một câu mùa vụ hoặc một nhóm hàng cần thống kê sức bán. Crew đo từng tên, xếp hạng, đăng GitHub Pages và gửi bài xếp hạng kèm link.',
       crew_endpoint_url: hunterUrl,
       raw_requirement: hunterRaw,
       blueprint: hunterBlueprint,

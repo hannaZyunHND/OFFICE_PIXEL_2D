@@ -947,7 +947,7 @@ export function generateProductHunterMinimalBlueprint(
       grid_cols: gridCols,
       grid_rows: gridRows,
       tile_size: 32,
-      layout_profile: 'product_hunter_minimal_v2',
+      layout_profile: 'product_hunter_minimal_v4',
     },
     zones,
     furniture,

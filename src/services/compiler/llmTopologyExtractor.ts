@@ -102,25 +102,29 @@ export const COMPACT_5_AGENT_MARKDOWN = `# Hệ Thống Multi-Agent Phát Triể
 - Oracle -> Seraph: Security Audit Report
 `;
 
-export const PRODUCT_HUNTER_MARKDOWN = `# Product Hunter — Săn Sản Phẩm 3 Sàn TMĐT (11 Agents · Telegram + HITL + External Tools)
+export const PRODUCT_HUNTER_MARKDOWN = `# Product Hunter — Săn Sản Phẩm 3 Sàn TMĐT (15 Agents · Telegram + HITL + External Tools)
 
 ## Các Phòng Ban (Zones)
-- **Khu Nghiên Cứu & Thu Thập Đa Sàn (WORK)**: Mở rộng từ khóa, gọi API Sàn Cam / Sàn Xanh / Sàn Đen song song và phân tích giá - review.
-- **Phòng Kiểm Toán Số Liệu & Báo Cáo (APPROVAL)**: Lọc nhiễu, bước sang Phòng Giám Đốc trình duyệt HITL và đóng gói Dashboard chiến lược.
+- **Khu Nghiên Cứu & Thu Thập Đa Sàn (WORK)**: Nghe câu hỏi, đổi mùa vụ hoặc nhóm hàng thành tên hàng, gọi API Sàn Cam / Sàn Xanh / Sàn Đen và phân tích giá - review.
+- **Phòng Kiểm Toán Số Liệu & Báo Cáo (APPROVAL)**: Lọc nhiễu, trình Giám đốc, đóng gói Dashboard, rồi xếp hạng tên hàng.
 - **Phòng Chơi & Pantry (IDLE)**: Khu giải lao tinh gọn gồm Quầy Pantry, máy PS5 PES và bàn Bi Lắc.
 
 ## Danh Sách Nhân Sự (Agents)
-1. **Liên lạc Telegram** — Nhận tên sản phẩm Chủ tịch nhắn trong group
-2. **Market Strategist** — Mở rộng từ khóa & quét tín hiệu Google Serper
-3. **Shopee Hunter [Sàn Cam]** — Gọi AddLiveTag Market & Batch API
-4. **Lazada Hunter [Sàn Xanh]** — Cào LazMall & giá khuyến mãi qua Apify
-5. **TikTok Shop Hunter [Sàn Đen]** — Quét xu hướng GMV video/live & KOC qua Apify
-6. **Pricing & Margin Analyst** — Phân tầng phân khúc giá & điểm ngọt thị trường
-7. **VOC & Pain-Point Miner** — Khai thác nỗi đau đánh giá 1★–3★ → USP
-8. **Camera văn phòng** — Cứ 10 giây chụp toàn cảnh gửi Chủ tịch
-9. **Market Auditor [HITL]** — Kiểm toán chéo & trình Giám đốc chốt ngách + nhập giá vốn
-10. **Executive Report Architect** — Tính Unit Economics & xuất Dashboard HTML/ZIP
-11. **Thư ký Chủ tịch** — Đăng GitHub Pages và gửi link vào Telegram
+1. **Liên lạc Telegram** — Nhận câu Chủ tịch nhắn trong group
+2. **Điều phối yêu cầu** — Bỏ ý ngoài phạm vi, giữ mốc thời gian, nhóm hàng hoặc đúng tên sản phẩm
+3. **Thăm dò mùa vụ** — Đổi dịp thành vài tên hàng có thể gõ lên sàn
+4. **Thăm dò nhóm hàng** — Tách nhóm rộng thành tên cụ thể và xếp theo sức bán
+5. **Market Strategist** — Mở rộng từ khóa & quét tín hiệu Google Serper
+6. **Shopee Hunter [Sàn Cam]** — Gọi AddLiveTag Market & Batch API
+7. **Lazada Hunter [Sàn Xanh]** — Cào LazMall & giá khuyến mãi qua Apify
+8. **TikTok Shop Hunter [Sàn Đen]** — Quét xu hướng GMV video/live & KOC qua Apify
+9. **Pricing & Margin Analyst** — Phân tầng phân khúc giá & điểm ngọt thị trường
+10. **VOC & Pain-Point Miner** — Khai thác nỗi đau đánh giá 1★–3★ → USP
+11. **Camera văn phòng** — Cứ 10 giây chụp toàn cảnh gửi Chủ tịch
+12. **Market Auditor [HITL]** — Kiểm toán chéo & trình Giám đốc chốt ngách + nhập giá vốn
+13. **Executive Report Architect** — Tính Unit Economics & xuất Dashboard HTML/ZIP
+14. **Tổng hợp phù hợp** — Xếp hạng tên hàng theo phiếu đo thị trường
+15. **Thư ký Chủ tịch** — Đăng GitHub Pages và gửi bài xếp hạng kèm link vào Telegram
 `;
 
 const SYSTEM_INSTRUCTION = `You are Stage 1 of the Pixel Agent Office Markdown-to-Office Compiler.
@@ -693,7 +697,7 @@ function buildProductHunterTopology(_markdownText: string): Stage1SemanticTopolo
   };
 
   return {
-    project_name: 'Product Hunter — Săn Sản Phẩm 3 Sàn (11 Agents)',
+    project_name: 'Product Hunter — Săn Sản Phẩm 3 Sàn (15 Agents)',
     zones: [
       {
         id: 'zone_work',
@@ -718,9 +722,33 @@ function buildProductHunterTopology(_markdownText: string): Stage1SemanticTopolo
       {
         id: 'agent_telegram_liaison',
         name: 'Liên lạc Telegram',
-        role: 'Nhận yêu cầu sản phẩm từ group Telegram của Chủ tịch',
+        role: 'Nhận câu hỏi từ group Telegram của Chủ tịch',
         zone_id: 'zone_work',
         color: '#22c55e',
+        avatar_sprite: nextAvatar(),
+      },
+      {
+        id: 'agent_brief_officer',
+        name: 'Điều phối yêu cầu',
+        role: 'Nghe câu Chủ tịch, bỏ ý nhập hàng và vốn, chỉ giữ mốc thời gian hoặc đúng tên sản phẩm',
+        zone_id: 'zone_work',
+        color: '#a3e635',
+        avatar_sprite: nextAvatar(),
+      },
+      {
+        id: 'agent_season_scout',
+        name: 'Thăm dò mùa vụ',
+        role: 'Đổi dịp và mốc thời gian thành vài tên hàng có thể gõ lên sàn để đo',
+        zone_id: 'zone_work',
+        color: '#fb7185',
+        avatar_sprite: nextAvatar(),
+      },
+      {
+        id: 'agent_category_scout',
+        name: 'Thăm dò nhóm hàng',
+        role: 'Tách một nhóm hàng rộng thành vài tên cụ thể rồi xếp theo lượt bán',
+        zone_id: 'zone_work',
+        color: '#2dd4bf',
         avatar_sprite: nextAvatar(),
       },
       {
@@ -796,17 +824,30 @@ function buildProductHunterTopology(_markdownText: string): Stage1SemanticTopolo
         avatar_sprite: nextAvatar(),
       },
       {
+        id: 'agent_fit_synthesizer',
+        name: 'Tổng hợp phù hợp',
+        role: 'So phiếu đo rồi xếp tên nào hợp nhất, tên nào đứng thứ hai, tên nào không còn chỗ',
+        zone_id: 'zone_approval',
+        color: '#c4b5fd',
+        avatar_sprite: nextAvatar(),
+      },
+      {
         id: 'agent_chairman_courier',
         name: 'Thư ký Chủ tịch',
-        role: 'Deploy GitHub Pages và gửi link báo cáo cho Chủ tịch',
+        role: 'Đăng GitHub Pages và gửi bài xếp hạng kèm link cho Chủ tịch',
         zone_id: 'zone_approval',
         color: '#eab308',
         avatar_sprite: nextAvatar(),
       },
     ],
     edges: [
-      { from: 'agent_telegram_liaison', to: 'agent_market_strategist', label: 'Yêu cầu từ Telegram' },
+      { from: 'agent_telegram_liaison', to: 'agent_brief_officer', label: 'Câu hỏi' },
       { from: 'agent_telegram_liaison', to: 'agent_office_camera', label: 'Mở camera văn phòng' },
+      { from: 'agent_brief_officer', to: 'agent_season_scout', label: 'Câu tư vấn' },
+      { from: 'agent_brief_officer', to: 'agent_category_scout', label: 'Nhóm hàng' },
+      { from: 'agent_brief_officer', to: 'agent_market_strategist', label: 'Tên sản phẩm' },
+      { from: 'agent_season_scout', to: 'agent_market_strategist', label: 'Tên hàng để đo' },
+      { from: 'agent_category_scout', to: 'agent_market_strategist', label: 'Tên hàng bán chạy' },
       { from: 'agent_market_strategist', to: 'agent_shopee_hunter', label: 'Keyword Matrix (Cam)' },
       { from: 'agent_market_strategist', to: 'agent_lazada_hunter', label: 'Keyword Matrix (Xanh)' },
       { from: 'agent_market_strategist', to: 'agent_tiktok_hunter', label: 'Keyword Matrix (Đen)' },
@@ -816,7 +857,8 @@ function buildProductHunterTopology(_markdownText: string): Stage1SemanticTopolo
       { from: 'agent_pricing_analyst', to: 'agent_market_auditor', label: '3 Price Tiers' },
       { from: 'agent_voc_miner', to: 'agent_market_auditor', label: 'Pain Points & USPs' },
       { from: 'agent_market_auditor', to: 'agent_report_architect', label: 'HITL Approved Focus' },
-      { from: 'agent_report_architect', to: 'agent_chairman_courier', label: 'Gửi link Chủ tịch' },
+      { from: 'agent_report_architect', to: 'agent_fit_synthesizer', label: 'Phiếu đo' },
+      { from: 'agent_fit_synthesizer', to: 'agent_chairman_courier', label: 'Bài xếp hạng' },
     ],
   };
 }

@@ -33,7 +33,7 @@ describe('Workflow Generator & CrewAI Technical Documentation', () => {
     expect(seeds[0].crew_endpoint_url).toBe(`${DEFAULT_CREWAI_WS_ORIGIN}/product-hunter`);
 
     const firstSeed = seeds[0];
-    expect(firstSeed.blueprint.agents.length).toBe(11);
+    expect(firstSeed.blueprint.agents.length).toBe(15);
     expect(firstSeed.integration_doc_md).toContain(
       'TÀI LIỆU KỸ THUẬT KẾT NỐI CREWAI',
     );

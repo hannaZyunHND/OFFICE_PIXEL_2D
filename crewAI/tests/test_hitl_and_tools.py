@@ -116,7 +116,9 @@ class TestExternalToolsAndHitl(unittest.IsolatedAsyncioTestCase):
                 "REPORT_PUBLISH": "off",
             },
             clear=False,
-        ):
+        ), patch("telegram_office.bot_token", return_value=""), patch(
+            "telegram_office.chat_id", return_value=""
+        ), patch("telegram_office.publish_product_report", return_value=""):
             with tempfile.TemporaryDirectory() as tmpdir:
                 result = await run_product_hunter_flow(
                     keyword_prompt="khăn giấy gấu trúc",
@@ -143,6 +145,8 @@ class TestExternalToolsAndHitl(unittest.IsolatedAsyncioTestCase):
                 self.assertIn("Logs Request / Response", html_content)
                 self.assertIn("Cách xử lý dữ liệu để ra số liệu", html_content)
                 self.assertGreaterEqual(result["master_blueprint"]["api_logs_count"], 6)
+                self.assertEqual(result["topic"], "khăn giấy gấu trúc")
+                self.assertEqual(result["fit_mode"], "product")
                 self.assertTrue(Path(tmpdir, result["zip_filename"]).is_file())
 
     def test_live_schema_parsers(self) -> None:

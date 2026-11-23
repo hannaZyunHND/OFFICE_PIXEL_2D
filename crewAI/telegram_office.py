@@ -152,14 +152,24 @@ def ack_text(keyword: str) -> str:
     )
 
 
-def build_delivery_message(title: str, public_url: str, warning: str = "") -> str:
+def build_delivery_message(
+    title: str,
+    public_url: str,
+    warning: str = "",
+    note: str = "",
+) -> str:
     if public_url:
-        return (
+        body = (
             f"Chủ tịch, báo cáo “{title}” đã xong.\n"
             f"Link xem trên điện thoại:\n{public_url}"
         )
-    detail = warning.strip() or "Chưa đẩy được báo cáo lên host công khai."
-    return f"Chủ tịch, báo cáo “{title}” đã soạn xong nhưng chưa có link công khai.\n{detail}"
+    else:
+        detail = warning.strip() or "Chưa đẩy được báo cáo lên host công khai."
+        body = f"Chủ tịch, báo cáo “{title}” đã soạn xong nhưng chưa có link công khai.\n{detail}"
+    ranking = note.strip()
+    if ranking:
+        return f"{ranking}\n\n{body}"
+    return body
 
 
 def send_message(text: str, target_chat: str = "") -> bool:
@@ -433,7 +443,12 @@ def _deliver_report(args: Dict[str, Any], extras: Dict[str, Any]) -> Dict[str, A
     except Exception as exc:
         warning = str(exc)
         print(f"[Pages] Không đẩy được báo cáo lên host công khai: {exc}")
-    message = build_delivery_message(title, public_url, warning)
+    message = build_delivery_message(
+        title,
+        public_url,
+        warning,
+        note=str(args.get("note") or ""),
+    )
     sent = False
     if bot_token() and chat_id():
         try:
@@ -512,6 +527,7 @@ DEFAULT_TOOL_REGISTRY.tool(
             "slug": {"type": "string"},
             "title": {"type": "string"},
             "local_url": {"type": "string"},
+            "note": {"type": "string", "description": "Bài xếp hạng gửi kèm link"},
         },
         "required": ["html_path", "slug", "title"],
     },

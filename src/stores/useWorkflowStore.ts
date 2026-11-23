@@ -98,7 +98,7 @@ export const useWorkflowStore = defineStore('workflow', () => {
             if (w.id === 'product_hunter_crewai') {
               const hunterSeed = defaults.find((d) => d.id === 'product_hunter_crewai');
               const needsMinimalUpgrade =
-                w.blueprint?.meta?.layout_profile !== 'product_hunter_minimal_v2';
+                w.blueprint?.meta?.layout_profile !== 'product_hunter_minimal_v4';
               const needsCopyRefresh = Boolean(
                 hunterSeed &&
                   (w.name !== hunterSeed.name || w.description !== hunterSeed.description),

@@ -154,7 +154,7 @@ async def main() -> None:
             f'[CrewAI Flow] Dispatching prompt="{prompt}" | workflow="{workflow_name}" | endpoint="{endpoint_url}"'
         )
 
-        # 0. Product Hunter Multi-Marketplace Crew (11 Agents · Shopee / Lazada / TikTok Shop)
+        # 0. Product Hunter Multi-Marketplace Crew (15 Agents · Shopee / Lazada / TikTok Shop)
         if (
             "product-hunter" in endpoint_url
             or "product_hunter" in workflow_id

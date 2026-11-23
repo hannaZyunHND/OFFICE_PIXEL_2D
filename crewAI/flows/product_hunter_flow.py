@@ -1,5 +1,5 @@
 """
-CrewAI Flow: Product Hunter — Phân Tích Thị Trường Đa Sàn TMĐT (11 Agents · Tự Động Toàn Trình)
+CrewAI Flow: Product Hunter — Phân Tích Thị Trường Đa Sàn TMĐT (15 Agents · Tự Động Toàn Trình)
 -----------------------------------------------------------------------------------------------
 - Mặc định chạy TỰ ĐỘNG 100% (`hitlPolicy="auto_skip"`) xuất Báo cáo Thị trường chuẩn
   ShopeeAnalytics cho 3 sàn:
@@ -27,11 +27,16 @@ from pixel_office_sdk import PixelOfficeBridge
 import providers.ecommerce_providers  # noqa: F401
 from providers.ecommerce_providers import get_platform_capabilities
 from tool_registry import execute_tool_for_agent
+import brief_fit  # noqa: F401
+from brief_fit import fit_banner_html, rank_products, render_fit_note
 import telegram_office  # noqa: F401
 
 
 PRODUCT_HUNTER_AGENTS = {
     "liaison": "agent_telegram_liaison",
+    "brief": "agent_brief_officer",
+    "scout": "agent_season_scout",
+    "category": "agent_category_scout",
     "strategist": "agent_market_strategist",
     "shopee": "agent_shopee_hunter",
     "lazada": "agent_lazada_hunter",
@@ -40,6 +45,7 @@ PRODUCT_HUNTER_AGENTS = {
     "voc": "agent_voc_miner",
     "auditor": "agent_market_auditor",
     "architect": "agent_report_architect",
+    "synthesizer": "agent_fit_synthesizer",
     "camera": "agent_office_camera",
     "courier": "agent_chairman_courier",
 }
@@ -774,18 +780,59 @@ def _render_logs_tab_html(api_logs: List[Dict[str, Any]], overall_formula: Dict[
     </section>"""
 
 
-def _render_dashboard_html(report_data: Dict[str, Any]) -> str:
-    keyword = html.escape(str(report_data["keyword"]))
-    narrative = html.escape(str(report_data["narrative"]))
-    llm_engine = html.escape(str(report_data.get("llm_engine") or "Market Engine"))
+def _bundle_from_platform_items(
+    keyword: str,
+    items_by_platform: Dict[str, List[Dict[str, Any]]],
+    mode: str,
+) -> Dict[str, Any]:
+    """Same market card the full report uses, built from one keyword's measured items."""
+    all_items: List[Dict[str, Any]] = []
+    per_platform: Dict[str, Dict[str, Any]] = {}
+    for plat, items in items_by_platform.items():
+        all_items.extend(items)
+        per_platform[plat] = _compute_market_overview_metrics(
+            items,
+            platform_key=plat,
+            mode=mode,
+            provider=plat,
+        )
+    overall = _compute_market_overview_metrics(
+        all_items,
+        platform_key="all",
+        mode=mode,
+        provider="Tổng hợp 3 Sàn (Shopee / Lazada / TikTok Shop)",
+    )
+    voc = _extract_voc_insights(keyword, all_items)
+    return {
+        "keyword": keyword,
+        "llm_engine": "Market Engine",
+        "narrative": (
+            f"«{keyword}»: {overall['sp_count']} SP, {overall['shop_count']} shop, "
+            f"đại dương xanh {overall['blue_ocean_score']}/100, giá TB {_fmt_vnd(overall['avg_price_vnd'])}."
+        ),
+        "overall": overall,
+        "per_platform": per_platform,
+        "all_items": all_items,
+        "items_by_platform": items_by_platform,
+        "ai_sections": _build_structured_ai_sections(keyword, overall, per_platform, voc),
+        "voc": voc,
+        "api_logs": [],
+    }
+
+
+def _keyword_market_parts(
+    report_data: Dict[str, Any],
+    prefix: str,
+    include_logs: bool,
+) -> tuple[str, str, str]:
     overall: Dict[str, Any] = report_data["overall"]
     per_platform: Dict[str, Dict[str, Any]] = report_data["per_platform"]
     all_items: List[Dict[str, Any]] = report_data["all_items"]
     items_by_platform: Dict[str, List[Dict[str, Any]]] = report_data["items_by_platform"]
     ai_sections: List[Dict[str, str]] = report_data["ai_sections"]
-    api_logs: List[Dict[str, Any]] = report_data["api_logs"]
+    api_logs: List[Dict[str, Any]] = report_data.get("api_logs") or []
 
-    tabs_meta = [("all", "🌐 Tổng Hợp 3 Sàn", overall, all_items)]
+    tabs_meta = [(f"{prefix}all", "🌐 Tổng Hợp 3 Sàn", overall, all_items)]
     plat_titles = {
         "shopee": "🟠 Sàn Cam (Shopee)",
         "lazada": "🔵 Sàn Xanh (Lazada)",
@@ -793,25 +840,75 @@ def _render_dashboard_html(report_data: Dict[str, Any]) -> str:
     }
     for key in ("shopee", "lazada", "tiktok_shop"):
         if key in per_platform:
-            tabs_meta.append((key, plat_titles[key], per_platform[key], items_by_platform.get(key, [])))
+            tabs_meta.append((f"{prefix}{key}", plat_titles[key], per_platform[key], items_by_platform.get(key, [])))
 
     tabs_html = "".join(
-        f'<button type="button" class="tab-btn{" active" if idx == 0 else ""}" data-tab="{pid}" onclick="switchMarketTab(\'{pid}\')">{label}</button>'
+        f'<button type="button" class="tab-btn{" active" if idx == 0 else ""}" data-tab="{pid}" onclick="switchMarketTab(\'{pid}\', this)">{label}</button>'
         for idx, (pid, label, _, _) in enumerate(tabs_meta)
-    ) + f'<button type="button" class="tab-btn log-tab" data-tab="logs" onclick="switchMarketTab(\'logs\')">🪵 Logs Request / Response ({len(api_logs)})</button>'
-
+    )
+    if include_logs:
+        tabs_html += (
+            f'<button type="button" class="tab-btn log-tab" data-tab="{prefix}logs" '
+            f'onclick="switchMarketTab(\'{prefix}logs\', this)">🪵 Logs Request / Response ({len(api_logs)})</button>'
+        )
     panels_html = "".join(
         _render_standardized_platform_tab(pid, label, metrics, tab_items, ai_sections, idx == 0)
         for idx, (pid, label, metrics, tab_items) in enumerate(tabs_meta)
     )
-    logs_panel_html = _render_logs_tab_html(api_logs, overall.get("formula_trace") or {}, per_platform)
+    logs_html = ""
+    if include_logs:
+        logs_html = _render_logs_tab_html(api_logs, overall.get("formula_trace") or {}, per_platform)
+        if prefix:
+            logs_html = logs_html.replace('id="panel_logs"', f'id="panel_{prefix}logs"', 1)
+    return tabs_html, panels_html, logs_html
+
+
+def _render_dashboard_html(report_data: Dict[str, Any]) -> str:
+    llm_engine = html.escape(str(report_data.get("llm_engine") or "Market Engine"))
+    raw_reports = report_data.get("keyword_reports")
+    multi = isinstance(raw_reports, list) and len(raw_reports) > 1
+    reports: List[Dict[str, Any]] = raw_reports if multi else [report_data]
+    if multi:
+        shown = ", ".join(str(rep.get("keyword") or "") for rep in reports)
+        hero_h1 = f'Các từ khóa: "{html.escape(shown)}"'
+        hero_narrative = "Mỗi tên hàng có một bảng đo riêng trên 3 sàn. Xếp hạng nằm ở đầu trang."
+        page_title = html.escape(shown)
+    else:
+        hero_h1 = f'Từ khóa: "{html.escape(str(report_data["keyword"]))}"'
+        hero_narrative = html.escape(str(report_data["narrative"]))
+        page_title = html.escape(str(report_data["keyword"]))
+
+    blocks: List[str] = []
+    for index, rep in enumerate(reports):
+        prefix = f"k{index}_" if multi else ""
+        tabs_html, panels_html, logs_html = _keyword_market_parts(rep, prefix, include_logs=(not multi or index == 0))
+        hidden = "" if index == 0 else ' style="display:none"'
+        heading = ""
+        if multi:
+            heading = (
+                f'<h2 class="sa-title" style="margin:8px 0 4px">Từ khóa: "{html.escape(str(rep.get("keyword") or ""))}"</h2>'
+                f'<p class="hero-narrative">{html.escape(str(rep.get("narrative") or ""))}</p>'
+            )
+        blocks.append(
+            f'<div class="keyword-block" id="kwblock_{index}"{hidden}>{heading}'
+            f'<div class="tabs-bar">{tabs_html}</div>{panels_html}{logs_html}</div>'
+        )
+    nav_html = ""
+    if multi:
+        nav_html = '<div class="tabs-bar">' + "".join(
+            f'<button type="button" class="tab-btn kw-btn{" active" if index == 0 else ""}" '
+            f'data-kw="kwblock_{index}" onclick="showKeyword(\'kwblock_{index}\')">'
+            f'{html.escape(str(rep.get("keyword") or ""))}</button>'
+            for index, rep in enumerate(reports)
+        ) + "</div>"
+    market_html = nav_html + "".join(blocks)
 
     return f"""<!DOCTYPE html>
 <html lang="vi">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Báo Cáo Thị Trường Đa Sàn — {keyword}</title>
+  <title>Báo Cáo Thị Trường Đa Sàn — {page_title}</title>
   <style>
     :root {{ color-scheme: dark; }}
     * {{ box-sizing: border-box; }}
@@ -913,22 +1010,30 @@ def _render_dashboard_html(report_data: Dict[str, Any]) -> str:
   <div class="wrap">
     <div class="hero">
       <span class="pill">🎯 PRODUCT HUNTER · BÁO CÁO PHÂN TÍCH THỊ TRƯỜNG ĐA SÀN &bull; {llm_engine}</span>
-      <h1>Từ khóa: "{keyword}"</h1>
-      <p class="hero-narrative">{narrative}</p>
+      <h1>{hero_h1}</h1>
+      <p class="hero-narrative">{hero_narrative}</p>
     </div>
 
-    <div class="tabs-bar">{tabs_html}</div>
-    {panels_html}
-    {logs_panel_html}
+    {market_html}
   </div>
 
   <script>
     var tabFilterState = {{}};
-    function switchMarketTab(tabId) {{
-      document.querySelectorAll('.tab-btn').forEach(function(btn) {{
-        btn.classList.toggle('active', btn.getAttribute('data-tab') === tabId);
+    function showKeyword(id) {{
+      document.querySelectorAll('.keyword-block').forEach(function(el) {{
+        el.style.display = el.id === id ? 'block' : 'none';
       }});
-      document.querySelectorAll('.sa-tab-panel').forEach(function(panel) {{
+      document.querySelectorAll('.kw-btn').forEach(function(btn) {{
+        btn.classList.toggle('active', btn.getAttribute('data-kw') === id);
+      }});
+    }}
+    function switchMarketTab(tabId, btn) {{
+      var root = (btn && btn.closest) ? (btn.closest('.keyword-block') || document) : document;
+      root.querySelectorAll('.tab-btn').forEach(function(b) {{
+        if (b.classList.contains('kw-btn')) return;
+        b.classList.toggle('active', b.getAttribute('data-tab') === tabId);
+      }});
+      root.querySelectorAll('.sa-tab-panel').forEach(function(panel) {{
         panel.style.display = (panel.id === 'panel_' + tabId) ? 'block' : 'none';
       }});
     }}
@@ -982,16 +1087,11 @@ async def run_product_hunter_flow(
     hitl_policy = str(extras.get("hitlPolicy") or "auto_skip")
     default_max_items = int(extras.get("apifyMaxItemsPerPlatform") or 20)
 
-    clean_keyword = re.sub(
-        r"^(?:phân tích|tìm|săn|nghiên cứu|tra cứu)\s+(?:sản phẩm|thị trường|từ khóa)?\s*[:\-]?\s*",
-        "",
-        keyword_prompt.strip(),
-        flags=re.IGNORECASE,
-    ).strip() or keyword_prompt.strip() or "khăn giấy gấu trúc"
-
-    slug = slugify_keyword(clean_keyword)
-    pkg_dir = output_root / "product_hunter" / slug
-    pkg_dir.mkdir(parents=True, exist_ok=True)
+    asked = re.sub(r"\s+", " ", keyword_prompt.strip()) or "khăn giấy gấu trúc"
+    clean_keyword = asked
+    chairman_brief: Dict[str, Any] = {"mode": "product", "product_name": asked, "dropped_noise": []}
+    fit_cards: List[Dict[str, Any]] = []
+    probe_store: Dict[str, Dict[str, List[Dict[str, Any]]]] = {}
     api_logs: List[Dict[str, Any]] = []
 
     def _append_tool_log(agent_id: str, res: Dict[str, Any]) -> None:
@@ -1013,15 +1113,15 @@ async def run_product_hunter_flow(
     await bridge.emit_event(
         "AGENT_START",
         liaison_id,
-        f"Nhận yêu cầu từ Telegram: '{clean_keyword}'",
-        input_payload={"keyword": clean_keyword, "source": str(opts.get("source") or "office")},
+        f"Nhận yêu cầu từ Telegram: '{asked[:180]}'",
+        input_payload={"keyword": asked[:180], "source": str(opts.get("source") or "office")},
         tokens_used=120,
     )
     recv = await execute_tool_for_agent(
         bridge,
         liaison_id,
         "telegram_receive_request",
-        {"text": clean_keyword},
+        {"text": asked[:300]},
         extras=extras,
         icon="message",
         tokens_used=80,
@@ -1030,18 +1130,202 @@ async def run_product_hunter_flow(
     await bridge.emit_event(
         "AGENT_HANDOFF",
         liaison_id,
-        "Chuyển yêu cầu sang Market Strategist",
-        target_agent_id=PRODUCT_HUNTER_AGENTS["strategist"],
+        "Chuyển câu hỏi sang Điều phối yêu cầu",
+        target_agent_id=PRODUCT_HUNTER_AGENTS["brief"],
         icon="message",
         tokens_used=40,
     )
     await bridge.emit_event(
         "AGENT_COMPLETE",
         liaison_id,
-        "Đã chuyển yêu cầu ✓",
+        "Đã chuyển câu hỏi ✓",
         icon="check",
         tokens_used=40,
     )
+
+    # ── Điều phối yêu cầu: tên sản phẩm đi thẳng, câu tư vấn thì tách mốc ──
+    brief_id = PRODUCT_HUNTER_AGENTS["brief"]
+    await bridge.emit_event(
+        "AGENT_START",
+        brief_id,
+        "Nghe câu Chủ tịch, bỏ ý ngoài việc tìm và đo sản phẩm...",
+        tokens_used=140,
+    )
+    brief_res = await execute_tool_for_agent(
+        bridge,
+        brief_id,
+        "interpret_chairman_brief",
+        {"text": asked},
+        extras=extras,
+        icon="search",
+        tokens_used=90,
+    )
+    _append_tool_log(brief_id, brief_res)
+    if isinstance(brief_res.get("data"), dict):
+        chairman_brief = brief_res["data"]
+    advisory = chairman_brief.get("mode") == "advisory"
+    category = chairman_brief.get("mode") == "category"
+    spread = advisory or category
+    rank_by = "sales" if category else "fit"
+    if not spread:
+        clean_keyword = str(chairman_brief.get("product_name") or "").strip() or asked
+    if advisory:
+        slug_source = str(chairman_brief.get("window") or chairman_brief.get("occasion_label") or "mua vu")
+    elif category:
+        slug_source = str(chairman_brief.get("category") or "nhom hang")
+    else:
+        slug_source = clean_keyword
+    slug = slugify_keyword(slug_source)
+    pkg_dir = output_root / "product_hunter" / slug
+    pkg_dir.mkdir(parents=True, exist_ok=True)
+    if advisory:
+        handoff_text = "Câu tư vấn, đưa sang Thăm dò mùa vụ"
+        handoff_target = PRODUCT_HUNTER_AGENTS["scout"]
+    elif category:
+        handoff_text = "Nhóm hàng, đưa sang Thăm dò nhóm hàng"
+        handoff_target = PRODUCT_HUNTER_AGENTS["category"]
+    else:
+        handoff_text = f"Tên sản phẩm «{clean_keyword}», đo thẳng"
+        handoff_target = PRODUCT_HUNTER_AGENTS["strategist"]
+    await bridge.emit_event(
+        "AGENT_HANDOFF",
+        brief_id,
+        handoff_text,
+        target_agent_id=handoff_target,
+        icon="message",
+        tokens_used=40,
+    )
+    await bridge.emit_event(
+        "AGENT_COMPLETE",
+        brief_id,
+        "Đã tách phần cần đo ✓",
+        icon="check",
+        tokens_used=40,
+    )
+
+    # ── Thăm dò mùa vụ: vài tên hàng, đo nhanh, chọn tên để làm báo cáo đầy đủ ──
+    scout_id = PRODUCT_HUNTER_AGENTS["category"] if category else PRODUCT_HUNTER_AGENTS["scout"]
+    if spread:
+        await bridge.emit_event(
+            "AGENT_START",
+            scout_id,
+            "Tách nhóm hàng thành vài tên cụ thể để đo sức bán..." if category else "Đổi mốc thời gian thành tên hàng có thể gõ lên sàn...",
+            tokens_used=160,
+        )
+        propose_res = await execute_tool_for_agent(
+            bridge,
+            scout_id,
+            "propose_category_products" if category else "propose_seasonal_products",
+            {"brief": chairman_brief},
+            extras=extras,
+            icon="search",
+            tokens_used=80,
+        )
+        _append_tool_log(scout_id, propose_res)
+        proposed = (propose_res.get("data") or {}).get("products") or []
+        for candidate in proposed:
+            if not isinstance(candidate, dict):
+                continue
+            probe_name = str(candidate.get("keyword") or "").strip()
+            if not probe_name or probe_name == asked:
+                continue
+            probed_items: List[Dict[str, Any]] = []
+            by_platform: Dict[str, List[Dict[str, Any]]] = {}
+            probe_mode = "sandbox"
+            probe_tools = (
+                ("addlivetag_market_search", "shopee", {"query": probe_name, "max_items": max(30, default_max_items)}),
+                ("apify_lazada_search", "lazada", {"keyword": probe_name, "max_items": default_max_items}),
+                ("apify_tiktok_shop_search", "tiktok_shop", {"keyword": probe_name, "region": "VN", "max_items": default_max_items}),
+            )
+            for tool_name, platform_key, tool_args in probe_tools:
+                probe_res = await execute_tool_for_agent(
+                    bridge,
+                    scout_id,
+                    tool_name,
+                    tool_args,
+                    extras=extras,
+                    icon="search",
+                    tokens_used=120,
+                    status_prefix=f"Đo thử «{probe_name}»",
+                )
+                _append_tool_log(scout_id, probe_res)
+                platform_items = (probe_res.get("data") or {}).get("items") or []
+                by_platform[platform_key] = platform_items
+                probed_items.extend(platform_items)
+                if probe_res.get("mode") == "live":
+                    probe_mode = "live"
+            metrics = _compute_market_overview_metrics(
+                probed_items,
+                platform_key="all",
+                mode=probe_mode,
+                provider="Đo nhanh mùa vụ",
+            )
+            fit_cards.append(
+                {
+                    "keyword": probe_name,
+                    "name": str(candidate.get("name") or probe_name),
+                    "reason": str(candidate.get("reason") or ""),
+                    "blue_ocean_score": metrics["blue_ocean_score"],
+                    "blue_ocean_label": metrics["blue_ocean_label"],
+                    "sp_count": metrics["sp_count"],
+                    "shop_count": metrics["shop_count"],
+                    "avg_price_vnd": metrics["avg_price_vnd"],
+                    "min_price_vnd": metrics["min_price_vnd"],
+                    "max_price_vnd": metrics["max_price_vnd"],
+                    "total_sold": metrics["total_sold"],
+                    "total_revenue_vnd": metrics["total_revenue_vnd"],
+                    "mode": probe_mode,
+                }
+            )
+            probe_store[probe_name] = by_platform
+        if fit_cards:
+            fit_cards = rank_products(fit_cards, by=rank_by)
+            clean_keyword = str(fit_cards[0].get("keyword") or clean_keyword)
+        elif proposed and isinstance(proposed[0], dict):
+            clean_keyword = str(proposed[0].get("keyword") or "quà tặng theo mùa")
+        else:
+            clean_keyword = "quà tặng theo mùa"
+        await bridge.emit_event(
+            "AGENT_HANDOFF",
+            scout_id,
+            f"Tên hàng để đo đầy đủ: «{clean_keyword}»",
+            target_agent_id=PRODUCT_HUNTER_AGENTS["strategist"],
+            icon="message",
+            tokens_used=40,
+        )
+        await bridge.emit_event(
+            "AGENT_COMPLETE",
+            scout_id,
+            f"Đưa {len(fit_cards)} tên vào cùng một báo cáo ✓",
+            icon="check",
+            tokens_used=50,
+        )
+        idle_id = PRODUCT_HUNTER_AGENTS["scout"] if category else PRODUCT_HUNTER_AGENTS["category"]
+        idle_text = "Câu này là nhóm hàng, không phải mùa vụ." if category else "Câu này là mùa vụ, không phải nhóm hàng."
+        await bridge.emit_event("AGENT_START", idle_id, idle_text, tokens_used=20)
+        await bridge.emit_event("AGENT_COMPLETE", idle_id, "Không thăm dò ✓", icon="check", tokens_used=10)
+    else:
+        await bridge.emit_event(
+            "AGENT_START",
+            scout_id,
+            "Câu này đã là tên sản phẩm, không thăm dò thêm.",
+            tokens_used=40,
+        )
+        await bridge.emit_event(
+            "AGENT_COMPLETE",
+            scout_id,
+            "Không thăm dò ✓",
+            icon="check",
+            tokens_used=20,
+        )
+        category_id = PRODUCT_HUNTER_AGENTS["category"]
+        await bridge.emit_event(
+            "AGENT_START",
+            category_id,
+            "Câu này đã là tên sản phẩm, không tách nhóm hàng.",
+            tokens_used=20,
+        )
+        await bridge.emit_event("AGENT_COMPLETE", category_id, "Không thăm dò ✓", icon="check", tokens_used=10)
 
     # ── PHASE 0: Market Strategist ─────────────────────────────────────────────
     s_id = PRODUCT_HUNTER_AGENTS["strategist"]
@@ -1307,7 +1591,24 @@ async def run_product_hunter_flow(
     )
 
     ai_sections = _build_structured_ai_sections(clean_keyword, overall_metrics, per_platform_metrics, voc)
-    report_payload = {
+    if not fit_cards:
+        fit_cards = [
+            {
+                "keyword": clean_keyword,
+                "name": clean_keyword,
+                "reason": "Câu hỏi đã là một tên sản phẩm, đo trực tiếp trên 3 sàn.",
+                "blue_ocean_score": overall_metrics["blue_ocean_score"],
+                "blue_ocean_label": overall_metrics["blue_ocean_label"],
+                "sp_count": overall_metrics["sp_count"],
+                "shop_count": overall_metrics["shop_count"],
+                "avg_price_vnd": overall_metrics["avg_price_vnd"],
+                "min_price_vnd": overall_metrics["min_price_vnd"],
+                "max_price_vnd": overall_metrics["max_price_vnd"],
+            }
+        ]
+    comparison_cards = [dict(card) for card in fit_cards]
+    fit_note = render_fit_note(chairman_brief, fit_cards)
+    winner_view = {
         "keyword": clean_keyword,
         "llm_engine": narrative_info["llm_engine"],
         "narrative": narrative_info["narrative"],
@@ -1319,6 +1620,20 @@ async def run_product_hunter_flow(
         "voc": voc,
         "api_logs": api_logs,
     }
+    keyword_reports: List[Dict[str, Any]] = []
+    if len(fit_cards) > 1 and probe_store:
+        for card in fit_cards:
+            kw = str(card.get("keyword") or "")
+            stored = probe_store.get(kw)
+            if kw == clean_keyword:
+                keyword_reports.append(winner_view)
+            elif stored:
+                keyword_reports.append(
+                    _bundle_from_platform_items(kw, stored, str(card.get("mode") or "sandbox"))
+                )
+    report_payload = dict(winner_view)
+    if len(keyword_reports) > 1:
+        report_payload["keyword_reports"] = keyword_reports
 
     html_path = pkg_dir / "index.html"
     md_path = pkg_dir / "market_report.md"
@@ -1326,18 +1641,30 @@ async def run_product_hunter_flow(
     zip_filename = f"ProductHunter_{slug}.zip"
     zip_path = output_root / zip_filename
 
-    html_path.write_text(_render_dashboard_html(report_payload), encoding="utf-8")
-    json_path.write_text(json.dumps(report_payload, ensure_ascii=False, indent=2), encoding="utf-8")
-    md_path.write_text(
-        f"# Báo Cáo Thị Trường Đa Sàn: {clean_keyword}\n\n"
-        f"- **Điểm Đại dương xanh**: {overall_metrics['blue_ocean_score']} / 100 ({overall_metrics['blue_ocean_label']})\n"
-        f"- **SP khớp từ khóa**: {overall_metrics['sp_count']} | **Shop đang bán**: {overall_metrics['shop_count']}\n"
-        f"- **Lượt bán lũy kế**: {overall_metrics['total_sold']:,} | **Doanh thu ước tính**: {_fmt_vnd(overall_metrics['total_revenue_vnd'])}\n"
-        f"- **Giá trung bình**: {_fmt_vnd(overall_metrics['avg_price_vnd'])} | **Khoảng giá**: {_fmt_vnd(overall_metrics['min_price_vnd'])} – {_fmt_vnd(overall_metrics['max_price_vnd'])}\n"
-        f"- **Tỷ lệ có bán**: {overall_metrics['sell_through_pct']}% | **HHI**: {overall_metrics['hhi']} | **Hoa hồng TB**: {overall_metrics['avg_commission_display']}\n\n"
-        f"## Nhận Định Thị Trường ({narrative_info['llm_engine']})\n{narrative_info['narrative']}\n",
-        encoding="utf-8",
+    html_text = _render_dashboard_html(report_payload)
+    html_text = html_text.replace(
+        "<body>",
+        "<body>\n" + fit_banner_html(
+            fit_note,
+            "Xếp hạng sức bán" if category else "Xếp hạng sản phẩm phù hợp",
+        ),
+        1,
     )
+    html_path.write_text(html_text, encoding="utf-8")
+    json_path.write_text(json.dumps(report_payload, ensure_ascii=False, indent=2), encoding="utf-8")
+    md_parts = [fit_note, ""]
+    for bundle in report_payload.get("keyword_reports") or [report_payload]:
+        bundle_overall = bundle["overall"]
+        md_parts.append(
+            f"# Báo Cáo Thị Trường Đa Sàn: {bundle['keyword']}\n\n"
+            f"- **Điểm Đại dương xanh**: {bundle_overall['blue_ocean_score']} / 100 ({bundle_overall['blue_ocean_label']})\n"
+            f"- **SP khớp từ khóa**: {bundle_overall['sp_count']} | **Shop đang bán**: {bundle_overall['shop_count']}\n"
+            f"- **Lượt bán lũy kế**: {bundle_overall['total_sold']:,} | **Doanh thu ước tính**: {_fmt_vnd(bundle_overall['total_revenue_vnd'])}\n"
+            f"- **Giá trung bình**: {_fmt_vnd(bundle_overall['avg_price_vnd'])} | **Khoảng giá**: {_fmt_vnd(bundle_overall['min_price_vnd'])} – {_fmt_vnd(bundle_overall['max_price_vnd'])}\n"
+            f"- **Tỷ lệ có bán**: {bundle_overall['sell_through_pct']}% | **HHI**: {bundle_overall['hhi']} | **Hoa hồng TB**: {bundle_overall['avg_commission_display']}\n\n"
+            f"## Nhận Định Thị Trường ({bundle.get('llm_engine') or narrative_info['llm_engine']})\n{bundle.get('narrative') or ''}\n"
+        )
+    md_path.write_text("\n".join(md_parts), encoding="utf-8")
 
     with zipfile.ZipFile(zip_path, "w", compression=zipfile.ZIP_DEFLATED) as zf:
         for fp in (html_path, md_path, json_path):
@@ -1354,6 +1681,47 @@ async def run_product_hunter_flow(
         icon="check",
         output_payload={"portal_url": portal_url, "logs_count": len(api_logs)},
         tokens_used=230 + int(narrative_info.get("tokens_used") or 0),
+    )
+    await bridge.emit_event(
+        "AGENT_HANDOFF",
+        arch_id,
+        "Đưa phiếu đo sang Tổng hợp phù hợp",
+        target_agent_id=PRODUCT_HUNTER_AGENTS["synthesizer"],
+        icon="message",
+        tokens_used=40,
+    )
+
+    syn_id = PRODUCT_HUNTER_AGENTS["synthesizer"]
+    await bridge.emit_event(
+        "AGENT_START",
+        syn_id,
+        "So phiếu đo và viết bài xếp hạng...",
+        tokens_used=160,
+    )
+    rank_res = await execute_tool_for_agent(
+        bridge,
+        syn_id,
+        "rank_product_fit",
+        {"cards": comparison_cards, "rank_by": rank_by},
+        extras=extras,
+        icon="check",
+        tokens_used=80,
+    )
+    _append_tool_log(syn_id, rank_res)
+    await bridge.emit_event(
+        "AGENT_HANDOFF",
+        syn_id,
+        "Bài xếp hạng sang Thư ký Chủ tịch",
+        target_agent_id=PRODUCT_HUNTER_AGENTS["courier"],
+        icon="message",
+        tokens_used=40,
+    )
+    await bridge.emit_event(
+        "AGENT_COMPLETE",
+        syn_id,
+        fit_note.split("\n")[0][:180],
+        icon="check",
+        tokens_used=60,
     )
 
     courier_id = PRODUCT_HUNTER_AGENTS["courier"]
@@ -1372,6 +1740,7 @@ async def run_product_hunter_flow(
             "slug": slug,
             "title": clean_keyword,
             "local_url": portal_url,
+            "note": fit_note,
         },
         extras=extras,
         icon="message",
@@ -1391,10 +1760,13 @@ async def run_product_hunter_flow(
 
     elapsed = round(time.time() - t0, 2)
     return {
-        "flow_name": "Product Hunter — Báo Cáo Chuẩn 3 Sàn + Logs (11 Agents)",
+        "flow_name": "Product Hunter — Báo Cáo Chuẩn 3 Sàn + Logs (15 Agents)",
         "prompt": keyword_prompt,
         "topic": clean_keyword,
         "slug": slug,
+        "fit_mode": chairman_brief.get("mode") or "product",
+        "fit_note": fit_note,
+        "fit_ranking": [str(card.get("name") or "") for card in fit_cards],
         "elapsed_seconds": elapsed,
         "portal_url": portal_url,
         "result_url": public_url or portal_url,

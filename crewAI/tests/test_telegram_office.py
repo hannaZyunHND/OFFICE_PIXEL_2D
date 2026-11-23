@@ -48,6 +48,13 @@ class TestTelegramOffice(unittest.TestCase):
         missing = build_delivery_message("Hộp gỗ", "", "đẩy lỗi")
         self.assertIn("chưa có link", missing)
         self.assertIn("đẩy lỗi", missing)
+        noted = build_delivery_message(
+            "Hộp quà Tết",
+            "https://example.github.io/pixel-office-reports/tet/",
+            note="Phù hợp nhất: Hộp quà Tết",
+        )
+        self.assertTrue(noted.startswith("Phù hợp nhất: Hộp quà Tết"))
+        self.assertIn("https://example.github.io/pixel-office-reports/tet/", noted)
 
     def test_decode_jpeg_rejects_non_jpeg(self) -> None:
         self.assertEqual(decode_jpeg(""), b"")
