@@ -1,5 +1,5 @@
 """
-CrewAI Flow: Product Hunter — Phân Tích Thị Trường Đa Sàn TMĐT (8 Agents · Tự Động Toàn Trình)
+CrewAI Flow: Product Hunter — Phân Tích Thị Trường Đa Sàn TMĐT (11 Agents · Tự Động Toàn Trình)
 -----------------------------------------------------------------------------------------------
 - Mặc định chạy TỰ ĐỘNG 100% (`hitlPolicy="auto_skip"`) xuất Báo cáo Thị trường chuẩn
   ShopeeAnalytics cho 3 sàn:
@@ -27,9 +27,11 @@ from pixel_office_sdk import PixelOfficeBridge
 import providers.ecommerce_providers  # noqa: F401
 from providers.ecommerce_providers import get_platform_capabilities
 from tool_registry import execute_tool_for_agent
+import telegram_office  # noqa: F401
 
 
 PRODUCT_HUNTER_AGENTS = {
+    "liaison": "agent_telegram_liaison",
     "strategist": "agent_market_strategist",
     "shopee": "agent_shopee_hunter",
     "lazada": "agent_lazada_hunter",
@@ -38,6 +40,8 @@ PRODUCT_HUNTER_AGENTS = {
     "voc": "agent_voc_miner",
     "auditor": "agent_market_auditor",
     "architect": "agent_report_architect",
+    "camera": "agent_office_camera",
+    "courier": "agent_chairman_courier",
 }
 
 API_NOT_READY = "(API đang phát triển)"
@@ -1004,6 +1008,41 @@ async def run_product_hunter_flow(
             }
         )
 
+    # ── Liên lạc Telegram: xác nhận yêu cầu Chủ tịch vừa nhắn ────────────────
+    liaison_id = PRODUCT_HUNTER_AGENTS["liaison"]
+    await bridge.emit_event(
+        "AGENT_START",
+        liaison_id,
+        f"Nhận yêu cầu từ Telegram: '{clean_keyword}'",
+        input_payload={"keyword": clean_keyword, "source": str(opts.get("source") or "office")},
+        tokens_used=120,
+    )
+    recv = await execute_tool_for_agent(
+        bridge,
+        liaison_id,
+        "telegram_receive_request",
+        {"text": clean_keyword},
+        extras=extras,
+        icon="message",
+        tokens_used=80,
+    )
+    _append_tool_log(liaison_id, recv)
+    await bridge.emit_event(
+        "AGENT_HANDOFF",
+        liaison_id,
+        "Chuyển yêu cầu sang Market Strategist",
+        target_agent_id=PRODUCT_HUNTER_AGENTS["strategist"],
+        icon="message",
+        tokens_used=40,
+    )
+    await bridge.emit_event(
+        "AGENT_COMPLETE",
+        liaison_id,
+        "Đã chuyển yêu cầu ✓",
+        icon="check",
+        tokens_used=40,
+    )
+
     # ── PHASE 0: Market Strategist ─────────────────────────────────────────────
     s_id = PRODUCT_HUNTER_AGENTS["strategist"]
     await bridge.emit_event(
@@ -1317,15 +1356,50 @@ async def run_product_hunter_flow(
         tokens_used=230 + int(narrative_info.get("tokens_used") or 0),
     )
 
+    courier_id = PRODUCT_HUNTER_AGENTS["courier"]
+    await bridge.emit_event(
+        "AGENT_START",
+        courier_id,
+        "Đăng báo cáo lên GitHub Pages và gửi link cho Chủ tịch...",
+        tokens_used=180,
+    )
+    deliver = await execute_tool_for_agent(
+        bridge,
+        courier_id,
+        "telegram_deliver_report",
+        {
+            "html_path": str(html_path),
+            "slug": slug,
+            "title": clean_keyword,
+            "local_url": portal_url,
+        },
+        extras=extras,
+        icon="message",
+        tokens_used=160,
+    )
+    _append_tool_log(courier_id, deliver)
+    deliver_data = deliver.get("data") if isinstance(deliver.get("data"), dict) else {}
+    public_url = str((deliver_data or {}).get("public_url") or "")
+    await bridge.emit_event(
+        "AGENT_COMPLETE",
+        courier_id,
+        "Đã gửi link cho Chủ tịch ✓" if public_url else "Đã xử lý bàn giao báo cáo ✓",
+        icon="check",
+        output_payload={"public_url": public_url},
+        tokens_used=80,
+    )
+
     elapsed = round(time.time() - t0, 2)
     return {
-        "flow_name": "Product Hunter — Báo Cáo Chuẩn 3 Sàn + Logs (8 Agents)",
+        "flow_name": "Product Hunter — Báo Cáo Chuẩn 3 Sàn + Logs (11 Agents)",
         "prompt": keyword_prompt,
         "topic": clean_keyword,
         "slug": slug,
         "elapsed_seconds": elapsed,
         "portal_url": portal_url,
-        "result_url": portal_url,
+        "result_url": public_url or portal_url,
+        "public_url": public_url,
+        "pages_attempted": True,
         "zip_url": zip_url,
         "zip_filename": zip_filename,
         "files_count": 3,

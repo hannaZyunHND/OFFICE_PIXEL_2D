@@ -19,9 +19,12 @@ describe('Product Hunter Crew, HITL UI State & Provider Extras Config', () => {
     setActivePinia(createPinia());
   });
 
-  it('compiles PRODUCT_HUNTER_MARKDOWN into a valid 8-agent OfficeBlueprint with A* walkable paths', () => {
+  it('compiles PRODUCT_HUNTER_MARKDOWN into a valid 11-agent OfficeBlueprint with A* walkable paths', () => {
     const topology = parseMarkdownDeterministically(PRODUCT_HUNTER_MARKDOWN);
-    expect(topology.agents.length).toBe(8);
+    expect(topology.agents.length).toBe(11);
+    expect(topology.agents[0]?.id).toBe('agent_telegram_liaison');
+    expect(topology.agents.some((a) => a.id === 'agent_office_camera')).toBe(true);
+    expect(topology.agents.some((a) => a.id === 'agent_chairman_courier')).toBe(true);
     expect(topology.agents.some((a) => a.id === 'agent_shopee_hunter')).toBe(true);
     expect(topology.agents.some((a) => a.id === 'agent_lazada_hunter')).toBe(true);
     expect(topology.agents.some((a) => a.id === 'agent_tiktok_hunter')).toBe(true);
@@ -45,11 +48,11 @@ describe('Product Hunter Crew, HITL UI State & Provider Extras Config', () => {
     const ph = seeds.find((w) => w.id === 'product_hunter_crewai');
     expect(ph).toBeDefined();
     expect(ph?.crew_endpoint_url).toBe(`${DEFAULT_CREWAI_WS_ORIGIN}/product-hunter`);
-    expect(ph?.blueprint.agents.length).toBe(8);
+    expect(ph?.blueprint.agents.length).toBe(11);
     expect(ph?.steps.length).toBeGreaterThan(10);
 
     const bp = ph!.blueprint;
-    expect(bp.meta.layout_profile).toBe('product_hunter_minimal_v1');
+    expect(bp.meta.layout_profile).toBe('product_hunter_minimal_v2');
 
     const types = bp.furniture.map((f) => f.type);
     expect(types).toContain('LARGE_AQUARIUM');
@@ -65,7 +68,7 @@ describe('Product Hunter Crew, HITL UI State & Provider Extras Config', () => {
     expect(types).not.toContain('ECO_BIOME_DOME');
     expect(types).not.toContain('KOI_POND');
     expect(types).not.toContain('CORGI_DOG');
-    expect(bp.furniture.length).toBe(18);
+    expect(bp.furniture.length).toBe(21);
 
     const pathfinder = new GridPathfinder(bp);
     const desk0 = bp.furniture.find((f) => f.id === bp.agents[0].desk_id)!;

@@ -15,6 +15,7 @@ Thumbs.db
 __pycache__/
 *.py[cod]
 data/*.sqlite*
+data/telegram_offset.txt
 tsconfig.tsbuildinfo
 logs/
 crewAI/output/ProductHunter_*.zip

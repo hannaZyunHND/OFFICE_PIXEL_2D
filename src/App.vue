@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, onMounted, onBeforeUnmount } from 'vue';
+import { ref, onMounted, onBeforeUnmount, watch } from 'vue';
 import PixelOfficeCanvas from '@/components/canvas/PixelOfficeCanvas.vue';
 import TopHudBar from '@/components/hud/TopHudBar.vue';
 import ModeStatusBanner from '@/components/hud/ModeStatusBanner.vue';
@@ -37,6 +37,42 @@ const settingsStore = useSettingsStore();
 const runHistoryStore = useRunHistoryStore();
 
 let eventBus: EventBusManager | null = null;
+let snapshotTimer: ReturnType<typeof setInterval> | null = null;
+let snapshotInFlight = false;
+
+function stopOfficeSnapshots(): void {
+  if (snapshotTimer) {
+    clearInterval(snapshotTimer);
+    snapshotTimer = null;
+  }
+}
+
+function pushOfficeSnapshot(): void {
+  if (!eventBus || snapshotInFlight || !uiStore.crewAiFlowRunning) return;
+  if (workflowStore.activeWorkflow?.id !== 'product_hunter_crewai') return;
+  if (!eventBus.wsClient.isConnected()) return;
+  snapshotInFlight = true;
+  try {
+    const dataUrl = canvasRef.value?.captureOfficePanorama();
+    if (!dataUrl || !uiStore.crewAiFlowRunning) return;
+    const comma = dataUrl.indexOf(',');
+    const image = comma >= 0 ? dataUrl.slice(comma + 1) : dataUrl;
+    if (image.length < 80) return;
+    eventBus.wsClient.sendOfficeSnapshot(image, 'Toàn cảnh văn phòng');
+  } finally {
+    snapshotInFlight = false;
+  }
+}
+
+watch(
+  () => uiStore.crewAiFlowRunning,
+  (running) => {
+    stopOfficeSnapshots();
+    if (!running) return;
+    pushOfficeSnapshot();
+    snapshotTimer = setInterval(pushOfficeSnapshot, 10_000);
+  },
+);
 
 function handleIngestEvent(event: AgentEvent): void {
   // 1. Record bounded telemetry event in Pinia (RingBuffer 200 cap + 10KB truncation)
@@ -76,7 +112,20 @@ onMounted(async () => {
       },
       onFlowStarted: (prompt) => {
         uiStore.crewAiFlowRunning = true;
+        uiStore.crewAiPrompt = prompt;
         uiStore.isGodView = true;
+        if (!runHistoryStore.activeRunId) {
+          const activeWf = workflowStore.activeWorkflow;
+          runHistoryStore.startRunSession({
+            workflowId: activeWf?.id || 'product_hunter_crewai',
+            workflowName: activeWf?.name || 'Product Hunter',
+            endpointUrl: activeWf?.crew_endpoint_url || DEFAULT_CREWAI_WS_ORIGIN,
+            prompt,
+          });
+        }
+        if (!canvasRef.value?.isDirectorBriefing()) {
+          void canvasRef.value?.startDirectorBriefing(prompt);
+        }
         uiStore.showToast(
           `🚀 CrewAI (${workflowStore.activeWorkflow?.crew_endpoint_url || DEFAULT_CREWAI_WS_ORIGIN}) đang thực thi: "${prompt}"`,
           'info',
@@ -155,6 +204,7 @@ onMounted(async () => {
 });
 
 onBeforeUnmount(() => {
+  stopOfficeSnapshots();
   eventBus?.destroy();
   window.removeEventListener('keydown', handleGlobalKeydown);
 });

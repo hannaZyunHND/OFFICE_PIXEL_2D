@@ -94,6 +94,17 @@ export class WebSocketClient {
     }
   }
 
+  public sendOfficeSnapshot(imageBase64: string, caption: string): void {
+    if (!imageBase64 || !this.ws || this.ws.readyState !== WebSocket.OPEN) return;
+    this.ws.send(
+      JSON.stringify({
+        type: 'OFFICE_SNAPSHOT',
+        image_base64: imageBase64,
+        caption,
+      }),
+    );
+  }
+
   public sendHumanApprovalResponse(response: HitlApprovalResponse): void {
     const payload = JSON.stringify({
       type: 'HUMAN_APPROVAL_RESPONSE',

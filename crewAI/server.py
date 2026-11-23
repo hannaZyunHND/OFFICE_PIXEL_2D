@@ -20,6 +20,8 @@ from flows.game_factory_flow import (
 )
 from flows.elearning_lesson_flow import run_elearning_lesson_flow
 from flows.product_hunter_flow import run_product_hunter_flow
+from publish_pages import publish_product_report
+import telegram_office
 
 OUTPUT_DIR = Path(__file__).resolve().parent / "output"
 
@@ -152,7 +154,7 @@ async def main() -> None:
             f'[CrewAI Flow] Dispatching prompt="{prompt}" | workflow="{workflow_name}" | endpoint="{endpoint_url}"'
         )
 
-        # 0. Product Hunter Multi-Marketplace Crew (8 Agents · Shopee / Lazada / TikTok Shop)
+        # 0. Product Hunter Multi-Marketplace Crew (11 Agents · Shopee / Lazada / TikTok Shop)
         if (
             "product-hunter" in endpoint_url
             or "product_hunter" in workflow_id
@@ -167,8 +169,26 @@ async def main() -> None:
                 step_delay=step_delay,
                 options=options,
             )
+            if not result.get("pages_attempted"):
+                html_path = OUTPUT_DIR / "product_hunter" / str(result.get("slug") or "") / "index.html"
+                try:
+                    public_url = await asyncio.to_thread(
+                        publish_product_report,
+                        html_path,
+                        str(result.get("slug") or ""),
+                        str(result.get("topic") or result.get("prompt") or ""),
+                    )
+                except Exception as exc:
+                    public_url = ""
+                    print(f"[Pages] Không đẩy được báo cáo lên host công khai: {exc}")
+                if public_url:
+                    result["result_url"] = public_url
+                    result["public_url"] = public_url
+            public_url = str(result.get("public_url") or "")
+            if public_url:
+                print(f"[Pages] Báo cáo công khai: {public_url}")
             print(
-                f'[CrewAI Product Hunter] Completed in {result["elapsed_seconds"]}s -> {result["portal_url"]}'
+                f'[CrewAI Product Hunter] Completed in {result["elapsed_seconds"]}s -> {result.get("result_url") or result["portal_url"]}'
             )
             return result
 
@@ -220,10 +240,15 @@ async def main() -> None:
         return result
 
     bridge.on_task_dispatch(handle_task)
-
-    ws_server = await bridge.start_ws_server()
-    print(f"[CrewAI Server] Ready! WS=ws://{host}:{crew_port} | Portal={portal_base}/")
-    await ws_server.wait_closed()
+    telegram_office.bind_bridge(bridge)
+    bridge.set_office_snapshot_handler(telegram_office.handle_office_snapshot)
+    intake_task = asyncio.create_task(telegram_office.run_chairman_intake(bridge))
+    try:
+        ws_server = await bridge.start_ws_server()
+        print(f"[CrewAI Server] Ready! WS=ws://{host}:{crew_port} | Portal={portal_base}/")
+        await ws_server.wait_closed()
+    finally:
+        intake_task.cancel()
 
 
 if __name__ == "__main__":

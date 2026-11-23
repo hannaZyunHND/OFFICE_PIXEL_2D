@@ -181,6 +181,14 @@ function resetCamera(): void {
   rendererRef.value?.resetCamera();
 }
 
+function isDirectorBriefing(): boolean {
+  return rendererRef.value?.isDirectorBriefing() ?? false;
+}
+
+function captureOfficePanorama(): string | null {
+  return rendererRef.value?.captureOfficePanorama() ?? null;
+}
+
 async function reloadCustomAssets(): Promise<void> {
   const sprites = await getAllCustomSpriteAssets();
   await rendererRef.value?.registerCustomAssets(sprites);
@@ -193,6 +201,8 @@ defineExpose({
   resolveAgentHumanApproval,
   resetCamera,
   reloadCustomAssets,
+  isDirectorBriefing,
+  captureOfficePanorama,
 });
 
 onBeforeUnmount(() => {

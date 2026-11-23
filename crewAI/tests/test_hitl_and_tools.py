@@ -107,7 +107,14 @@ class TestExternalToolsAndHitl(unittest.IsolatedAsyncioTestCase):
         bridge = PixelOfficeBridge()
         with patch.dict(
             os.environ,
-            {"ADDLIVETAG_API_KEY": "", "APIFY_API_TOKEN": "", "SERPER_API_KEY": ""},
+            {
+                "ADDLIVETAG_API_KEY": "",
+                "APIFY_API_TOKEN": "",
+                "SERPER_API_KEY": "",
+                "TELEGRAM_BOT_TOKEN": "",
+                "TELEGRAM_CHAT_ID": "",
+                "REPORT_PUBLISH": "off",
+            },
             clear=False,
         ):
             with tempfile.TemporaryDirectory() as tmpdir:

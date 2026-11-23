@@ -58,6 +58,13 @@ class PixelOfficeBridge:
         self._relay_client_ws: Optional[Any] = None
         self._pending_approvals: Dict[str, asyncio.Future[Dict[str, Any]]] = {}
         self._tool_metadata_list: List[Dict[str, Any]] = []
+        self._office_snapshot_handler: Optional[Callable[[str, str], Awaitable[None]]] = None
+
+    def set_office_snapshot_handler(
+        self, handler: Callable[[str, str], Awaitable[None]]
+    ) -> None:
+        """Receives an office panorama (base64 JPEG) from the open browser."""
+        self._office_snapshot_handler = handler
 
     def set_tool_metadata(self, tools: List[Dict[str, Any]]) -> None:
         """Registers external tool schemas so connected frontends can inspect available functions."""
@@ -278,6 +285,12 @@ class PixelOfficeBridge:
                     ).strip()
                     options = data.get("options") or {}
                     await self.trigger_flow(prompt, options)
+                elif msg_type == "OFFICE_SNAPSHOT":
+                    handler = self._office_snapshot_handler
+                    image_b64 = str(data.get("image_base64") or "")
+                    caption = str(data.get("caption") or "")
+                    if handler and image_b64:
+                        asyncio.create_task(self._forward_office_snapshot(handler, image_b64, caption))
                 elif msg_type == "HUMAN_APPROVAL_RESPONSE":
                     resp = data.get("response") if isinstance(data.get("response"), dict) else data
                     approval_id = str(resp.get("approval_id") or "")
@@ -332,6 +345,17 @@ class PixelOfficeBridge:
                 )
 
         self._running_task = asyncio.create_task(_runner())
+
+    async def _forward_office_snapshot(
+        self,
+        handler: Callable[[str, str], Awaitable[None]],
+        image_b64: str,
+        caption: str,
+    ) -> None:
+        try:
+            await handler(image_b64, caption)
+        except Exception as exc:
+            print(f"[Telegram] Không gửi được ảnh văn phòng: {exc}")
 
     def _process_http_request(self, _connection: Any, request: Any) -> Optional[Response]:
         """
@@ -391,6 +415,7 @@ class PixelOfficeBridge:
                 self._handle_client,
                 self.host,
                 self.ws_port,
+                max_size=8 * 1024 * 1024,
                 process_request=self._process_http_request if self.static_output_dir else None,
             )
             print(

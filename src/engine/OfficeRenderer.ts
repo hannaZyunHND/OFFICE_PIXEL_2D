@@ -68,6 +68,24 @@ export interface OfficeRendererCallbacks {
   onSpeechMessage?: (msg: OfficeSpeechEvent) => void;
 }
 
+function shrinkCanvasToJpeg(
+  source: HTMLCanvasElement | OffscreenCanvas,
+): string | null {
+  const srcW = source.width || 0;
+  const srcH = source.height || 0;
+  if (srcW < 2 || srcH < 2) return null;
+  const width = Math.max(2, Math.min(1100, srcW));
+  const height = Math.max(2, Math.round((srcH * width) / srcW));
+  const out = document.createElement('canvas');
+  out.width = width;
+  out.height = height;
+  const ctx = out.getContext('2d');
+  if (!ctx) return null;
+  ctx.imageSmoothingEnabled = false;
+  ctx.drawImage(source, 0, 0, width, height);
+  return out.toDataURL('image/jpeg', 0.62);
+}
+
 /**
  * Core 2D Pixel Office Engine (PixiJS v8 + EasyStar.js).
  * Strictly isolated from Vue reactivity to guarantee a locked 60 FPS loop.
@@ -582,6 +600,44 @@ export class OfficeRenderer {
     const buffered = this.briefingBufferedEvents.splice(0);
     for (const ev of buffered) {
       this.agentEntities.get(ev.agent_id)?.enqueueEvent(ev);
+    }
+  }
+
+  public isDirectorBriefing(): boolean {
+    return this.isBriefingActive;
+  }
+
+  /** JPEG of the whole office, not just the current camera view. */
+  public captureOfficePanorama(): string | null {
+    const app = this.app;
+    if (!app) return null;
+    const extract = (
+      app.renderer as unknown as {
+        extract?: {
+          canvas?: (options: { target: Container }) => CanvasImageSource & {
+            width?: number;
+            height?: number;
+            toDataURL?: (type: string, quality?: number) => string;
+            canvas?: HTMLCanvasElement;
+          };
+        };
+      }
+    ).extract;
+    try {
+      const shot = extract?.canvas?.({ target: this.worldContainer });
+      const source =
+        shot && 'canvas' in shot && shot.canvas
+          ? shot.canvas
+          : (shot as HTMLCanvasElement | undefined);
+      const jpeg = source ? shrinkCanvasToJpeg(source) : null;
+      if (jpeg) return jpeg;
+    } catch (err) {
+      console.warn('[Office] Không chụp được toàn cảnh', err);
+    }
+    try {
+      return shrinkCanvasToJpeg(app.canvas as HTMLCanvasElement);
+    } catch {
+      return null;
     }
   }
 

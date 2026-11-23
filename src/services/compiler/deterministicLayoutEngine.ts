@@ -731,8 +731,8 @@ export function generateDeterministicBlueprint(
 
 /**
  * Generates the streamlined, minimalist Studio Layout specifically requested for Product Hunter:
- * - WORK zone: 6 Agent desks + ONLY 1 Office Cat (OFFICE_CAT) & 1 Robot Vacuum (ROBOT_VACUUM).
- * - APPROVAL zone: 2 Auditor/Architect desks.
+ * - WORK zone: hunter desks + ONLY 1 Office Cat (OFFICE_CAT) & 1 Robot Vacuum (ROBOT_VACUUM).
+ * - APPROVAL zone: Auditor, Architect, and the chairman courier.
  * - IDLE zone ("Phòng Chơi & Pantry"): ONLY Pantry (COFFEE_MACHINE + MINI_BAR_COUNTER) + PS5_PES_STATION + FOOSBALL_TABLE.
  * - DIRECTOR zone ("Phòng Giám Đốc (Tôi)"): DIRECTOR_DESK + LARGE_AQUARIUM (4x2) + BOOKSHELF (2x1) + visitor SOFA.
  */
@@ -947,7 +947,7 @@ export function generateProductHunterMinimalBlueprint(
       grid_cols: gridCols,
       grid_rows: gridRows,
       tile_size: 32,
-      layout_profile: 'product_hunter_minimal_v1',
+      layout_profile: 'product_hunter_minimal_v2',
     },
     zones,
     furniture,

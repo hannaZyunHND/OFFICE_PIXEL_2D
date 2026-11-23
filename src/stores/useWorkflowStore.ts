@@ -25,13 +25,24 @@ import { pickRandomAgentAvatarId } from '@/data/agentAvatarCatalog';
 import { normalizeLegacyCrewWsUrl } from '@/config/runtimeEndpoints';
 
 const LOCAL_MIRROR_KEY = 'pixel_office_sqlite_workflows_mirror_v1';
+const RETIRED_WORKFLOW_IDS = new Set([
+  'game_factory_crewai',
+  'research_crew_full',
+  'cybersec_product_crew',
+]);
+
+function withoutRetiredWorkflows(
+  list: StoredWorkflowRecord[],
+): StoredWorkflowRecord[] {
+  return list.filter((workflow) => !RETIRED_WORKFLOW_IDS.has(workflow.id));
+}
 
 export const useWorkflowStore = defineStore('workflow', () => {
   const blueprintStore = useBlueprintStore();
   const settingsStore = useSettingsStore();
 
   const workflows = ref<StoredWorkflowRecord[]>(buildDefaultSeedWorkflows());
-  const activeWorkflowId = ref<string>('game_factory_crewai');
+  const activeWorkflowId = ref<string>('product_hunter_crewai');
   const sqliteReady = ref<boolean>(false);
   const lastSavedAt = ref<number>(Date.now());
 
@@ -47,9 +58,12 @@ export const useWorkflowStore = defineStore('workflow', () => {
       const res = await fetch('/api/workflows');
       if (res.ok) {
         const data = await res.json();
-        const dbList: StoredWorkflowRecord[] = Array.isArray(data.workflows)
-          ? data.workflows
-          : [];
+        const dbList: StoredWorkflowRecord[] = withoutRetiredWorkflows(
+          Array.isArray(data.workflows) ? data.workflows : [],
+        );
+        const retiredIds = (Array.isArray(data.workflows) ? data.workflows : [])
+          .map((workflow: StoredWorkflowRecord) => workflow.id)
+          .filter((id: string) => RETIRED_WORKFLOW_IDS.has(id));
 
         if (dbList.length === 0) {
           await fetch('/api/workflows', {
@@ -82,24 +96,35 @@ export const useWorkflowStore = defineStore('workflow', () => {
 
             const furnList = w.blueprint?.furniture || [];
             if (w.id === 'product_hunter_crewai') {
+              const hunterSeed = defaults.find((d) => d.id === 'product_hunter_crewai');
               const needsMinimalUpgrade =
-                w.blueprint?.meta?.layout_profile !== 'product_hunter_minimal_v1';
-              if (needsMinimalUpgrade || needsEndpointMigration) {
+                w.blueprint?.meta?.layout_profile !== 'product_hunter_minimal_v2';
+              const needsCopyRefresh = Boolean(
+                hunterSeed &&
+                  (w.name !== hunterSeed.name || w.description !== hunterSeed.description),
+              );
+              if (needsMinimalUpgrade || needsCopyRefresh || needsEndpointMigration) {
                 upgradedAny = true;
-                const minimalBp = needsMinimalUpgrade
-                  ? generateProductHunterMinimalBlueprint(
-                      parseMarkdownDeterministically(
-                        w.raw_requirement || PRODUCT_HUNTER_MARKDOWN,
-                      ),
-                    )
-                  : w.blueprint;
+                const minimalBp =
+                  needsMinimalUpgrade || needsCopyRefresh
+                    ? generateProductHunterMinimalBlueprint(
+                        parseMarkdownDeterministically(
+                          hunterSeed?.raw_requirement ||
+                            w.raw_requirement ||
+                            PRODUCT_HUNTER_MARKDOWN,
+                        ),
+                      )
+                    : w.blueprint;
                 return {
                   ...w,
+                  name: hunterSeed?.name || w.name,
+                  description: hunterSeed?.description || w.description,
+                  raw_requirement: hunterSeed?.raw_requirement || w.raw_requirement,
                   crew_endpoint_url: normalizedEndpoint,
                   integration_doc_md: generateCrewAiIntegrationDoc(
                     minimalBp,
                     w.id,
-                    w.raw_requirement,
+                    hunterSeed?.raw_requirement || w.raw_requirement,
                     normalizedEndpoint,
                   ),
                   avatar_catalog_v2: true,
@@ -231,6 +256,13 @@ export const useWorkflowStore = defineStore('workflow', () => {
             });
           }
         }
+        await Promise.all(
+          retiredIds.map((id) =>
+            fetch(`/api/workflows?id=${encodeURIComponent(id)}`, {
+              method: 'DELETE',
+            }),
+          ),
+        );
         sqliteReady.value = true;
         saveLocalMirror(workflows.value);
       } else {
@@ -362,8 +394,11 @@ export const useWorkflowStore = defineStore('workflow', () => {
       const raw = window.localStorage.getItem(LOCAL_MIRROR_KEY);
       if (raw) {
         const parsed = JSON.parse(raw) as StoredWorkflowRecord[];
-        if (Array.isArray(parsed) && parsed.length > 0) {
-          workflows.value = parsed.map((w) => ({
+        const kept = withoutRetiredWorkflows(
+          Array.isArray(parsed) ? parsed : [],
+        );
+        if (kept.length > 0) {
+          workflows.value = kept.map((w) => ({
             ...w,
             crew_endpoint_url: normalizeLegacyCrewWsUrl(w.crew_endpoint_url),
           }));

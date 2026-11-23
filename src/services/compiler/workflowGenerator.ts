@@ -2,18 +2,10 @@ import type { OfficeBlueprint } from '@/types/blueprint';
 import type { AgentEvent, ToolIconType } from '@/types/events';
 import type { Stage1SemanticTopology } from '@/types/assets';
 import {
-  GAME_FACTORY_WORKFLOW_MARKDOWN,
-  COMPACT_5_AGENT_MARKDOWN,
   PRODUCT_HUNTER_MARKDOWN,
   parseMarkdownDeterministically,
 } from './llmTopologyExtractor';
-import {
-  findBestSlotForFurniture,
-  generateDeterministicBlueprint,
-  generateProductHunterMinimalBlueprint,
-} from './deterministicLayoutEngine';
-import defaultBlueprintData from '@/data/defaultBlueprint.json';
-import { MOCK_SCENARIOS } from '@/data/mockScenarios';
+import { generateProductHunterMinimalBlueprint } from './deterministicLayoutEngine';
 import { pickRandomAgentAvatarId } from '@/data/agentAvatarCatalog';
 import { DEFAULT_CREWAI_WS_ORIGIN } from '@/config/runtimeEndpoints';
 
@@ -473,63 +465,9 @@ export function parseChatOrMarkdownRequirement(
 }
 
 /**
- * Builds the 3 default seed workflows stored in SQLite so the user can switch
- * between them immediately and inspect their blueprints + endpoint URLs + technical docs.
+ * The only built-in office. Older sample crews are not seeded again.
  */
 export function buildDefaultSeedWorkflows(): StoredWorkflowRecord[] {
-  // 1. Multi-Agent Game Factory (11 Agents, 28x23 Tiles)
-  const gameFactoryUrl = `${DEFAULT_CREWAI_WS_ORIGIN}/game-factory`;
-  const gameFactoryTopology = parseMarkdownDeterministically(
-    GAME_FACTORY_WORKFLOW_MARKDOWN,
-  );
-  const gameFactoryBlueprint = generateDeterministicBlueprint(gameFactoryTopology);
-  const gameFactorySteps =
-    MOCK_SCENARIOS.find((s) => s.id === 'game_factory_crewai')?.steps ||
-    synthesizeSimulationStepsForBlueprint(gameFactoryBlueprint);
-  const gameFactoryRaw = `URL kết nối: ${gameFactoryUrl}\n${GAME_FACTORY_WORKFLOW_MARKDOWN}`;
-
-  // 2. Autonomous Research Crew (4 Agents, 24x16 Tiles)
-  const researchUrl = `${DEFAULT_CREWAI_WS_ORIGIN}/research-crew`;
-  const researchBlueprint = JSON.parse(
-    JSON.stringify(defaultBlueprintData),
-  ) as OfficeBlueprint;
-  const usedResearchAvatars: string[] = [];
-  researchBlueprint.agents = researchBlueprint.agents.map((agent) => {
-    if (agent.avatar_sprite === 'director_ceo') return agent;
-    const avatar = pickRandomAgentAvatarId({ excludeIds: usedResearchAvatars });
-    usedResearchAvatars.push(avatar);
-    return { ...agent, avatar_sprite: avatar };
-  });
-  if (!researchBlueprint.furniture.some((f) => f.type === 'PS5_PES_STATION')) {
-    const ps5Slot = findBestSlotForFurniture(
-      researchBlueprint,
-      'PS5_PES_STATION',
-      [2, 1],
-      'IDLE',
-      'ps5_pes',
-    );
-    if (ps5Slot) researchBlueprint.furniture.push(ps5Slot);
-  }
-  const researchSteps =
-    MOCK_SCENARIOS.find((s) => s.id === 'research_crew_full')?.steps ||
-    synthesizeSimulationStepsForBlueprint(researchBlueprint);
-  const researchRawMd = `URL kết nối: ${researchUrl}
-# Autonomous Research Crew (4 Agents)
-## Danh Sách Nhân Sự (Agents)
-1. **Alice (Researcher)** — Thu thập & Tổng hợp dữ liệu (Khu Phát Triển)
-2. **Bob (Data Analyst)** — Phân tích định lượng & Kiểm chứng (Khu Phát Triển)
-3. **Clara (Tech Writer)** — Biên soạn báo cáo & Trực quan hóa (Khu Phát Triển)
-4. **Viktor (QA Supervisor)** — Kiểm duyệt chất lượng & Phê duyệt (Phòng Kiểm Duyệt)
-`;
-
-  // 3. CyberSec & Full-Stack Product Squad (5 Agents)
-  const cyberUrl = `${DEFAULT_CREWAI_WS_ORIGIN}/cybersec-crew`;
-  const cyberTopology = parseMarkdownDeterministically(COMPACT_5_AGENT_MARKDOWN);
-  const cyberBlueprint = generateDeterministicBlueprint(cyberTopology);
-  const cyberSteps = synthesizeSimulationStepsForBlueprint(cyberBlueprint);
-  const cyberRaw = `URL kết nối: ${cyberUrl}\n${COMPACT_5_AGENT_MARKDOWN}`;
-
-  // 4. Product Hunter — 3 Sàn TMĐT (Shopee / Lazada / TikTok Shop — 8 Agents)
   const hunterUrl = `${DEFAULT_CREWAI_WS_ORIGIN}/product-hunter`;
   const hunterTopology = parseMarkdownDeterministically(PRODUCT_HUNTER_MARKDOWN);
   const hunterBlueprint = generateProductHunterMinimalBlueprint(hunterTopology);
@@ -538,61 +476,10 @@ export function buildDefaultSeedWorkflows(): StoredWorkflowRecord[] {
 
   return [
     {
-      id: 'game_factory_crewai',
-      name: 'Multi-Agent Game Factory (CrewAI Flows — 11 Agents)',
-      description:
-        'Mô hình phòng ban 11 Agents (28x23 tiles): Phase 1 Tuần tự → Phase 2 Rẽ nhánh song song 3 luồng (Arcade/Sim/Puzzle) + Vòng lặp QA/Vision Critic → Phase 3 Đóng gói Portal.',
-      crew_endpoint_url: gameFactoryUrl,
-      raw_requirement: gameFactoryRaw,
-      blueprint: gameFactoryBlueprint,
-      steps: gameFactorySteps,
-      integration_doc_md: generateCrewAiIntegrationDoc(
-        gameFactoryBlueprint,
-        'game_factory_crewai',
-        gameFactoryRaw,
-        gameFactoryUrl,
-      ),
-      created_at: Date.now() - 30000,
-    },
-    {
-      id: 'research_crew_full',
-      name: 'Autonomous Research Crew — Viết Báo Cáo Nghiên Cứu (4 Agents)',
-      description:
-        'Mô hình phòng ban 4 Agents tiêu chuẩn (24x16 tiles): Alice (Researcher) → Bob (Analyst) → Clara (Writer) → Viktor (QA Supervisor).',
-      crew_endpoint_url: researchUrl,
-      raw_requirement: researchRawMd,
-      blueprint: researchBlueprint,
-      steps: researchSteps,
-      integration_doc_md: generateCrewAiIntegrationDoc(
-        researchBlueprint,
-        'research_crew_full',
-        researchRawMd,
-        researchUrl,
-      ),
-      created_at: Date.now() - 20000,
-    },
-    {
-      id: 'cybersec_product_crew',
-      name: 'CyberSec & Product Squad — Phát Triển & Bảo Mật (5 Agents)',
-      description:
-        'Mô hình phòng ban 5 Agents (Neo, Trinity, Morpheus, Oracle, Seraph) với luồng rẽ nhánh Backend/Frontend và cổng kiểm toán bảo mật.',
-      crew_endpoint_url: cyberUrl,
-      raw_requirement: cyberRaw,
-      blueprint: cyberBlueprint,
-      steps: cyberSteps,
-      integration_doc_md: generateCrewAiIntegrationDoc(
-        cyberBlueprint,
-        'cybersec_product_crew',
-        cyberRaw,
-        cyberUrl,
-      ),
-      created_at: Date.now() - 10000,
-    },
-    {
       id: 'product_hunter_crewai',
-      name: 'Product Hunter — Săn Sản Phẩm 3 Sàn (Shopee / Lazada / TikTok — 8 Agents)',
+      name: 'Product Hunter — Săn Sản Phẩm 3 Sàn (Shopee / Lazada / TikTok — 11 Agents)',
       description:
-        'CrewAI phân tích thị trường đa sàn hoàn toàn tự động (AddLiveTag Sàn Cam, Apify Sàn Xanh & Đen, Serper): Điểm Đại dương xanh /100, HHI, Tỷ lệ có bán, Hoa hồng TB, Top Shop CR5; hỗ trợ bật HITL tùy chọn.',
+        'Chủ tịch nhắn tên sản phẩm trong group Telegram. Crew săn 3 sàn, đăng GitHub Pages, gửi link lại group và chụp toàn cảnh văn phòng mỗi 10 giây.',
       crew_endpoint_url: hunterUrl,
       raw_requirement: hunterRaw,
       blueprint: hunterBlueprint,
