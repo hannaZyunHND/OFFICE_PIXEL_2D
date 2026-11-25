@@ -959,3 +959,160 @@ export function generateProductHunterMinimalBlueprint(
     })),
   };
 }
+
+const V2_DESK_SLOTS: Record<string, { x: number; y: number }> = {
+  agent_v2_liaison: { x: 2, y: 3 },
+  agent_v2_router: { x: 8, y: 3 },
+  agent_office_camera: { x: 14, y: 3 },
+  agent_v2_market_keyword: { x: 2, y: 7 },
+  agent_v2_market_category: { x: 6, y: 7 },
+  agent_v2_top_products: { x: 10, y: 7 },
+  agent_v2_product_eval: { x: 14, y: 7 },
+  agent_v2_compare: { x: 18, y: 7 },
+  agent_v2_full_report: { x: 22, y: 7 },
+  agent_v2_san_cam: { x: 2, y: 11 },
+  agent_v2_san_xanh: { x: 8, y: 11 },
+  agent_v2_san_den: { x: 14, y: 11 },
+  agent_v2_answer: { x: 2, y: 19 },
+  agent_v2_courier: { x: 8, y: 19 },
+};
+
+export function generateProductHunterV2Blueprint(
+  topology: Stage1SemanticTopology,
+): OfficeBlueprint {
+  const gridCols = 42;
+  const gridRows = 24;
+  const zones: ZoneDefinition[] = [
+    {
+      id: 'zone_v2_work',
+      name: 'Câu hỏi và sàn',
+      type: 'WORK',
+      rect: [1, 1, 28, 16],
+    },
+    {
+      id: 'zone_v2_answer',
+      name: 'Bài trả lời',
+      type: 'APPROVAL',
+      rect: [1, 17, 14, 6],
+    },
+    {
+      id: 'zone_v2_pantry',
+      name: 'Pantry',
+      type: 'IDLE',
+      rect: [16, 17, 12, 6],
+    },
+    {
+      id: 'zone_director',
+      name: 'Phòng Giám Đốc (Tôi)',
+      type: 'DIRECTOR',
+      rect: [30, 1, 11, 22],
+    },
+  ];
+  const furniture: FurnitureItem[] = [];
+  const agents: AgentBlueprint[] = [];
+  for (const spec of topology.agents) {
+    const slot = V2_DESK_SLOTS[spec.id];
+    if (!slot) continue;
+    const deskId = `furn_desk_${spec.id}`;
+    furniture.push({
+      id: deskId,
+      type: 'DESK_PC',
+      x: slot.x,
+      y: slot.y,
+      footprint: [2, 1],
+      interaction_point: [slot.x, slot.y + 1],
+      facing: 'UP',
+      agent_id: spec.id,
+    });
+    agents.push({
+      id: spec.id,
+      name: spec.name,
+      role: spec.role,
+      color: spec.color,
+      avatar_sprite: spec.avatar_sprite,
+      desk_id: deskId,
+    });
+  }
+  furniture.push(
+    {
+      id: 'furn_v2_cat',
+      type: 'OFFICE_CAT',
+      x: 26,
+      y: 4,
+      footprint: [1, 1],
+      interaction_point: [26, 5],
+      facing: 'DOWN',
+    },
+    {
+      id: 'furn_v2_coffee',
+      type: 'COFFEE_MACHINE',
+      x: 18,
+      y: 19,
+      footprint: [1, 1],
+      interaction_point: [18, 20],
+      facing: 'UP',
+    },
+    {
+      id: 'furn_v2_ps5',
+      type: 'PS5_PES_STATION',
+      x: 21,
+      y: 19,
+      footprint: [2, 1],
+      interaction_point: [21, 20],
+      facing: 'UP',
+    },
+    {
+      id: 'furn_v2_foosball',
+      type: 'FOOSBALL_TABLE',
+      x: 25,
+      y: 19,
+      footprint: [2, 1],
+      interaction_point: [25, 20],
+      facing: 'UP',
+    },
+    {
+      id: 'furn_v2_director_desk',
+      type: 'DIRECTOR_DESK',
+      x: 32,
+      y: 10,
+      footprint: [3, 1],
+      interaction_point: [32, 11],
+      facing: 'UP',
+    },
+    {
+      id: 'furn_v2_aquarium',
+      type: 'LARGE_AQUARIUM',
+      x: 32,
+      y: 3,
+      footprint: [4, 2],
+      interaction_point: [32, 5],
+      facing: 'UP',
+    },
+    {
+      id: 'furn_v2_shelf',
+      type: 'BOOKSHELF',
+      x: 32,
+      y: 14,
+      footprint: [2, 1],
+      interaction_point: [32, 15],
+      facing: 'UP',
+    },
+  );
+  return {
+    meta: {
+      project_name: topology.project_name,
+      grid_cols: gridCols,
+      grid_rows: gridRows,
+      tile_size: 32,
+      layout_profile: 'product_hunter_v2_v1',
+    },
+    zones,
+    furniture,
+    agents,
+    edges: topology.edges.map((edge) => ({
+      from: edge.from,
+      to: edge.to,
+      label: edge.label,
+    })),
+  };
+}

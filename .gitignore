@@ -14,6 +14,8 @@ Thumbs.db
 .idea/
 __pycache__/
 *.py[cod]
+.venv/
+crewAI/.venv/
 data/*.sqlite*
 data/telegram_offset.txt
 tsconfig.tsbuildinfo

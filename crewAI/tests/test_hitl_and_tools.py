@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import asyncio
 import os
+import urllib.parse
 from pathlib import Path
 import sys
 import tempfile
@@ -73,6 +74,45 @@ class TestExternalToolsAndHitl(unittest.IsolatedAsyncioTestCase):
             )
             self.assertEqual(laz_metrics["avg_commission_display"], "(API đang phát triển)")
             self.assertEqual(laz_metrics["history_coverage_display"], "(API đang phát triển)")
+
+    async def test_shopee_keeps_paging_past_one_hundred(self) -> None:
+        calls = []
+
+        def fake(url, **_kwargs):
+            query = urllib.parse.parse_qs(urllib.parse.urlparse(url).query)
+            offset = int(query["offset"][0])
+            limit = int(query["limit"][0])
+            calls.append((offset, limit))
+            total = 250
+            rows = []
+            if offset < total:
+                for index in range(offset, min(offset + limit, total)):
+                    rows.append(
+                        {
+                            "itemId": str(1000 + index),
+                            "productName": f"Hộp gỗ {index}",
+                            "price": 90000,
+                            "sales": 2,
+                            "revenueAll": 180000,
+                            "shopId": "9",
+                            "shopName": "Gỗ",
+                        }
+                    )
+            return True, 200, {"products": rows, "market": {"totalProducts": total}}, ""
+
+        with patch.dict(os.environ, {"ADDLIVETAG_API_KEY": "unit-key"}, clear=False), patch(
+            "providers.ecommerce_providers._http_json_request",
+            side_effect=fake,
+        ):
+            result = await DEFAULT_TOOL_REGISTRY.invoke(
+                "addlivetag_market_search",
+                {"query": "hộp gỗ giấy ăn", "max_items": 0},
+                extras={},
+            )
+        self.assertEqual(result["mode"], "live")
+        self.assertEqual(len(result["data"]["items"]), 250)
+        self.assertFalse(result["data"]["list_truncated"])
+        self.assertEqual(calls, [(0, 200), (200, 200)])
 
     async def test_hitl_bridge_future_resolution(self) -> None:
         bridge = PixelOfficeBridge()

@@ -191,6 +191,23 @@ def _parse_sold_count(raw: Any, default: int = 0) -> int:
     return int(round(float(num_str.replace(",", "."))))
 
 
+def _optional_float(raw: Any) -> Optional[float]:
+    if raw is None or raw == "" or isinstance(raw, bool):
+        return None
+    try:
+        return float(raw)
+    except (TypeError, ValueError):
+        return None
+
+
+def _first_text(row: Dict[str, Any], keys: tuple[str, ...]) -> str:
+    for key in keys:
+        value = row.get(key)
+        if isinstance(value, str) and value.strip():
+            return value.strip()
+    return ""
+
+
 def _to_commission_pct(raw: Any) -> Optional[float]:
     """Converts AddLiveTag decimal fraction (0.025 -> 2.5%) or percentage number cleanly."""
     if raw is None or isinstance(raw, bool):
@@ -339,6 +356,99 @@ def _build_sandbox_items(keyword: str, platform: str, count: int) -> List[Dict[s
     return items
 
 
+_SHOPEE_PAGE = 200
+_SHOPEE_LIST_FUSE = 100_000
+
+
+def _shopee_wanted(raw: Any) -> int:
+    """Missing means the old sandbox size. Zero means every page Sàn Cam will return."""
+    if raw in (None, ""):
+        return 20
+    try:
+        value = int(raw)
+    except (TypeError, ValueError):
+        return 20
+    return max(0, value)
+
+
+def _market_rows(payload: Dict[str, Any]) -> List[Any]:
+    rows = payload.get("products") or payload.get("items")
+    if rows is None and isinstance(payload.get("data"), dict):
+        rows = payload["data"].get("items")
+    if rows is None:
+        rows = payload.get("data")
+    return rows if isinstance(rows, list) else []
+
+
+def _normalize_shopee_row(row: Dict[str, Any], idx: int, query: str) -> Dict[str, Any]:
+    price = _parse_price_vnd(row.get("price") or row.get("price_vnd"), 0)
+    raw_sold = (
+        row.get("sales")
+        if row.get("sales") is not None
+        else (
+            row.get("sold")
+            if row.get("sold") is not None
+            else (row.get("sold_30d") if row.get("sold_30d") is not None else row.get("sold30d"))
+        )
+    )
+    sold = _parse_sold_count(raw_sold, 0)
+    raw_rev = (
+        row.get("revenueAll")
+        if row.get("revenueAll") is not None
+        else (row.get("revenue") if row.get("revenue") is not None else row.get("revenue30d"))
+    )
+    gmv = _parse_price_vnd(raw_rev, price * sold) if raw_rev is not None else price * sold
+    title_txt = str(row.get("productName") or row.get("name") or row.get("title") or query)
+    is_gift = bool(row.get("is_gift")) or (0 < price <= 2000) or ("quà tặng" in title_txt.lower())
+    shop_name = str(
+        row.get("shopName")
+        or row.get("shop_name")
+        or row.get("shop_location")
+        or f"Shopee Seller #{idx + 1}"
+    )
+    comm_raw = (
+        row.get("commissionRate")
+        if row.get("commissionRate") is not None
+        else (row.get("comm_rate") if row.get("comm_rate") is not None else row.get("commission_pct"))
+    )
+    raw_rating = row.get("rating") if row.get("rating") not in (None, "") else row.get("rating_star")
+    shop_id = str(row.get("shopId") or row.get("shop_id") or row.get("shopid") or shop_name)
+    has_hist = (
+        int(row.get("daysTracked") or 0) >= 8
+        if "daysTracked" in row
+        else bool(row.get("has_history_30d", True))
+    )
+    return {
+        "item_id": str(row.get("itemId") or row.get("item_id") or row.get("itemid") or f"shp_{idx + 1}"),
+        "title": title_txt,
+        "platform": "shopee",
+        "shop_id": shop_id,
+        "shop_name": shop_name,
+        "shop_url": f"https://shopee.vn/shop/{shop_id}" if shop_id.isdigit() else "",
+        "image_url": _first_text(row, ("imageUrl", "image", "img", "thumbnail")),
+        "is_mall": bool(row.get("is_official_shop") or row.get("is_mall") or "official" in shop_name.lower() or "mall" in shop_name.lower()),
+        "is_gift": is_gift,
+        "has_history_30d": has_hist,
+        "price_vnd": price,
+        "price_min_vnd": _parse_price_vnd(row.get("priceMin"), 0) if row.get("priceMin") not in (None, "") else None,
+        "price_max_vnd": _parse_price_vnd(row.get("priceMax"), 0) if row.get("priceMax") not in (None, "") else None,
+        "price_cv": _optional_float(row.get("priceCv")),
+        "sold_30d": sold,
+        "sold_7d": _parse_sold_count(row.get("sold7d"), 0) if row.get("sold7d") not in (None, "") else None,
+        "sold_window_30d": _parse_sold_count(row.get("sold30d"), 0) if row.get("sold30d") not in (None, "") else None,
+        "sold_all": _parse_sold_count(row.get("sales"), 0) if row.get("sales") not in (None, "") else None,
+        "gmv_30d_vnd": gmv,
+        "gmv_window_30d": _parse_price_vnd(row.get("revenue30d"), 0) if row.get("revenue30d") not in (None, "") else None,
+        "gmv_all": _parse_price_vnd(row.get("revenueAll"), 0) if row.get("revenueAll") not in (None, "") else None,
+        "rating": float(raw_rating) if raw_rating not in (None, "") else None,
+        "days_tracked": int(row.get("daysTracked")) if str(row.get("daysTracked") or "").isdigit() else None,
+        "growth": _optional_float(row.get("growth")),
+        "commission_pct": _to_commission_pct(comm_raw),
+        "koc_creators_count": None,
+        "url": str(row.get("productLink") or row.get("url") or f"https://shopee.vn/search?keyword={urllib.parse.quote(query)}"),
+    }
+
+
 @DEFAULT_TOOL_REGISTRY.tool(
     name="addlivetag_market_search",
     provider="AddLiveTag API (Sàn Cam / Shopee)",
@@ -362,12 +472,11 @@ def addlivetag_market_search(args: Dict[str, Any], extras: Dict[str, Any]) -> Di
     query = str(args.get("query") or "").strip()
     price_min = int(args.get("price_min") or 0)
     sort = str(args.get("sort") or "revenue")
-    max_items = int(args.get("max_items") or 20)
+    wanted = _shopee_wanted(args.get("max_items"))
+    max_items = wanted if wanted > 0 else 20
     api_key = _resolve_secret(extras, "addlivetagApiKey", "ADDLIVETAG_API_KEY")
 
     params: Dict[str, Any] = {"q": query, "sort": sort}
-    if price_min > 0:
-        params["price_min"] = price_min
     url = f"https://data.addlivetag.com/search/market.php?{urllib.parse.urlencode(params)}"
     headers_masked = {"X-API-Key": _mask_secret(api_key)}
 
@@ -376,85 +485,66 @@ def addlivetag_market_search(args: Dict[str, Any], extras: Dict[str, Any]) -> Di
     raw_sample: Any = None
 
     if api_key:
-        ok, status, payload, err_msg = _http_json_request(
-            url, headers={"X-API-Key": api_key}
-        )
-        http_status = status
-        raw_sample = payload if isinstance(payload, dict) else str(payload)[:400]
-        if ok and isinstance(payload, dict):
-            raw_items = (
-                payload.get("products")
-                or payload.get("items")
-                or (payload.get("data", {}).get("items") if isinstance(payload.get("data"), dict) else payload.get("data"))
-                or []
+        page_size = _SHOPEE_PAGE if wanted == 0 else min(wanted, _SHOPEE_PAGE)
+        collected: List[Any] = []
+        seen: set[str] = set()
+        offset = 0
+        payload: Dict[str, Any] | None = None
+        status: int | str = 0
+        err_msg = ""
+        truncated = False
+        while True:
+            params = {"q": query, "sort": sort, "limit": page_size, "offset": offset}
+            if price_min > 0:
+                params["price_min"] = price_min
+            url = f"https://data.addlivetag.com/search/market.php?{urllib.parse.urlencode(params)}"
+            _ok, status, page_payload, err_msg = _http_json_request(
+                url, headers={"X-API-Key": api_key}
             )
-            if isinstance(raw_items, list) and len(raw_items) > 0:
-                normalized: List[Dict[str, Any]] = []
-                for idx, row in enumerate(raw_items[:max_items]):
-                    if not isinstance(row, dict):
-                        continue
-                    price = _parse_price_vnd(row.get("price") or row.get("price_vnd"), 0)
-                    raw_sold = (
-                        row.get("sales")
-                        if row.get("sales") is not None
-                        else (
-                            row.get("sold")
-                            if row.get("sold") is not None
-                            else (row.get("sold_30d") if row.get("sold_30d") is not None else row.get("sold30d"))
-                        )
-                    )
-                    sold = _parse_sold_count(raw_sold, 0)
-                    raw_rev = (
-                        row.get("revenueAll")
-                        if row.get("revenueAll") is not None
-                        else (row.get("revenue") if row.get("revenue") is not None else row.get("revenue30d"))
-                    )
-                    gmv = _parse_price_vnd(raw_rev, price * sold) if raw_rev is not None else price * sold
-                    title_txt = str(row.get("productName") or row.get("name") or row.get("title") or query)
-                    is_gift = bool(row.get("is_gift")) or (0 < price <= 2000) or ("quà tặng" in title_txt.lower())
-                    shop_name = str(
-                        row.get("shopName")
-                        or row.get("shop_name")
-                        or row.get("shop_location")
-                        or f"Shopee Seller #{idx + 1}"
-                    )
-                    comm_raw = (
-                        row.get("commissionRate")
-                        if row.get("commissionRate") is not None
-                        else (row.get("comm_rate") if row.get("comm_rate") is not None else row.get("commission_pct"))
-                    )
-                    comm_pct = _to_commission_pct(comm_raw)
-                    has_hist = (
-                        int(row.get("daysTracked") or 0) >= 8
-                        if "daysTracked" in row
-                        else bool(row.get("has_history_30d", True))
-                    )
-                    normalized.append(
-                        {
-                            "item_id": str(row.get("itemId") or row.get("item_id") or row.get("itemid") or f"shp_{idx + 1}"),
-                            "title": title_txt,
-                            "platform": "shopee",
-                            "shop_id": str(row.get("shopId") or row.get("shop_id") or row.get("shopid") or shop_name),
-                            "shop_name": shop_name,
-                            "is_mall": bool(row.get("is_official_shop") or row.get("is_mall") or "official" in shop_name.lower() or "mall" in shop_name.lower()),
-                            "is_gift": is_gift,
-                            "has_history_30d": has_hist,
-                            "days_tracked": row.get("daysTracked"),
-                            "price_vnd": price,
-                            "sold_30d": sold,
-                            "gmv_30d_vnd": gmv,
-                            "rating": float(row.get("rating") or row.get("rating_star") or 4.7),
-                            "commission_pct": comm_pct,
-                            "koc_creators_count": None,
-                            "url": str(row.get("productLink") or row.get("url") or f"https://shopee.vn/search?keyword={urllib.parse.quote(query)}"),
-                        }
-                    )
-                if normalized:
+            http_status = status
+            if not _ok or not isinstance(page_payload, dict):
+                if collected:
+                    truncated = True
+                break
+            if payload is None:
+                payload = page_payload
+                raw_sample = page_payload
+            rows = _market_rows(page_payload)
+            added = 0
+            for row in rows:
+                if not isinstance(row, dict):
+                    continue
+                key = str(row.get("itemId") or row.get("item_id") or row.get("itemid") or "")
+                if not key:
+                    key = f"{offset}:{added}"
+                if key in seen:
+                    continue
+                seen.add(key)
+                collected.append(row)
+                added += 1
+                if wanted > 0 and len(collected) >= wanted:
+                    break
+            if wanted > 0 and len(collected) >= wanted:
+                break
+            if added == 0 or len(rows) < page_size:
+                break
+            offset += len(rows)
+            if len(collected) >= _SHOPEE_LIST_FUSE:
+                truncated = True
+                break
+        if isinstance(payload, dict) and collected:
+            raw_items = collected
+            normalized: List[Dict[str, Any]] = []
+            for idx, row in enumerate(raw_items):
+                if isinstance(row, dict):
+                    normalized.append(_normalize_shopee_row(row, idx, query))
+            if normalized:
                     market_summary = {
                         "market": payload.get("market"),
                         "last30Days": payload.get("last30Days"),
                         "giftsExcluded": payload.get("giftsExcluded"),
                         "scopeNote": payload.get("scopeNote"),
+                        "topShops": payload.get("topShops"),
                     }
                     trimmed_sample = {
                         "keys": list(payload.keys()),
@@ -473,6 +563,7 @@ def addlivetag_market_search(args: Dict[str, Any], extras: Dict[str, Any]) -> Di
                             "capabilities": get_platform_capabilities("shopee"),
                             "market_summary": market_summary,
                             "items": normalized,
+                            "list_truncated": truncated,
                         },
                         "trace": _make_trace(
                             method="GET",
@@ -588,6 +679,8 @@ def addlivetag_product_batch(args: Dict[str, Any], extras: Dict[str, Any]) -> Di
                             "is_xtra": bool(info.get("isXtra")),
                             "cap_vnd": info.get("cap"),
                             "data_source": row.get("dataSource"),
+                            "price_stats": info.get("priceStats") if isinstance(info.get("priceStats"), dict) else {},
+                            "latest_price_history": info.get("latestPriceHistory") if isinstance(info.get("latestPriceHistory"), dict) else {},
                         }
                     )
                 return {
@@ -727,7 +820,9 @@ def apify_lazada_search(args: Dict[str, Any], extras: Dict[str, Any]) -> Dict[st
                         "price_vnd": price,
                         "sold_30d": sold,
                         "gmv_30d_vnd": price * sold,
-                        "rating": round(float(row.get("ratingScore") or 4.6), 2),
+                        "rating": round(float(row.get("ratingScore")), 2) if row.get("ratingScore") not in (None, "") else None,
+                        "image_url": _first_text(row, ("imageUrl", "image", "img", "thumbnail", "mainImage")),
+                        "shop_url": _first_text(row, ("shopUrl", "sellerUrl", "storeUrl")),
                         "review_count": int(row.get("reviewCount") or 0),
                         "commission_pct": None,
                         "koc_creators_count": None,
@@ -888,7 +983,9 @@ def apify_tiktok_shop_search(args: Dict[str, Any], extras: Dict[str, Any]) -> Di
                         "price_vnd": price,
                         "sold_30d": sold,
                         "gmv_30d_vnd": price * sold,
-                        "rating": round(float(row.get("rating") or 4.7), 2),
+                        "rating": round(float(row.get("rating")), 2) if row.get("rating") not in (None, "") else None,
+                        "image_url": _first_text(row, ("imageUrl", "image", "img", "thumbnail", "mainImage")),
+                        "shop_url": _first_text(row, ("shopUrl", "sellerUrl", "storeUrl")),
                         "review_count": _parse_sold_count(row.get("reviewCount"), 0),
                         "koc_creators_count": koc_cnt,
                         "commission_pct": comm_pct,

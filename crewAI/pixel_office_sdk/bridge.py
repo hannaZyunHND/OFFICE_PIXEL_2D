@@ -322,10 +322,13 @@ class PixelOfficeBridge:
 
         self.is_flow_running = True
         self.latest_flow_result = None
+        opts = options or {}
         await self.broadcast_json(
             {
                 "type": "FLOW_STARTED",
                 "prompt": prompt,
+                "workflow_id": str(opts.get("workflow_id") or ""),
+                "workflow_name": str(opts.get("workflow_name") or ""),
             }
         )
 

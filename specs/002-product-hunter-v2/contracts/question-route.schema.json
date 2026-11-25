@@ -1,0 +1,69 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://pixel-agent-office.local/schemas/question-route.schema.json",
+  "title": "QuestionRoute",
+  "description": "Phiếu điều phối một câu của Chủ tịch trước khi đo sàn.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["raw", "intent", "platforms", "names", "clarify", "when", "status_text"],
+  "properties": {
+    "raw": { "type": "string", "minLength": 1 },
+    "intent": {
+      "type": "string",
+      "enum": [
+        "market_keyword",
+        "market_category",
+        "top_products",
+        "product_eval",
+        "compare",
+        "full_report",
+        "clarify"
+      ]
+    },
+    "platforms": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "enum": ["shopee", "lazada", "tiktok_shop"]
+      },
+      "uniqueItems": true
+    },
+    "names": {
+      "type": "array",
+      "items": { "type": "string", "minLength": 1 },
+      "maxItems": 4
+    },
+    "clarify": { "type": "string" },
+    "when": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "label", "kind", "query_hint"],
+      "description": "Cửa sổ thời gian Chủ tịch nêu. kind rỗng khi câu không nói tháng hay dịp. Tháng không có query_hint. Dịp có chữ gắn vào tên tìm.",
+      "properties": {
+        "id": { "type": "string" },
+        "label": { "type": "string" },
+        "kind": { "type": "string", "enum": ["", "occasion", "month"] },
+        "query_hint": { "type": "string" }
+      }
+    },
+    "status_text": { "type": "string", "minLength": 1, "maxLength": 180 }
+  },
+  "allOf": [
+    {
+      "if": { "properties": { "intent": { "const": "clarify" } } },
+      "then": {
+        "properties": {
+          "platforms": { "maxItems": 0 },
+          "names": { "maxItems": 0 },
+          "clarify": { "minLength": 1 }
+        }
+      },
+      "else": {
+        "properties": {
+          "platforms": { "minItems": 1 },
+          "clarify": { "maxLength": 0 }
+        }
+      }
+    }
+  ]
+}

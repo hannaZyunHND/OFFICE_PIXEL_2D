@@ -1,0 +1,173 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://pixel-agent-office.local/schemas/market-answer.schema.json",
+  "title": "MarketAnswer",
+  "description": "Bài trả lời ghép từ phiếu điều phối và các phiếu đo. Số trong prose phải đến từ samples hoặc related_searches.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["route", "samples", "related_searches", "prose"],
+  "properties": {
+    "route": {
+      "$ref": "question-route.schema.json"
+    },
+    "samples": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/floorSample" }
+    },
+    "related_searches": {
+      "type": "array",
+      "items": { "type": "string" },
+      "maxItems": 5
+    },
+    "prose": { "type": "string", "minLength": 1 },
+    "page_path": { "type": "string" }
+  },
+  "$defs": {
+    "floorSample": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["name", "platform", "mode", "scope", "items"],
+      "properties": {
+        "name": { "type": "string" },
+        "platform": {
+          "type": "string",
+          "enum": ["shopee", "lazada", "tiktok_shop"]
+        },
+        "mode": { "type": "string", "enum": ["live", "sandbox", "error"] },
+        "scope": { "type": "string", "enum": ["market_block", "sample"] },
+        "sp_count": { "type": "integer", "minimum": 0 },
+        "shop_count": { "type": "integer", "minimum": 0 },
+        "total_sold": { "type": "integer", "minimum": 0 },
+        "total_revenue_vnd": { "type": "integer", "minimum": 0 },
+        "avg_price_vnd": { "type": "integer", "minimum": 0 },
+        "min_price_vnd": { "type": "integer", "minimum": 0 },
+        "max_price_vnd": { "type": "integer", "minimum": 0 },
+        "sweet_spot_label": { "type": "string" },
+        "hhi": { "type": "number", "minimum": 0, "maximum": 1 },
+        "blue_ocean_score": { "type": "number", "minimum": 0, "maximum": 100 },
+        "avg_commission_pct": { "type": ["number", "null"] },
+        "max_commission_pct": { "type": ["number", "null"] },
+        "sell_through_pct": { "type": ["number", "null"] },
+        "products_with_sales": { "type": "integer", "minimum": 0 },
+        "window_all_time": { "$ref": "#/$defs/marketWindow" },
+        "window_tracked_30d": { "$ref": "#/$defs/trackedWindow" },
+        "gifts_excluded": { "$ref": "#/$defs/giftsExcluded" },
+        "source_note": { "type": "string" },
+        "sample_note": { "type": "string" },
+        "top_shops": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/topShop" }
+        },
+        "detail_items": {
+          "type": "array",
+          "maxItems": 5,
+          "items": { "$ref": "#/$defs/detailItem" }
+        },
+        "error": { "type": "string" },
+        "items": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/sampleItem" }
+        }
+      }
+    },
+    "sampleItem": {
+      "type": "object",
+      "required": ["title", "price_vnd", "sold", "gmv_vnd", "shop_name", "url"],
+      "properties": {
+        "title": { "type": "string" },
+        "image_url": { "type": "string" },
+        "price_vnd": { "type": "integer", "minimum": 0 },
+        "price_min_vnd": { "type": ["integer", "null"], "minimum": 0 },
+        "price_max_vnd": { "type": ["integer", "null"], "minimum": 0 },
+        "price_cv": { "type": ["number", "null"], "minimum": 0 },
+        "sold": { "type": "integer", "minimum": 0 },
+        "sold_7d": { "type": ["integer", "null"], "minimum": 0 },
+        "sold_30d": { "type": ["integer", "null"], "minimum": 0 },
+        "sold_all": { "type": ["integer", "null"], "minimum": 0 },
+        "gmv_vnd": { "type": "integer", "minimum": 0 },
+        "gmv_30d_vnd": { "type": ["integer", "null"], "minimum": 0 },
+        "gmv_all_vnd": { "type": ["integer", "null"], "minimum": 0 },
+        "shop_name": { "type": "string" },
+        "shop_id": { "type": "string" },
+        "shop_url": { "type": "string" },
+        "rating": { "type": ["number", "null"] },
+        "url": { "type": "string" },
+        "is_mall": { "type": "boolean" },
+        "commission_pct": { "type": ["number", "null"] },
+        "days_tracked": { "type": ["integer", "null"], "minimum": 0 },
+        "growth": { "type": ["number", "null"] }
+      }
+    },
+    "marketWindow": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "label": { "type": "string" },
+        "sp_count": { "type": "integer", "minimum": 0 },
+        "shop_count": { "type": "integer", "minimum": 0 },
+        "total_sold": { "type": "integer", "minimum": 0 },
+        "total_revenue_vnd": { "type": "integer", "minimum": 0 },
+        "avg_price_vnd": { "type": "integer", "minimum": 0 },
+        "min_price_vnd": { "type": "integer", "minimum": 0 },
+        "max_price_vnd": { "type": "integer", "minimum": 0 },
+        "products_with_sales": { "type": "integer", "minimum": 0 },
+        "sell_through_pct": { "type": "number", "minimum": 0 },
+        "hhi": { "type": "number", "minimum": 0 },
+        "blue_ocean_score": { "type": "number" },
+        "avg_commission_pct": { "type": ["number", "null"] },
+        "max_commission_pct": { "type": ["number", "null"] }
+      }
+    },
+    "trackedWindow": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "label": { "type": "string" },
+        "total_sold": { "type": "integer", "minimum": 0 },
+        "total_revenue_vnd": { "type": "integer", "minimum": 0 },
+        "tracked_products": { "type": "integer", "minimum": 0 },
+        "coverage_pct": { "type": "number", "minimum": 0 },
+        "note": { "type": "string" }
+      }
+    },
+    "giftsExcluded": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "products": { "type": "integer", "minimum": 0 },
+        "revenue_vnd": { "type": "integer", "minimum": 0 },
+        "note": { "type": "string" }
+      }
+    },
+    "topShop": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["shop_id", "revenue_vnd"],
+      "properties": {
+        "shop_id": { "type": "string" },
+        "shop_name": { "type": "string" },
+        "shop_url": { "type": "string" },
+        "revenue_vnd": { "type": "integer", "minimum": 0 },
+        "product_count": { "type": "integer", "minimum": 0 },
+        "share_pct": { "type": "number", "minimum": 0 }
+      }
+    },
+    "detailItem": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "item_id": { "type": "string" },
+        "category_name": { "type": "string" },
+        "seller_commission_pct": { "type": ["number", "null"] },
+        "platform_commission_pct": { "type": ["number", "null"] },
+        "commission_cap_vnd": { "type": ["integer", "null"] },
+        "price_change_7d": { "type": ["number", "null"] },
+        "price_change_30d": { "type": ["number", "null"] },
+        "discount_pct": { "type": ["number", "null"] },
+        "stock": { "type": ["integer", "null"] },
+        "list_price_vnd": { "type": ["integer", "null"] },
+        "detail_price_vnd": { "type": ["integer", "null"] }
+      }
+    }
+  }
+}

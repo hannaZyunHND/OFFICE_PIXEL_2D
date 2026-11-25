@@ -1,0 +1,25 @@
+CAI PIXEL AGENT OFFICE TREN MAY SEP
+=====================================
+
+Can san tren may:
+- Windows 10/11
+- Node.js 22.14 tro len (x64)
+  https://nodejs.org/dist/v22.21.1/node-v22.21.1-x64.msi
+- Python 3.11 tro len, tick "Add python.exe to PATH"
+  https://www.python.org/ftp/python/3.12.8/python-3.12.8-amd64.exe
+- Git for Windows (de day bao cao len GitHub Pages)
+  https://git-scm.com/download/win
+
+Cach chay:
+1. Giai nen ca thu muc nay.
+2. Mo PowerShell trong thu muc do.
+3. Tat ban dang chay tren may cu truoc. Bot Telegram chi nghe duoc o mot may.
+4. Chay:
+   powershell -ExecutionPolicy Bypass -File .\install.ps1
+5. Chay:
+   powershell -ExecutionPolicy Bypass -File .\run.ps1 -OpenBrowser
+6. Giu tab http://localhost:34213 mo. Anh toan canh 10 giay chi chup khi tab nay dang mo.
+7. Nhan cau hoi vao group Telegram. Bao cao se len GitHub Pages va bot gui link.
+
+Lan dau day bao cao, Git hoi dang nhap GitHub. Dang nhap tai khoan dang so huu repo pixel-office-reports.
+File .env da co san key. Dung commit file nay len GitHub.

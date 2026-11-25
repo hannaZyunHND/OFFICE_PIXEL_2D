@@ -540,7 +540,7 @@ def _render_standardized_platform_tab(
           <td><strong>{_fmt_vnd(it.get('gmv_30d_vnd') or 0)}</strong></td>
           <td>{comm_cell}</td>
           <td>{koc_cell}</td>
-          <td>{it.get('rating', 4.7)}★</td>
+          <td>{"—" if it.get("rating") is None else f"{it.get('rating')}★"}</td>
         </tr>"""
 
     # 6 Price Bins Bar Chart

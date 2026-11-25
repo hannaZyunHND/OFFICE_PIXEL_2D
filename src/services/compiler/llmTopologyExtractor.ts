@@ -304,6 +304,10 @@ export function parseMarkdownDeterministically(
     return buildGameFactoryTopology(markdownText);
   }
 
+  if (/Product Hunter v2|agent_v2_router/i.test(markdownText)) {
+    return buildProductHunterV2Topology();
+  }
+
   if (
     /Product Hunter|Shopee Hunter|Lazada Hunter|TikTok Shop Hunter/i.test(
       markdownText,
@@ -686,6 +690,89 @@ function slugifyAgentId(raw: string): string {
     .replace(/[^a-z0-9]+/g, '_')
     .replace(/^_+|_+$/g, '');
   return base.startsWith('agent_') ? base : `agent_${base || 'unit'}`;
+}
+
+export const PRODUCT_HUNTER_V2_MARKDOWN = `# Product Hunter v2 — Hỏi thị trường, nhìn đường đi
+Điều phối đọc một câu. Sàn Cam luôn đo. Sàn Xanh và Sàn Đen chỉ đứng dậy khi câu nhắc tới.
+`;
+
+export function buildProductHunterV2Topology(): Stage1SemanticTopology {
+  const used: string[] = [];
+  const nextAvatar = (): string => {
+    const id = pickRandomAgentAvatarId({ excludeIds: used });
+    used.push(id);
+    return id;
+  };
+  const desk = (
+    id: string,
+    name: string,
+    role: string,
+    zoneId: string,
+    color: string,
+  ) => ({
+    id,
+    name,
+    role,
+    zone_id: zoneId,
+    color,
+    avatar_sprite: nextAvatar(),
+  });
+  return {
+    project_name: 'Product Hunter v2 — Hỏi thị trường',
+    zones: [
+      {
+        id: 'zone_v2_work',
+        name: 'Câu hỏi và sàn',
+        type: 'WORK',
+        props: ['WHITEBOARD', 'PLANT'],
+      },
+      {
+        id: 'zone_v2_answer',
+        name: 'Bài trả lời',
+        type: 'APPROVAL',
+        props: ['PLANT'],
+      },
+      {
+        id: 'zone_v2_pantry',
+        name: 'Pantry',
+        type: 'IDLE',
+        props: ['COFFEE_MACHINE', 'SOFA'],
+      },
+    ],
+    agents: [
+      desk('agent_v2_liaison', 'Liên lạc', 'Nhận câu của Chủ tịch', 'zone_v2_work', '#22c55e'),
+      desk('agent_v2_router', 'Điều phối', 'Chọn một kiểu câu và các sàn', 'zone_v2_work', '#a3e635'),
+      desk('agent_office_camera', 'Camera văn phòng', 'Ảnh toàn cảnh', 'zone_v2_work', '#f43f5e'),
+      desk('agent_v2_market_keyword', 'Thị trường từ khóa', 'Câu một tên hàng', 'zone_v2_work', '#38bdf8'),
+      desk('agent_v2_market_category', 'Ngành hàng', 'Câu một ngành', 'zone_v2_work', '#2dd4bf'),
+      desk('agent_v2_top_products', 'Top sản phẩm', 'Câu top', 'zone_v2_work', '#f59e0b'),
+      desk('agent_v2_product_eval', 'Đánh giá sản phẩm', 'Câu một món', 'zone_v2_work', '#10b981'),
+      desk('agent_v2_compare', 'So sánh', 'Câu hai tên', 'zone_v2_work', '#c4b5fd'),
+      desk('agent_v2_full_report', 'Báo cáo đầy đủ', 'Câu xin báo cáo dài', 'zone_v2_work', '#22d3ee'),
+      desk('agent_v2_san_cam', 'Sàn Cam', 'Luôn đo', 'zone_v2_work', '#f97316'),
+      desk('agent_v2_san_xanh', 'Sàn Xanh', 'Đo khi câu nhắc', 'zone_v2_work', '#2563eb'),
+      desk('agent_v2_san_den', 'Sàn Đen', 'Đo khi câu nhắc', 'zone_v2_work', '#0f172a'),
+      desk('agent_v2_answer', 'Viết bài', 'Ghép số thành lời', 'zone_v2_answer', '#a855f7'),
+      desk('agent_v2_courier', 'Thư ký', 'Gửi bài cho Chủ tịch', 'zone_v2_answer', '#eab308'),
+    ],
+    edges: [
+      { from: 'agent_v2_liaison', to: 'agent_v2_router', label: 'Câu hỏi' },
+      { from: 'agent_v2_liaison', to: 'agent_office_camera', label: 'Mở camera' },
+      { from: 'agent_v2_router', to: 'agent_v2_market_keyword', label: 'Thị trường từ khóa' },
+      { from: 'agent_v2_router', to: 'agent_v2_market_category', label: 'Ngành hàng' },
+      { from: 'agent_v2_router', to: 'agent_v2_top_products', label: 'Top sản phẩm' },
+      { from: 'agent_v2_router', to: 'agent_v2_product_eval', label: 'Đánh giá sản phẩm' },
+      { from: 'agent_v2_router', to: 'agent_v2_compare', label: 'So sánh' },
+      { from: 'agent_v2_router', to: 'agent_v2_full_report', label: 'Báo cáo đầy đủ' },
+      { from: 'agent_v2_router', to: 'agent_v2_san_cam', label: 'Sàn Cam' },
+      { from: 'agent_v2_router', to: 'agent_v2_san_xanh', label: 'Sàn Xanh' },
+      { from: 'agent_v2_router', to: 'agent_v2_san_den', label: 'Sàn Đen' },
+      { from: 'agent_v2_san_cam', to: 'agent_v2_answer', label: 'Số Sàn Cam' },
+      { from: 'agent_v2_san_xanh', to: 'agent_v2_answer', label: 'Số Sàn Xanh' },
+      { from: 'agent_v2_san_den', to: 'agent_v2_answer', label: 'Số Sàn Đen' },
+      { from: 'agent_v2_answer', to: 'agent_v2_courier', label: 'Bài trả lời' },
+    ],
+  };
 }
 
 function buildProductHunterTopology(_markdownText: string): Stage1SemanticTopology {

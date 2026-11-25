@@ -49,7 +49,8 @@ function stopOfficeSnapshots(): void {
 
 function pushOfficeSnapshot(): void {
   if (!eventBus || snapshotInFlight || !uiStore.crewAiFlowRunning) return;
-  if (workflowStore.activeWorkflow?.id !== 'product_hunter_crewai') return;
+  const officeId = workflowStore.activeWorkflow?.id;
+  if (officeId !== 'product_hunter_crewai' && officeId !== 'product_hunter_v2_crewai') return;
   if (!eventBus.wsClient.isConnected()) return;
   snapshotInFlight = true;
   try {
@@ -110,7 +111,11 @@ onMounted(async () => {
           );
         }
       },
-      onFlowStarted: (prompt) => {
+      onFlowStarted: (prompt, workflowId) => {
+        if (workflowId) {
+          workflowStore.activateWorkflow(workflowId, { keepEndpoint: true });
+          canvasRef.value?.resetCamera();
+        }
         uiStore.crewAiFlowRunning = true;
         uiStore.crewAiPrompt = prompt;
         uiStore.isGodView = true;

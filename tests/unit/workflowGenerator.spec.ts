@@ -28,8 +28,9 @@ describe('Workflow Generator & CrewAI Technical Documentation', () => {
     expect(topology.zones.length).toBe(3);
 
     const seeds = buildDefaultSeedWorkflows();
-    expect(seeds.length).toBe(1);
+    expect(seeds.length).toBe(2);
     expect(seeds[0].id).toBe('product_hunter_crewai');
+    expect(seeds.some((workflow) => workflow.id === 'product_hunter_v2_crewai')).toBe(true);
     expect(seeds[0].crew_endpoint_url).toBe(`${DEFAULT_CREWAI_WS_ORIGIN}/product-hunter`);
 
     const firstSeed = seeds[0];

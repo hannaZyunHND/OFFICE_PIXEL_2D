@@ -3,9 +3,14 @@ import type { AgentEvent, ToolIconType } from '@/types/events';
 import type { Stage1SemanticTopology } from '@/types/assets';
 import {
   PRODUCT_HUNTER_MARKDOWN,
+  PRODUCT_HUNTER_V2_MARKDOWN,
+  buildProductHunterV2Topology,
   parseMarkdownDeterministically,
 } from './llmTopologyExtractor';
-import { generateProductHunterMinimalBlueprint } from './deterministicLayoutEngine';
+import {
+  generateProductHunterMinimalBlueprint,
+  generateProductHunterV2Blueprint,
+} from './deterministicLayoutEngine';
 import { pickRandomAgentAvatarId } from '@/data/agentAvatarCatalog';
 import { DEFAULT_CREWAI_WS_ORIGIN } from '@/config/runtimeEndpoints';
 
@@ -474,6 +479,11 @@ export function buildDefaultSeedWorkflows(): StoredWorkflowRecord[] {
   const hunterSteps = synthesizeSimulationStepsForBlueprint(hunterBlueprint);
   const hunterRaw = `URL kết nối: ${hunterUrl}\n${PRODUCT_HUNTER_MARKDOWN}`;
 
+  const hunterV2Url = `${DEFAULT_CREWAI_WS_ORIGIN}/product-hunter-v2`;
+  const hunterV2Blueprint = generateProductHunterV2Blueprint(buildProductHunterV2Topology());
+  const hunterV2Steps = synthesizeSimulationStepsForBlueprint(hunterV2Blueprint);
+  const hunterV2Raw = `URL kết nối: ${hunterV2Url}\n${PRODUCT_HUNTER_V2_MARKDOWN}`;
+
   return [
     {
       id: 'product_hunter_crewai',
@@ -491,6 +501,25 @@ export function buildDefaultSeedWorkflows(): StoredWorkflowRecord[] {
         hunterUrl,
       ),
       created_at: Date.now() - 5000,
+      avatar_catalog_v2: true,
+      minimal_layout_v1: true,
+    },
+    {
+      id: 'product_hunter_v2_crewai',
+      name: 'Product Hunter v2 — Hỏi thị trường',
+      description:
+        'Chủ tịch hỏi thị trường, ngành, top, đánh giá hoặc so sánh. Sàn Cam luôn đo. Sàn Xanh và Sàn Đen chỉ đứng dậy khi câu nhắc tới.',
+      crew_endpoint_url: hunterV2Url,
+      raw_requirement: hunterV2Raw,
+      blueprint: hunterV2Blueprint,
+      steps: hunterV2Steps,
+      integration_doc_md: generateCrewAiIntegrationDoc(
+        hunterV2Blueprint,
+        'product_hunter_v2_crewai',
+        hunterV2Raw,
+        hunterV2Url,
+      ),
+      created_at: Date.now() - 4000,
       avatar_catalog_v2: true,
       minimal_layout_v1: true,
     },

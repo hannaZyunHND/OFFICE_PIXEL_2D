@@ -10,7 +10,7 @@ import { DEFAULT_CREWAI_WS_ORIGIN } from '@/config/runtimeEndpoints';
 
 export interface WebSocketControlCallbacks {
   onBlueprintSync?: (blueprint: OfficeBlueprint) => void;
-  onFlowStarted?: (prompt: string) => void;
+  onFlowStarted?: (prompt: string, workflowId?: string) => void;
   onFlowResult?: (result: CrewAiFlowResult) => void;
   onFlowError?: (error: string) => void;
   onHumanApprovalRequired?: (approval: HitlApprovalRequest) => void;
@@ -179,7 +179,10 @@ export class WebSocketClient {
           return;
         }
         if (parsed.type === 'FLOW_STARTED') {
-          this.controlCallbacks?.onFlowStarted?.(String(parsed.prompt || ''));
+          this.controlCallbacks?.onFlowStarted?.(
+            String(parsed.prompt || ''),
+            String(parsed.workflow_id || ''),
+          );
           return;
         }
         if (parsed.type === 'FLOW_RESULT' && parsed.result) {

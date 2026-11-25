@@ -137,9 +137,9 @@ def is_command(text: str) -> bool:
 
 def help_text() -> str:
     return (
-        "Chủ tịch nhắn tên sản phẩm vào group này.\n"
-        "Ví dụ: Hộp đựng giấy gỗ cao cấp\n"
-        "Văn phòng sẽ săn 3 sàn, đăng báo cáo và gửi link vào đây.\n"
+        "Chủ tịch nhắn một câu thị trường vào group này.\n"
+        "Ví dụ: Thị trường kem chống nắng đang thế nào?\n"
+        "Sàn Cam luôn được đo. Sàn Xanh và Sàn Đen chỉ thêm khi câu nhắc tới.\n"
         "Ảnh toàn cảnh gửi mỗi 10 giây khi máy văn phòng đang mở trang Pixel Office."
     )
 
@@ -312,9 +312,9 @@ async def _start_product_hunter(bridge: Any, keyword: str) -> None:
     await bridge.trigger_flow(
         keyword,
         {
-            "endpoint_url": f"{portal}/product-hunter",
-            "workflow_id": "product_hunter_crewai",
-            "workflow_name": "Product Hunter",
+            "endpoint_url": f"{portal}/product-hunter-v2",
+            "workflow_id": "product_hunter_v2_crewai",
+            "workflow_name": "Product Hunter v2",
             "source": "telegram",
             "extras": {},
         },
@@ -341,7 +341,7 @@ async def _handle_message(bridge: Any, message: Dict[str, Any]) -> None:
     if bridge.is_flow_running:
         await asyncio.to_thread(
             send_message,
-            "Văn phòng đang làm báo cáo khác. Chủ tịch gửi lại tên sản phẩm khi có link nhé.",
+            "Văn phòng đang đo câu khác. Chủ tịch gửi lại khi có bài nhé.",
         )
         return
     await _start_product_hunter(bridge, text)

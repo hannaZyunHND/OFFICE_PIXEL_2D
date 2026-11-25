@@ -20,6 +20,7 @@ from flows.game_factory_flow import (
 )
 from flows.elearning_lesson_flow import run_elearning_lesson_flow
 from flows.product_hunter_flow import run_product_hunter_flow
+from flows.product_hunter_v2_flow import run_product_hunter_v2_flow
 from publish_pages import publish_product_report
 import telegram_office
 
@@ -153,6 +154,30 @@ async def main() -> None:
         print(
             f'[CrewAI Flow] Dispatching prompt="{prompt}" | workflow="{workflow_name}" | endpoint="{endpoint_url}"'
         )
+
+        # 0a. Product Hunter v2 — one question, one lit path. Checked before v1
+        # because "product_hunter" is a prefix of "product_hunter_v2".
+        if (
+            "product-hunter-v2" in endpoint_url
+            or "product_hunter_v2" in workflow_id
+            or "product hunter v2" in workflow_name
+            or "agent_v2_router" in bp_agents
+        ):
+            step_delay = float(options.get("step_delay") or 0.2)
+            result = await run_product_hunter_v2_flow(
+                keyword_prompt=prompt,
+                bridge=bridge,
+                output_root=OUTPUT_DIR,
+                step_delay=step_delay,
+                options=options,
+            )
+            public_url = str(result.get("public_url") or "")
+            if public_url:
+                print(f"[Pages] Bài v2: {public_url}")
+            print(
+                f'[CrewAI Product Hunter v2] Completed in {result["elapsed_seconds"]}s -> {result.get("result_url") or result.get("answer", "")[:80]}'
+            )
+            return result
 
         # 0. Product Hunter Multi-Marketplace Crew (15 Agents · Shopee / Lazada / TikTok Shop)
         if (

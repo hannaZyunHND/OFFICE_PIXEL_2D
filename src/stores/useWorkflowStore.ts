@@ -42,7 +42,7 @@ export const useWorkflowStore = defineStore('workflow', () => {
   const settingsStore = useSettingsStore();
 
   const workflows = ref<StoredWorkflowRecord[]>(buildDefaultSeedWorkflows());
-  const activeWorkflowId = ref<string>('product_hunter_crewai');
+  const activeWorkflowId = ref<string>('product_hunter_v2_crewai');
   const sqliteReady = ref<boolean>(false);
   const lastSavedAt = ref<number>(Date.now());
 
@@ -130,6 +130,36 @@ export const useWorkflowStore = defineStore('workflow', () => {
                   avatar_catalog_v2: true,
                   minimal_layout_v1: true,
                   blueprint: minimalBp,
+                };
+              }
+              return w;
+            }
+            if (w.id === 'product_hunter_v2_crewai') {
+              const v2Seed = defaults.find((d) => d.id === 'product_hunter_v2_crewai');
+              const needsV2Layout =
+                w.blueprint?.meta?.layout_profile !== 'product_hunter_v2_v1';
+              const needsV2Copy = Boolean(
+                v2Seed &&
+                  (w.name !== v2Seed.name || w.description !== v2Seed.description),
+              );
+              if ((needsV2Layout || needsV2Copy || needsEndpointMigration) && v2Seed) {
+                upgradedAny = true;
+                const nextBp =
+                  needsV2Layout || needsV2Copy ? v2Seed.blueprint : w.blueprint;
+                return {
+                  ...w,
+                  name: v2Seed.name,
+                  description: v2Seed.description,
+                  raw_requirement: v2Seed.raw_requirement,
+                  crew_endpoint_url: normalizeLegacyCrewWsUrl(v2Seed.crew_endpoint_url),
+                  integration_doc_md: generateCrewAiIntegrationDoc(
+                    nextBp,
+                    w.id,
+                    v2Seed.raw_requirement,
+                    normalizeLegacyCrewWsUrl(v2Seed.crew_endpoint_url),
+                  ),
+                  avatar_catalog_v2: true,
+                  blueprint: nextBp,
                 };
               }
               return w;
@@ -280,12 +310,15 @@ export const useWorkflowStore = defineStore('workflow', () => {
     }
   }
 
-  function activateWorkflow(workflowId: string): StoredWorkflowRecord | null {
+  function activateWorkflow(
+    workflowId: string,
+    options?: { keepEndpoint?: boolean },
+  ): StoredWorkflowRecord | null {
     const found = workflows.value.find((w) => w.id === workflowId);
     if (!found) return null;
     activeWorkflowId.value = found.id;
     blueprintStore.setBlueprint(found.blueprint);
-    if (found.crew_endpoint_url) {
+    if (found.crew_endpoint_url && !options?.keepEndpoint) {
       settingsStore.updateSettings({ wsEndpoint: found.crew_endpoint_url });
     }
     return found;
@@ -398,10 +431,15 @@ export const useWorkflowStore = defineStore('workflow', () => {
           Array.isArray(parsed) ? parsed : [],
         );
         if (kept.length > 0) {
-          workflows.value = kept.map((w) => ({
+          const normalized = kept.map((w) => ({
             ...w,
             crew_endpoint_url: normalizeLegacyCrewWsUrl(w.crew_endpoint_url),
           }));
+          const ids = new Set(normalized.map((w) => w.id));
+          workflows.value = [
+            ...normalized,
+            ...defaults.filter((seed) => !ids.has(seed.id)),
+          ];
           return;
         }
       }
